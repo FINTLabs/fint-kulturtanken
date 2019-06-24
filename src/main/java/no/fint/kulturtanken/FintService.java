@@ -1,18 +1,22 @@
 package no.fint.kulturtanken;
 
 import lombok.extern.slf4j.Slf4j;
-import no.fint.kulturtanken.model.Kontaktinformasjon;
-import no.fint.kulturtanken.model.Skole;
-import no.fint.kulturtanken.model.SkoleOrganisasjon;
+import no.fint.kulturtanken.model.*;
+import no.fint.model.resource.Link;
 import no.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementResource;
 import no.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementResources;
+import no.fint.model.resource.utdanning.elev.BasisgruppeResource;
+import no.fint.model.resource.utdanning.elev.BasisgruppeResources;
 import no.fint.model.resource.utdanning.utdanningsprogram.ArstrinnResources;
 import no.fint.model.resource.utdanning.utdanningsprogram.SkoleResources;
+import no.fint.model.utdanning.elev.Basisgruppe;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -49,6 +53,29 @@ public class FintService {
                         .collect(Collectors.toList()));
 
         ArstrinnResources arstrinnResources = getArstrinnResources(bearer);
+        BasisgruppeResources basisgruppeResources = getBasisgruppeResources(bearer);
+
+        for (Skole skole : skoleOrganisasjon.getSkole()) {
+            Basisgrupper basisgrupper = new Basisgrupper();
+            arstrinnResources.getContent().stream().map(a -> {
+                Trinn trinn = new Trinn();
+                trinn.setNiva(a.getNavn());
+                trinn.setBasisgrupper();
+                List<Link> selfLinks = a.getSelfLinks();
+
+                List<BasisgruppeResource> basisgruppeResourceList = basisgruppeResources.getContent().stream().filter(basisgruppe -> basisgruppe.getTrinn().stream().anyMatch(link -> selfLinks.stream().anyMatch(link::equals))).collect(Collectors.toList());
+                List<Basisgruppe> basisgruppeList = new ArrayList<>();
+                for (BasisgruppeResource br : basisgruppeResourceList){
+                    Basisgrupper b = new Basisgrupper();
+                    b.setNavn(br.getNavn());
+                    b.setAntall(br.get);
+                }
+            }
+
+
+        }
+
+
         return skoleOrganisasjon;
     }
 
@@ -81,6 +108,15 @@ public class FintService {
                 .header(HttpHeaders.AUTHORIZATION, bearer)
                 .retrieve()
                 .bodyToMono(ArstrinnResources.class)
+                .block();
+    }
+
+    private BasisgruppeResources getBasisgruppeResources(String bearer) {
+        return webClient.get()
+                .uri("/utdanning/utdanningsprogram/basisgruppe")
+                .header(HttpHeaders.AUTHORIZATION, bearer)
+                .retrieve()
+                .bodyToMono(BasisgruppeResources.class)
                 .block();
     }
 
