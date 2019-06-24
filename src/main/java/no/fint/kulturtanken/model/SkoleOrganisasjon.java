@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class Skoleeier{
+public class SkoleOrganisasjon {
 	private Kontaktinformasjon kontaktinformasjon;
 	private List<Skole> skole;
 	private String navn;
