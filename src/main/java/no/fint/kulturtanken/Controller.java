@@ -11,7 +11,7 @@ import javax.validation.constraints.NotBlank;
 
 @Slf4j
 @RestController
-@RequestMapping("api/skoleOrganisasjon")
+@RequestMapping("api/skoleorganisasjon")
 public class Controller {
 
     @Autowired
