@@ -181,7 +181,6 @@ public class FintService {
 
         listSkole.add(new Link("http://bo.barneskole/"));
         listSkole2.add(new Link("http://bo.folkestad/"));
-
         listMedAntallStudenter.add(new Link("Per"));
         listMedAntallStudenter.add(new Link("Gunnar"));
         listMedAntallStudenter.add(new Link("Knut"));
