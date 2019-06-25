@@ -22,7 +22,7 @@ public class Controller {
 
     @GetMapping("{id}")
     public SkoleOrganisasjon getSkoleOrganisasjonById(@PathVariable String id,
-                                              @RequestHeader(name = HttpHeaders.AUTHORIZATION) @NotBlank String bearer
+                                                      @RequestHeader(name = HttpHeaders.AUTHORIZATION) @NotBlank String bearer
     ) {
         log.info("Id: {}", id);
         log.info("Bearer token: {}", bearer);
@@ -30,5 +30,9 @@ public class Controller {
         //List<ArstrinnResource> arstrinn = arstrinnResources.getContent().stream().peek(System.out::println).collect(Collectors.toList());
 
         return fintService.getSkoleOrganisasjon(bearer);
+    }
+    @GetMapping("/test")
+    public void getTest() {
+        fintService.test();
     }
 }

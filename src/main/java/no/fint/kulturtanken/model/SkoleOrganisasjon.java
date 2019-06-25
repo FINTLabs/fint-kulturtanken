@@ -6,8 +6,9 @@ import java.util.List;
 
 @Data
 public class SkoleOrganisasjon {
-	private Kontaktinformasjon kontaktinformasjon;
-	private List<Skole> skole;
 	private String navn;
 	private String organisasjonsnummer;
+	private List<Skole> skole;
+	private Kontaktinformasjon kontaktinformasjon;
+
 }
