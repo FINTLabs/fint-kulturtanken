@@ -56,24 +56,24 @@ public class FintService {
         BasisgruppeResources basisgruppeResources = getBasisgruppeResources(bearer);
 
         for (Skole skole : skoleOrganisasjon.getSkole()) {
-            Basisgrupper basisgrupper = new Basisgrupper();
+            List<Trinn> trinnList = new ArrayList<>();
             arstrinnResources.getContent().stream().map(a -> {
                 Trinn trinn = new Trinn();
                 trinn.setNiva(a.getNavn());
-                trinn.setBasisgrupper();
                 List<Link> selfLinks = a.getSelfLinks();
 
                 List<BasisgruppeResource> basisgruppeResourceList = basisgruppeResources.getContent().stream().filter(basisgruppe -> basisgruppe.getTrinn().stream().anyMatch(link -> selfLinks.stream().anyMatch(link::equals))).collect(Collectors.toList());
-                List<Basisgruppe> basisgruppeList = new ArrayList<>();
+                List<Basisgrupper> basisgruppeList = new ArrayList<>();
                 for (BasisgruppeResource br : basisgruppeResourceList){
                     Basisgrupper b = new Basisgrupper();
                     b.setNavn(br.getNavn());
-                    b.setAntall(br.get);
+                    b.setAntall(br.getUndervisningsforhold().size());
+                    basisgruppeList.add(b);
                 }
+                trinn.setBasisgrupper(basisgruppeList);
+                trinnList.add(trinn);
             }
-
-
-        }
+        };
 
 
         return skoleOrganisasjon;
