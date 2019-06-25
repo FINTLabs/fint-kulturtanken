@@ -57,25 +57,24 @@ public class FintService {
 
         for (Skole skole : skoleOrganisasjon.getSkole()) {
             List<Trinn> trinnList = new ArrayList<>();
-            arstrinnResources.getContent().stream().map(a -> {
+            arstrinnResources.getContent().stream().forEach(aarstrinn -> {
                 Trinn trinn = new Trinn();
-                trinn.setNiva(a.getNavn());
-                List<Link> selfLinks = a.getSelfLinks();
+                trinn.setNiva(aarstrinn.getNavn());
+                List<Link> aarstrinnSelfLinks = aarstrinn.getSelfLinks();
 
-                List<BasisgruppeResource> basisgruppeResourceList = basisgruppeResources.getContent().stream().filter(basisgruppe -> basisgruppe.getTrinn().stream().anyMatch(link -> selfLinks.stream().anyMatch(link::equals))).collect(Collectors.toList());
+                List<BasisgruppeResource> basisgruppeResourceList = basisgruppeResources.getContent().stream().filter(basisgruppe -> basisgruppe.getTrinn().stream().anyMatch(link -> aarstrinnSelfLinks.stream().anyMatch(link::equals))).collect(Collectors.toList());
                 List<Basisgrupper> basisgruppeList = new ArrayList<>();
-                for (BasisgruppeResource br : basisgruppeResourceList){
-                    Basisgrupper b = new Basisgrupper();
-                    b.setNavn(br.getNavn());
-                    b.setAntall(br.getUndervisningsforhold().size());
-                    basisgruppeList.add(b);
+                for (BasisgruppeResource basisgruppeResource : basisgruppeResourceList){
+                    Basisgrupper basisgrupper = new Basisgrupper();
+                    basisgrupper.setNavn(basisgruppeResource.getNavn());
+                    basisgrupper.setAntall(basisgruppeResource.getUndervisningsforhold().size());
+                    basisgruppeList.add(basisgrupper);
                 }
                 trinn.setBasisgrupper(basisgruppeList);
                 trinnList.add(trinn);
-            }
-        };
-
-
+            });
+            skole.setTrinn(trinnList);
+        }
         return skoleOrganisasjon;
     }
 
