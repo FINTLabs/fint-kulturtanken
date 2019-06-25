@@ -1,6 +1,5 @@
 package no.fint.kulturtanken;
 
-import lombok.extern.slf4j.Slf4j;
 import no.fint.kulturtanken.model.*;
 import no.fint.model.felles.kompleksedatatyper.Identifikator;
 import no.fint.model.resource.Link;
@@ -14,16 +13,12 @@ import no.fint.model.resource.utdanning.utdanningsprogram.SkoleResource;
 import no.fint.model.resource.utdanning.utdanningsprogram.SkoleResources;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
-import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Slf4j
-@Service
-public class FintService {
-
+public class FintServiceTestComponents {
     @Autowired
     private WebClient webClient;
 
@@ -140,7 +135,7 @@ public class FintService {
         return kontaktinformasjon;
     }
 
-    public SkoleOrganisasjon test() {
+    public SkoleOrganisasjon getSkoleOrganisasjonTestData() {
         Identifikator identifikatorOrgNummer = new Identifikator();
         identifikatorOrgNummer.setIdentifikatorverdi("98765432");
         Identifikator identifikatorSkoleNummer = new Identifikator();
@@ -315,5 +310,4 @@ public class FintService {
         }
         return skoleOrganisasjon;
     }
-
 }
