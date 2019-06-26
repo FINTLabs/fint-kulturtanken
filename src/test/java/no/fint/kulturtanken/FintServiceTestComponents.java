@@ -280,35 +280,51 @@ public class FintServiceTestComponents {
                         })
                         .collect(Collectors.toList()));
 
+        List<SkoleResource> schoolResourceList = skoleResources.getContent();
+        List<ArstrinnResource> levelResourceList = arstrinnResources.getContent();
+        List<BasisgruppeResource> groupResourceList = basisgruppeResources.getContent();
 
-        for (SkoleResource skoleResourceTest : skoleResources.getContent()) {
-            Link skoleResouceLink = skoleResourceTest.getSelfLinks().get(0);
-            List<Trinn> trinnList = new ArrayList<>();
-            arstrinnResources.getContent().forEach(aarstrinn -> {
-                Trinn trinn = new Trinn();
-                trinn.setNiva(aarstrinn.getNavn());
-                List<Link> aarstrinnSelfLinks = aarstrinn.getSelfLinks();
-                List<Basisgrupper> basisgruppeList = new ArrayList<>();
-                for (BasisgruppeResource basisgruppeResourceTest : basisgruppeResources.getContent()) {
-                    if (basisgruppeResourceTest.getTrinn().get(0).equals(aarstrinnSelfLinks.get(0))) {
-                        if (basisgruppeResourceTest.getSkole().get(0).equals(skoleResouceLink)) {
-                            Basisgrupper basisgrupper = new Basisgrupper();
-                            basisgrupper.setNavn(basisgruppeResourceTest.getNavn());
-                            basisgrupper.setAntall(basisgruppeResourceTest.getElevforhold().size());
-                            basisgruppeList.add(basisgrupper);
-                        }
-                    }
-                }
-                trinn.setBasisgrupper(basisgruppeList);
-                if (basisgruppeList.size() > 0)
-                    trinnList.add(trinn);
-                for (Skole skole : skoleOrganisasjon.getSkole()) {
-                    if (skole.getNavn().equals(skoleResourceTest.getNavn())) {
-                        skole.setTrinn(trinnList);
-                    }
-                }
-            });
-        }
+        schoolResourceList.forEach(schoolResource -> {
+            Link schoolResouceLink = schoolResource.getSelfLinks().get(0);
+            filterLevelsAndGroups(levelResourceList, schoolResouceLink, groupResourceList, skoleOrganisasjon, schoolResource);
+        });
+
         return skoleOrganisasjon;
+    }
+    private void filterLevelsAndGroups(List<ArstrinnResource> levelResourceList, Link schoolResouceLink, List<BasisgruppeResource> groupResourceList, SkoleOrganisasjon schoolOrganisation, SkoleResource schoolResource) {
+        List<Trinn> levelList = new ArrayList<>();
+        levelResourceList.forEach(level -> {
+            Link levelSelfLink = level.getSelfLinks().get(0);
+            List<Basisgrupper> filteredGroups = filterGroups(levelSelfLink, schoolResouceLink, groupResourceList);
+            addLvlAndGroupToSchool(level, levelList, filteredGroups, schoolOrganisation, schoolResource);
+        });
+    }
+
+    private List<Basisgrupper> filterGroups(Link levelSelfLink, Link schoolResouceLink, List<BasisgruppeResource> groupResources) {
+        return groupResources.stream()
+                .filter(groupResource ->
+                        groupResource.getTrinn().get(0).equals(levelSelfLink))
+                .filter(levelFilteredGroupResource ->
+                        levelFilteredGroupResource.getSkole().get(0).equals(schoolResouceLink))
+                .map(filteredGroupResource -> {
+                    Basisgrupper basisgrupper = new Basisgrupper();
+                    basisgrupper.setNavn(filteredGroupResource.getNavn());
+                    basisgrupper.setAntall(filteredGroupResource.getElevforhold().size());
+                    return basisgrupper;
+                }).collect(Collectors.toList());
+    }
+
+    private void addLvlAndGroupToSchool(ArstrinnResource level, List<Trinn> levelList, List<Basisgrupper> filteredGroups, SkoleOrganisasjon schoolOrganisation, SkoleResource skoleResource) {
+
+        Trinn trinn = new Trinn();
+        trinn.setNiva(level.getNavn());
+        trinn.setBasisgrupper(filteredGroups);
+        if (filteredGroups.size() > 0)
+            levelList.add(trinn);
+        for (Skole skole : schoolOrganisation.getSkole()) {
+            if (skole.getNavn().equals(skoleResource.getNavn())) {
+                skole.setTrinn(levelList);
+            }
+        }
     }
 }

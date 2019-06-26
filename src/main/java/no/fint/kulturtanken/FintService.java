@@ -46,7 +46,7 @@ public class FintService {
         topLevelOrg.ifPresent(o -> {
             schoolOrganisation.setNavn(o.getNavn());
             schoolOrganisation.setOrganisasjonsnummer(o.getOrganisasjonsnummer().getIdentifikatorverdi());
-            schoolOrganisation.setKontaktinformasjon(getKontaktinformasjon(o.getKontaktinformasjon()));
+            schoolOrganisation.setKontaktinformasjon(getContactInformasjon(o.getKontaktinformasjon()));
         });
     }
 
@@ -59,7 +59,7 @@ public class FintService {
                             Skole skole = new Skole();
                             skole.setNavn(s.getNavn());
                             skole.setSkolenummer(s.getSkolenummer().getIdentifikatorverdi());
-                            skole.setKontaktinformasjon(getKontaktinformasjon(s.getKontaktinformasjon()));
+                            skole.setKontaktinformasjon(getContactInformasjon(s.getKontaktinformasjon()));
                             skole.setOrganisasjonsnummer(s.getOrganisasjonsnummer().getIdentifikatorverdi());
                             return skole;
                         })
@@ -79,10 +79,11 @@ public class FintService {
     }
 
     private void filterLevelsAndGroups(List<ArstrinnResource> levelResourceList, Link schoolResouceLink, List<BasisgruppeResource> groupResourceList, SkoleOrganisasjon schoolOrganisation, SkoleResource schoolResource) {
+        List<Trinn> levelList = new ArrayList<>();
         levelResourceList.forEach(level -> {
             Link levelSelfLink = level.getSelfLinks().get(0);
             List<Basisgrupper> filteredGroups = filterGroups(levelSelfLink, schoolResouceLink, groupResourceList);
-            addLvlAndGroupToSchool(level, filteredGroups, schoolOrganisation, schoolResource);
+            addLvlAndGroupToSchool(level, levelList, filteredGroups, schoolOrganisation, schoolResource);
         });
     }
 
@@ -100,16 +101,15 @@ public class FintService {
                 }).collect(Collectors.toList());
     }
 
-    private void addLvlAndGroupToSchool(ArstrinnResource level, List<Basisgrupper> filteredGroups, SkoleOrganisasjon schoolOrganisation, SkoleResource skoleResource) {
-        List<Trinn> trinnList = new ArrayList<>();
+    private void addLvlAndGroupToSchool(ArstrinnResource level,List<Trinn> levelList,  List<Basisgrupper> filteredGroups, SkoleOrganisasjon schoolOrganisation, SkoleResource skoleResource) {
         Trinn trinn = new Trinn();
         trinn.setNiva(level.getNavn());
         trinn.setBasisgrupper(filteredGroups);
         if (filteredGroups.size() > 0)
-            trinnList.add(trinn);
+            levelList.add(trinn);
         for (Skole skole : schoolOrganisation.getSkole()) {
             if (skole.getNavn().equals(skoleResource.getNavn())) {
-                skole.setTrinn(trinnList);
+                skole.setTrinn(levelList);
             }
         }
     }
@@ -159,11 +159,11 @@ public class FintService {
                 .block();
     }
 
-    private Kontaktinformasjon getKontaktinformasjon(no.fint.model.felles.kompleksedatatyper.Kontaktinformasjon kontaktinformasjon1) {
-        Kontaktinformasjon kontaktinformasjon = new Kontaktinformasjon();
-        kontaktinformasjon.setEpostadresse(kontaktinformasjon1.getEpostadresse());
-        kontaktinformasjon.setMobiltelefonnummer(kontaktinformasjon1.getMobiltelefonnummer());
-        return kontaktinformasjon;
+    private Kontaktinformasjon getContactInformasjon(no.fint.model.felles.kompleksedatatyper.Kontaktinformasjon contactInformation1) {
+        Kontaktinformasjon contactInformation = new Kontaktinformasjon();
+        contactInformation.setEpostadresse(contactInformation1.getEpostadresse());
+        contactInformation.setMobiltelefonnummer(contactInformation1.getMobiltelefonnummer());
+        return contactInformation;
     }
 
     public SkoleOrganisasjon test() {
@@ -295,7 +295,7 @@ public class FintService {
         SkoleOrganisasjon skoleOrganisasjon = new SkoleOrganisasjon();
         skoleOrganisasjon.setNavn(organisasjonselementResource.getNavn());
         skoleOrganisasjon.setOrganisasjonsnummer(organisasjonselementResource.getOrganisasjonsnummer().getIdentifikatorverdi());
-        skoleOrganisasjon.setKontaktinformasjon(getKontaktinformasjon(organisasjonselementResource.getKontaktinformasjon()));
+        skoleOrganisasjon.setKontaktinformasjon(getContactInformasjon(organisasjonselementResource.getKontaktinformasjon()));
 
         skoleOrganisasjon.setSkole(
                 skoleResources.getContent()
@@ -304,41 +304,21 @@ public class FintService {
                             Skole skole = new Skole();
                             skole.setNavn(s.getNavn());
                             skole.setSkolenummer(s.getSkolenummer().getIdentifikatorverdi());
-                            skole.setKontaktinformasjon(getKontaktinformasjon(s.getKontaktinformasjon()));
+                            skole.setKontaktinformasjon(getContactInformasjon(s.getKontaktinformasjon()));
                             skole.setOrganisasjonsnummer(s.getOrganisasjonsnummer().getIdentifikatorverdi());
                             return skole;
                         })
                         .collect(Collectors.toList()));
 
+        List<SkoleResource> schoolResourceList = skoleResources.getContent();
+        List<ArstrinnResource> levelResourceList = arstrinnResources.getContent();
+        List<BasisgruppeResource> groupResourceList = basisgruppeResources.getContent();
 
-        for (SkoleResource skoleResourceTest : skoleResources.getContent()) {
-            Link skoleResouceLink = skoleResourceTest.getSelfLinks().get(0);
-            List<Trinn> trinnList = new ArrayList<>();
-            arstrinnResources.getContent().forEach(aarstrinn -> {
-                Trinn trinn = new Trinn();
-                trinn.setNiva(aarstrinn.getNavn());
-                List<Link> aarstrinnSelfLinks = aarstrinn.getSelfLinks();
-                List<Basisgrupper> basisgruppeList = new ArrayList<>();
-                for (BasisgruppeResource basisgruppeResourceTest : basisgruppeResources.getContent()) {
-                    if (basisgruppeResourceTest.getTrinn().get(0).equals(aarstrinnSelfLinks.get(0))) {
-                        if (basisgruppeResourceTest.getSkole().get(0).equals(skoleResouceLink)) {
-                            Basisgrupper basisgrupper = new Basisgrupper();
-                            basisgrupper.setNavn(basisgruppeResourceTest.getNavn());
-                            basisgrupper.setAntall(basisgruppeResourceTest.getElevforhold().size());
-                            basisgruppeList.add(basisgrupper);
-                        }
-                    }
-                }
-                trinn.setBasisgrupper(basisgruppeList);
-                if (basisgruppeList.size() > 0)
-                    trinnList.add(trinn);
-                for (Skole skole : skoleOrganisasjon.getSkole()) {
-                    if (skole.getNavn().equals(skoleResourceTest.getNavn())) {
-                        skole.setTrinn(trinnList);
-                    }
-                }
-            });
-        }
+        schoolResourceList.forEach(schoolResource -> {
+            Link schoolResouceLink = schoolResource.getSelfLinks().get(0);
+            filterLevelsAndGroups(levelResourceList, schoolResouceLink, groupResourceList, skoleOrganisasjon, schoolResource);
+        });
+
         return skoleOrganisasjon;
     }
 
