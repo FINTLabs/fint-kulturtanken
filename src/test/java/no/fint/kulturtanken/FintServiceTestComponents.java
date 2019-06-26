@@ -24,6 +24,7 @@ public class FintServiceTestComponents {
 
 
     public SkoleOrganisasjon getSkoleOrganisasjon(String bearer) {
+
         SkoleOrganisasjon skoleOrganisasjon = new SkoleOrganisasjon();
         OrganisasjonselementResources organisasjonselementResources = getOrganisasjonselementResources(bearer);
         Optional<OrganisasjonselementResource> overordnet = getOverordnet(organisasjonselementResources);

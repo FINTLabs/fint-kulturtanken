@@ -1,8 +1,57 @@
 import no.fint.kulturtanken.FintServiceTestComponents
+import no.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementResources
+import no.fint.model.resource.utdanning.elev.BasisgruppeResources
+import no.fint.model.resource.utdanning.utdanningsprogram.SkoleResources
+import okhttp3.mockwebserver.MockResponse
+import okhttp3.mockwebserver.MockWebServer
+import org.springframework.core.io.ClassPathResource
+import org.springframework.http.HttpHeaders
+import org.springframework.http.MediaType
+import org.springframework.web.reactive.function.client.WebClient
 import spock.lang.Specification
 
 class FintServiceSpec extends Specification {
-    def fintserviceTestComponents = new FintServiceTestComponents()
+    private def server = new MockWebServer()
+    private def webClient = WebClient.create(server.url('/').toString())
+    private def fintserviceTestComponents = new FintServiceTestComponents(webClient: webClient)
+
+
+    def "Get OrganisasjonselementResources from webclient and build SkoleOrganisasjon"(){
+        given:
+        server.enqueue(
+                new MockResponse().setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                        .setBody(new ClassPathResource("skoleOrganisasjonResources.json").getFile().text))
+        when:
+        OrganisasjonselementResources reply = fintserviceTestComponents.getOrganisasjonselementResources("test")
+
+        then:
+        print(reply.toString())
+    }
+
+    def "Get SkoleResources from webclient and build Skole"(){
+        given:
+        server.enqueue(
+                new MockResponse().setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                        .setBody(new ClassPathResource("skoleResources.json").getFile().text))
+        when:
+        SkoleResources reply = fintserviceTestComponents.getSkoleResources("test")
+
+        then:
+        print(reply.toString())
+    }
+
+    def "Get basisgrupper from webclient and build basisgruppe"(){
+        given:
+        server.enqueue(
+                new MockResponse().setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                        .setBody(new ClassPathResource("basisgrupperResources.json").getFile().text))
+        when:
+        BasisgruppeResources reply = fintserviceTestComponents.getBasisgruppeResources("test")
+
+        then:
+        print(reply.getContent().toString())
+    }
+
     def "Get skoleOrganisasjonTestData check school size is four"() {
         given:
 

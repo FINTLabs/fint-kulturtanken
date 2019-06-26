@@ -1,0 +1,149 @@
+{
+  "entries": [
+    {
+      "kontaktinformasjon": {
+        "epostadresse": "ola@fint.no",
+        "mobiltelefonnummer": "47759931",
+        "telefonnummer": "00000000"
+      },
+      "organisasjonsnavn": "Bø videregående skole",
+      "organisasjonsnummer": {
+        "identifikatorverdi": "98765432"
+      },
+      "domenenavn": "bovgs.no",
+      "juridiskNavn": "Bø Videregående Skole",
+      "navn": "Bø VGS",
+      "skolenummer": {
+        "identifikatorverdi": "12345"
+      },
+      "_links": {
+        "organisasjon": [
+          {
+            "href": "https://play-with-fint.felleskomponent.no/administrasjon/organisasjon/organisasjonselement/organisasjonsnummer/970123458"
+          }
+        ],
+        "fag": [
+          {
+            "href": "https://play-with-fint.felleskomponent.no/utdanning/timeplan/fag/systemid/FA_NOR1Z41_2018"
+          }
+        ],
+        "skoleeiertype": [
+          {
+            "href": "https://play-with-fint.felleskomponent.no/utdanning/kodeverk/skoleeiertype/systemid/1"
+          }
+        ],
+        "utdanningsprogram": [
+          {
+            "href": "https://play-with-fint.felleskomponent.no/utdanning/utdanningsprogram/utdanningsprogram/systemid/UP_studiespesialisering"
+          }
+        ],
+        "elevforhold": [
+          {
+            "href": "https://play-with-fint.felleskomponent.no/utdanning/elev/elevforhold/systemid/E_500001_1"
+          },
+          {
+            "href": "https://play-with-fint.felleskomponent.no/utdanning/elev/elevforhold/systemid/E_500002_1"
+          },
+          {
+            "href": "https://play-with-fint.felleskomponent.no/utdanning/elev/elevforhold/systemid/E_500003_1"
+          },
+          {
+            "href": "https://play-with-fint.felleskomponent.no/utdanning/elev/elevforhold/systemid/E_ZZZZZZ_2"
+          }
+        ],
+        "undervisningsforhold": [
+          {
+            "href": "https://play-with-fint.felleskomponent.no/utdanning/elev/undervisningsforhold/systemid/L_100003_1"
+          }
+        ],
+        "self": [
+          {
+            "href": "bo.vgs.no"
+          }
+        ]
+      }
+    },
+    {
+      "kontaktinformasjon": {
+        "epostadresse": "post@haugfk.no",
+        "mobiltelefonnummer": "47474747",
+        "nettsted": "http://www.haugfk.no",
+        "sip": "kundesenter@haugfk.no",
+        "telefonnummer": "52525252"
+      },
+      "postadresse": {
+        "adresselinje": [
+          "PB 69"
+        ],
+        "postnummer": "5501",
+        "poststed": "Haugesund"
+      },
+      "forretningsadresse": {
+        "adresselinje": [
+          "Marilyn Monroe 1"
+        ],
+        "postnummer": "5520",
+        "poststed": "Haugesund"
+      },
+      "organisasjonsnavn": "Sundet Videregående Skole",
+      "organisasjonsnummer": {
+        "identifikatorverdi": "970123458"
+      },
+      "domenenavn": "sundetvgs.haugfk.no",
+      "juridiskNavn": "Sundet Videregående Skole",
+      "navn": "Sundet VGS",
+      "skolenummer": {
+        "identifikatorverdi": "123456"
+      },
+      "systemId": {
+        "identifikatorverdi": "XX1234"
+      },
+      "_links": {
+        "organisasjon": [
+          {
+            "href": "https://play-with-fint.felleskomponent.no/administrasjon/organisasjon/organisasjonselement/organisasjonsnummer/970123458"
+          }
+        ],
+        "fag": [
+          {
+            "href": "https://play-with-fint.felleskomponent.no/utdanning/timeplan/fag/systemid/FA_NOR1Z41_2018"
+          }
+        ],
+        "skoleeiertype": [
+          {
+            "href": "https://play-with-fint.felleskomponent.no/utdanning/kodeverk/skoleeiertype/systemid/1"
+          }
+        ],
+        "utdanningsprogram": [
+          {
+            "href": "https://play-with-fint.felleskomponent.no/utdanning/utdanningsprogram/utdanningsprogram/systemid/UP_studiespesialisering"
+          }
+        ],
+        "elevforhold": [
+          {
+            "href": "https://play-with-fint.felleskomponent.no/utdanning/elev/elevforhold/systemid/E_500001_1"
+          },
+          {
+            "href": "https://play-with-fint.felleskomponent.no/utdanning/elev/elevforhold/systemid/E_500002_1"
+          },
+          {
+            "href": "https://play-with-fint.felleskomponent.no/utdanning/elev/elevforhold/systemid/E_500003_1"
+          },
+          {
+            "href": "https://play-with-fint.felleskomponent.no/utdanning/elev/elevforhold/systemid/E_ZZZZZZ_2"
+          }
+        ],
+        "undervisningsforhold": [
+          {
+            "href": "https://play-with-fint.felleskomponent.no/utdanning/elev/undervisningsforhold/systemid/L_100003_1"
+          }
+        ],
+        "self": [
+          {
+            "href": "https://play-with-fint.felleskomponent.no/utdanning/utdanningsprogram/skole/skolenummer/123456"
+          }
+        ]
+      }
+    }
+  ]
+}
