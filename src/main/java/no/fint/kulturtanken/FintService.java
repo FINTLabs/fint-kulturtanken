@@ -28,10 +28,10 @@ public class FintService {
     private WebClient webClient;
 
     public SkoleOrganisasjon getSkoleOrganisasjon(String bearer) {
-        return setUpSkoleOrganisasjon(bearer);
+        return setUpSchoolOrganisation(bearer);
     }
 
-    private SkoleOrganisasjon setUpSkoleOrganisasjon(String bearer) {
+    private SkoleOrganisasjon setUpSchoolOrganisation(String bearer) {
         SkoleOrganisasjon schoolOrganisation = new SkoleOrganisasjon();
         addOrganisationInfo(schoolOrganisation, bearer);
         schoolOrganisation.setSkole(getSchool(bearer));
