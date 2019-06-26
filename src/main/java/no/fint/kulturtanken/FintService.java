@@ -39,6 +39,33 @@ public class FintService {
         return schoolOrganisation;
     }
 
+
+    private void addOrganisationInfo(SkoleOrganisasjon schoolOrganisation, String bearer) {
+        OrganisasjonselementResources organisasjonselementResources = getOrganisasjonselementResources(bearer);
+        Optional<OrganisasjonselementResource> topLevelOrg = getTopElement(organisasjonselementResources);
+        topLevelOrg.ifPresent(o -> {
+            schoolOrganisation.setNavn(o.getNavn());
+            schoolOrganisation.setOrganisasjonsnummer(o.getOrganisasjonsnummer().getIdentifikatorverdi());
+            schoolOrganisation.setKontaktinformasjon(getKontaktinformasjon(o.getKontaktinformasjon()));
+        });
+    }
+
+    private List<Skole> getSchool(String bearer) {
+        SkoleResources skoleResources = getSkoleResources(bearer);
+        return
+                skoleResources.getContent()
+                        .stream()
+                        .map(s -> {
+                            Skole skole = new Skole();
+                            skole.setNavn(s.getNavn());
+                            skole.setSkolenummer(s.getSkolenummer().getIdentifikatorverdi());
+                            skole.setKontaktinformasjon(getKontaktinformasjon(s.getKontaktinformasjon()));
+                            skole.setOrganisasjonsnummer(s.getOrganisasjonsnummer().getIdentifikatorverdi());
+                            return skole;
+                        })
+                        .collect(Collectors.toList());
+    }
+
     private void setSchoolLevelsAndGroups(SkoleOrganisasjon schoolOrganisation, String bearer) {
         List<SkoleResource> schoolResourceList = getSkoleResources(bearer).getContent();
         List<ArstrinnResource> levelResourceList = getArstrinnResources(bearer).getContent();
@@ -59,6 +86,19 @@ public class FintService {
         });
     }
 
+    private List<Basisgrupper> filterGroups(Link levelSelfLink, Link schoolResouceLink, List<BasisgruppeResource> groupResources) {
+        return groupResources.stream()
+                .filter(groupResource ->
+                        groupResource.getTrinn().get(0).equals(levelSelfLink))
+                .filter(levelFilteredGroupResource ->
+                        levelFilteredGroupResource.getSkole().get(0).equals(schoolResouceLink))
+                .map(filteredGroupResource -> {
+                    Basisgrupper basisgrupper = new Basisgrupper();
+                    basisgrupper.setNavn(filteredGroupResource.getNavn());
+                    basisgrupper.setAntall(filteredGroupResource.getElevforhold().size());
+                    return basisgrupper;
+                }).collect(Collectors.toList());
+    }
 
     private void addLvlAndGroupToSchool(ArstrinnResource level, List<Basisgrupper> filteredGroups, SkoleOrganisasjon schoolOrganisation, SkoleResource skoleResource) {
         List<Trinn> trinnList = new ArrayList<>();
@@ -74,47 +114,6 @@ public class FintService {
         }
     }
 
-    private List<Basisgrupper> filterGroups(Link levelSelfLink, Link schoolResouceLink, List<BasisgruppeResource> groupResources) {
-        return groupResources.stream()
-                .filter(groupResource ->
-                        groupResource.getTrinn().get(0).equals(levelSelfLink))
-                .filter(levelFilteredGroupResource ->
-                        levelFilteredGroupResource.getSkole().get(0).equals(schoolResouceLink))
-                .map(filteredGroupResource -> {
-                    Basisgrupper basisgrupper = new Basisgrupper();
-                    basisgrupper.setNavn(filteredGroupResource.getNavn());
-                    basisgrupper.setAntall(filteredGroupResource.getElevforhold().size());
-                    return basisgrupper;
-                }).collect(Collectors.toList());
-    }
-
-    private void addOrganisationInfo(SkoleOrganisasjon schoolOrganisation, String bearer) {
-        OrganisasjonselementResources organisasjonselementResources = getOrganisasjonselementResources(bearer);
-        Optional<OrganisasjonselementResource> topLevelOrg = getOverordnet(organisasjonselementResources);
-        topLevelOrg.ifPresent(o -> {
-            schoolOrganisation.setNavn(o.getNavn());
-            schoolOrganisation.setOrganisasjonsnummer(o.getOrganisasjonsnummer().getIdentifikatorverdi());
-            schoolOrganisation.setKontaktinformasjon(getKontaktinformasjon(o.getKontaktinformasjon()));
-        });
-    }
-
-
-    private List<Skole> getSchool(String bearer) {
-        SkoleResources skoleResources = getSkoleResources(bearer);
-        return
-                skoleResources.getContent()
-                        .stream()
-                        .map(s -> {
-                            Skole skole = new Skole();
-                            skole.setNavn(s.getNavn());
-                            skole.setSkolenummer(s.getSkolenummer().getIdentifikatorverdi());
-                            skole.setKontaktinformasjon(getKontaktinformasjon(s.getKontaktinformasjon()));
-                            skole.setOrganisasjonsnummer(s.getOrganisasjonsnummer().getIdentifikatorverdi());
-                            return skole;
-                        })
-                        .collect(Collectors.toList());
-    }
-
 
     private OrganisasjonselementResources getOrganisasjonselementResources(String bearer) {
         return
@@ -126,7 +125,7 @@ public class FintService {
                         .block();
     }
 
-    private Optional<OrganisasjonselementResource> getOverordnet(OrganisasjonselementResources organisasjonselementResources) {
+    private Optional<OrganisasjonselementResource> getTopElement(OrganisasjonselementResources organisasjonselementResources) {
         return organisasjonselementResources.getContent()
                 .stream()
                 .filter(it -> it.getSelfLinks().stream().anyMatch(l -> it.getOverordnet().stream().anyMatch(l::equals)))
