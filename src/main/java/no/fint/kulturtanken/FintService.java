@@ -35,14 +35,17 @@ public class FintService {
     private SkoleOrganisasjon setUpSchoolOrganisation(String bearer) {
         SkoleOrganisasjon schoolOrganisation = new SkoleOrganisasjon();
         addOrganisationInfo(schoolOrganisation, bearer);
+        if (schoolOrganisation.getNavn() == null) return null;
         schoolOrganisation.setSkole(getSkoleList(bearer));
         setSchoolLevelsAndGroups(schoolOrganisation, bearer);
         return schoolOrganisation;
     }
 
-
     private void addOrganisationInfo(SkoleOrganisasjon schoolOrganisation, String bearer) {
         OrganisasjonselementResources organisasjonselementResources = getOrganisasjonselementResources(bearer);
+        if (organisasjonselementResources.getContent().size()==0){
+            return;
+        }
         Optional<OrganisasjonselementResource> topLevelOrg = getTopElement(organisasjonselementResources);
         topLevelOrg.ifPresent(o -> {
             schoolOrganisation.setNavn(o.getNavn());

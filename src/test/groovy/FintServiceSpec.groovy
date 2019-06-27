@@ -31,6 +31,18 @@ class FintServiceSpec extends Specification {
         skoleOrganisasjon.skole == null
     }
 
+    def "Atempt to create SkoleOrganisasjon, but return blank if getOrganisasjonselementResources returns empty"() {
+        given:
+        server.enqueue(
+                new MockResponse().setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                        .setBody(new ClassPathResource("skoleOrganisasjonResourcesEmpty.json").getFile().text))
+        when:
+        SkoleOrganisasjon skoleOrganisasjon = fintserviceTestComponents.getSkoleOrganisasjon("testBearer")
+
+        then:
+        skoleOrganisasjon == null
+    }
+
     def "Get ContactInformation and check if extracts email and phone number to new Object"() {
         given:
         Kontaktinformasjon kontaktinformasjon = new Kontaktinformasjon()

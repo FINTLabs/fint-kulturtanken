@@ -1,0 +1,16 @@
+{
+  "_embedded": {
+    "_entries": [
+      {
+      }
+    ]
+  },
+  "_links": {
+    "self": [
+      {
+        "href": "https://play-with-fint.felleskomponent.no/administrasjon/organisasjon/organisasjonselement/"
+      }
+    ]
+  },
+  "total_items": 8
+}

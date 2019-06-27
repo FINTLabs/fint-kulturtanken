@@ -1,5 +1,6 @@
 package no.fint.kulturtanken;
 
+import lombok.extern.slf4j.Slf4j;
 import no.fint.kulturtanken.model.*;
 import no.fint.model.resource.Link;
 import no.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementResource;
@@ -17,6 +18,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 public class FintServiceTestComponents {
     @Autowired
     private WebClient webClient;
@@ -28,6 +30,7 @@ public class FintServiceTestComponents {
     private SkoleOrganisasjon setUpSchoolOrganisation(String bearer) {
         SkoleOrganisasjon schoolOrganisation = new SkoleOrganisasjon();
         addOrganisationInfo(schoolOrganisation, bearer);
+        if (schoolOrganisation.getNavn() == null) return null;
         schoolOrganisation.setSkole(getSkoleList(bearer));
         setSchoolLevelsAndGroups(schoolOrganisation, bearer);
         return schoolOrganisation;
@@ -35,6 +38,10 @@ public class FintServiceTestComponents {
 
     private void addOrganisationInfo(SkoleOrganisasjon schoolOrganisation, String bearer) {
         OrganisasjonselementResources organisasjonselementResources = getOrganisasjonselementResources(bearer);
+
+        if (organisasjonselementResources.getContent().get(0).getNavn() == null){
+            return;
+        }
         Optional<OrganisasjonselementResource> topLevelOrg = getTopElement(organisasjonselementResources);
         topLevelOrg.ifPresent(o -> {
             schoolOrganisation.setNavn(o.getNavn());
