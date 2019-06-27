@@ -101,7 +101,7 @@ public class FintService {
                 }).collect(Collectors.toList());
     }
 
-    private void addLvlAndGroupToSchool(ArstrinnResource level,List<Trinn> levelList,  List<Basisgrupper> filteredGroups, SkoleOrganisasjon schoolOrganisation, SkoleResource skoleResource) {
+    private void addLvlAndGroupToSchool(ArstrinnResource level, List<Trinn> levelList, List<Basisgrupper> filteredGroups, SkoleOrganisasjon schoolOrganisation, SkoleResource skoleResource) {
         Trinn trinn = new Trinn();
         trinn.setNiva(level.getNavn());
         trinn.setBasisgrupper(filteredGroups);
@@ -113,7 +113,6 @@ public class FintService {
             }
         }
     }
-
 
     private OrganisasjonselementResources getOrganisasjonselementResources(String bearer) {
         return
@@ -165,161 +164,4 @@ public class FintService {
         contactInformation.setMobiltelefonnummer(contactInformation1.getMobiltelefonnummer());
         return contactInformation;
     }
-
-    public SkoleOrganisasjon test() {
-        Identifikator identifikatorOrgNummer = new Identifikator();
-        identifikatorOrgNummer.setIdentifikatorverdi("98765432");
-        Identifikator identifikatorSkoleNummer = new Identifikator();
-        identifikatorSkoleNummer.setIdentifikatorverdi("12345");
-        no.fint.model.felles.kompleksedatatyper.Kontaktinformasjon kontaktinformasjon = new no.fint.model.felles.kompleksedatatyper.Kontaktinformasjon();
-        kontaktinformasjon.setEpostadresse("Ola@test.no");
-        kontaktinformasjon.setMobiltelefonnummer("47759931");
-        Map<String, List<Link>> linkListVg1 = new TreeMap<>();
-        Map<String, List<Link>> linkListVg2 = new TreeMap<>();
-        Map<String, List<Link>> linkListVg3 = new TreeMap<>();
-        Map<String, List<Link>> linkListVg4IkkeISkole = new TreeMap<>();
-        Map<String, List<Link>> linkListSkole = new TreeMap<>();
-        Map<String, List<Link>> linkListSkole2 = new TreeMap<>();
-        Map<String, List<Link>> linkListForbasisGruppeVG1 = new TreeMap<>();
-        Map<String, List<Link>> linkListForbasisGruppeVG2 = new TreeMap<>();
-        Map<String, List<Link>> linkListForbasisGruppeVG3 = new TreeMap<>();
-        Map<String, List<Link>> linkListForbasisGruppeVG1SomIkkeErISkole = new TreeMap<>();
-        List<Link> listVG1 = new ArrayList<>();
-        List<Link> listVG2 = new ArrayList<>();
-        List<Link> listVG3 = new ArrayList<>();
-        List<Link> listVG4IkkeISkole = new ArrayList<>();
-        List<Link> listSkole = new ArrayList<>();
-        List<Link> listSkole2 = new ArrayList<>();
-        List<Link> listForBasisGruppeSomIkkeErISkole = new ArrayList<>();
-        List<Link> listMedAntallStudenter = new ArrayList<>();
-
-        listVG1.add(new Link("http://ola.test.link.vg1/"));
-        linkListVg1.put("self", listVG1);
-
-        listVG2.add(new Link("http://ola.test.link.vg2/"));
-        linkListVg2.put("self", listVG2);
-
-        listVG3.add(new Link("http://ola.test.link.vg3/"));
-        linkListVg3.put("self", listVG3);
-
-        listVG4IkkeISkole.add(new Link("http://ola.test.link.vg4.ikke.i.skole/"));
-        linkListVg4IkkeISkole.put("self", listVG4IkkeISkole);
-
-        listSkole.add(new Link("http://bo.barneskole/"));
-        listSkole2.add(new Link("http://bo.folkestad/"));
-        listMedAntallStudenter.add(new Link("Per"));
-        listMedAntallStudenter.add(new Link("Gunnar"));
-        listMedAntallStudenter.add(new Link("Knut"));
-        listMedAntallStudenter.add(new Link("Lars"));
-
-        linkListForbasisGruppeVG1.put("trinn", listVG1);
-        linkListForbasisGruppeVG2.put("trinn", listVG2);
-        linkListForbasisGruppeVG3.put("trinn", listVG3);
-        linkListForbasisGruppeVG1.put("skole", listSkole);
-        linkListForbasisGruppeVG2.put("skole", listSkole);
-        linkListForbasisGruppeVG3.put("skole", listSkole);
-        linkListForbasisGruppeVG1.put("elevforhold", listMedAntallStudenter);
-        linkListForbasisGruppeVG2.put("elevforhold", listMedAntallStudenter);
-        linkListForbasisGruppeVG3.put("elevforhold", listMedAntallStudenter);
-
-        listForBasisGruppeSomIkkeErISkole.add(new Link("http://basisgrupp.ikke.med.i.skole"));
-        linkListForbasisGruppeVG1SomIkkeErISkole.put("trinn", listVG1);
-        linkListForbasisGruppeVG1SomIkkeErISkole.put("skole", listForBasisGruppeSomIkkeErISkole);
-        linkListForbasisGruppeVG1SomIkkeErISkole.put("elevforhold", listMedAntallStudenter);
-
-        OrganisasjonselementResource organisasjonselementResource = new OrganisasjonselementResource();
-        organisasjonselementResource.setNavn("Telemark Fylkeskommune");
-        organisasjonselementResource.setOrganisasjonsnummer(identifikatorOrgNummer);
-        organisasjonselementResource.setKontaktinformasjon(kontaktinformasjon);
-
-        SkoleResource skoleResource = new SkoleResource();
-        skoleResource.setNavn("Bø Barneskule");
-        skoleResource.setSkolenummer(identifikatorSkoleNummer);
-        skoleResource.setOrganisasjonsnummer(identifikatorOrgNummer);
-        skoleResource.setKontaktinformasjon(kontaktinformasjon);
-        SkoleResource skoleResource2 = new SkoleResource();
-        skoleResource2.setNavn("Folkestad skule");
-        skoleResource2.setSkolenummer(identifikatorSkoleNummer);
-        skoleResource2.setOrganisasjonsnummer(identifikatorOrgNummer);
-        skoleResource2.setKontaktinformasjon(kontaktinformasjon);
-        SkoleResources skoleResources = new SkoleResources();
-        skoleResources.addResource(skoleResource);
-        skoleResources.addResource(skoleResource2);
-        linkListSkole.put("self", listSkole);
-        linkListSkole2.put("self", listSkole2);
-        skoleResource.setLinks(linkListSkole);
-        skoleResource2.setLinks(linkListSkole2);
-
-        ArstrinnResources arstrinnResources = new ArstrinnResources();
-        BasisgruppeResources basisgruppeResources = new BasisgruppeResources();
-
-        ArstrinnResource arstrinnResource = new ArstrinnResource();
-        ArstrinnResource arstrinnResource2 = new ArstrinnResource();
-        ArstrinnResource arstrinnResource3 = new ArstrinnResource();
-        ArstrinnResource arstrinnResource4 = new ArstrinnResource();
-        arstrinnResource.setNavn("VG1");
-        arstrinnResource.setLinks(linkListVg1);
-        arstrinnResource2.setNavn("VG2");
-        arstrinnResource2.setLinks(linkListVg2);
-        arstrinnResource3.setNavn("VG3");
-        arstrinnResource3.setLinks(linkListVg3);
-        arstrinnResource4.setNavn("VGAnnenLink");
-        arstrinnResource4.setLinks(linkListVg4IkkeISkole);
-        arstrinnResources.addResource(arstrinnResource);
-        arstrinnResources.addResource(arstrinnResource2);
-        arstrinnResources.addResource(arstrinnResource3);
-        arstrinnResources.addResource(arstrinnResource4);
-
-
-        BasisgruppeResource basisgruppeResource = new BasisgruppeResource();
-        BasisgruppeResource basisgruppeResource2 = new BasisgruppeResource();
-        BasisgruppeResource basisgruppeResource3 = new BasisgruppeResource();
-        BasisgruppeResource basisgruppeResource4 = new BasisgruppeResource();
-        BasisgruppeResource basisgruppeResource5 = new BasisgruppeResource();
-        basisgruppeResource.setLinks(linkListForbasisGruppeVG1);
-        basisgruppeResource2.setLinks(linkListForbasisGruppeVG2);
-        basisgruppeResource3.setLinks(linkListForbasisGruppeVG3);
-        basisgruppeResource4.setLinks(linkListForbasisGruppeVG1);
-        basisgruppeResource5.setLinks(linkListForbasisGruppeVG1SomIkkeErISkole);
-        basisgruppeResource.setNavn("VG1 - Idrett");
-        basisgruppeResource2.setNavn("VG2 - Fotball");
-        basisgruppeResource3.setNavn("VG3 - Håndball");
-        basisgruppeResource4.setNavn("VG1 - Almenn");
-        basisgruppeResource5.setNavn("VG1 - Frisør - Ikke del av Bø barneskole");
-        basisgruppeResources.addResource(basisgruppeResource);
-        basisgruppeResources.addResource(basisgruppeResource2);
-        basisgruppeResources.addResource(basisgruppeResource3);
-        basisgruppeResources.addResource(basisgruppeResource4);
-        basisgruppeResources.addResource(basisgruppeResource5);
-
-        SkoleOrganisasjon skoleOrganisasjon = new SkoleOrganisasjon();
-        skoleOrganisasjon.setNavn(organisasjonselementResource.getNavn());
-        skoleOrganisasjon.setOrganisasjonsnummer(organisasjonselementResource.getOrganisasjonsnummer().getIdentifikatorverdi());
-        skoleOrganisasjon.setKontaktinformasjon(getContactInformasjon(organisasjonselementResource.getKontaktinformasjon()));
-
-        skoleOrganisasjon.setSkole(
-                skoleResources.getContent()
-                        .stream()
-                        .map(s -> {
-                            Skole skole = new Skole();
-                            skole.setNavn(s.getNavn());
-                            skole.setSkolenummer(s.getSkolenummer().getIdentifikatorverdi());
-                            skole.setKontaktinformasjon(getContactInformasjon(s.getKontaktinformasjon()));
-                            skole.setOrganisasjonsnummer(s.getOrganisasjonsnummer().getIdentifikatorverdi());
-                            return skole;
-                        })
-                        .collect(Collectors.toList()));
-
-        List<SkoleResource> schoolResourceList = skoleResources.getContent();
-        List<ArstrinnResource> levelResourceList = arstrinnResources.getContent();
-        List<BasisgruppeResource> groupResourceList = basisgruppeResources.getContent();
-
-        schoolResourceList.forEach(schoolResource -> {
-            Link schoolResouceLink = schoolResource.getSelfLinks().get(0);
-            filterLevelsAndGroups(levelResourceList, schoolResouceLink, groupResourceList, skoleOrganisasjon, schoolResource);
-        });
-
-        return skoleOrganisasjon;
-    }
-
 }

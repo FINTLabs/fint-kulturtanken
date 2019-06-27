@@ -1,22 +1,26 @@
-[
-  {
-    "navn": "1VGS",
-    "_links": {
-      "self": [
-        {
-          "href": "https://play-with-fint.felleskomponent.no/utdanning/utdanningsprogram/arstrinn/systemid/vg1"
+{
+  "_embedded": {
+    "_entries": [
+      {
+        "navn": "1VGS",
+        "_links": {
+          "self": [
+            {
+              "href": "https://play-with-fint.felleskomponent.no/utdanning/utdanningsprogram/arstrinn/systemid/vg1"
+            }
+          ]
         }
-      ]
-    }
-  },
-  {
-    "navn": "2VGS",
-    "_links": {
-      "self": [
-        {
-          "href": "https://play-with-fint.felleskomponent.no/utdanning/utdanningsprogram/arstrinn/systemid/vg2"
+      },
+      {
+        "navn": "2VGS",
+        "_links": {
+          "self": [
+            {
+              "href": "https://play-with-fint.felleskomponent.no/utdanning/utdanningsprogram/arstrinn/systemid/vg2"
+            }
+          ]
         }
-      ]
-    }
+      }
+    ]
   }
-]
+}

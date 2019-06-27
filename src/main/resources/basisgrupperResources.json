@@ -1,149 +1,151 @@
 {
-  "entries": [
-    {
-      "navn": "1STA",
-      "_links": {
-        "trinn": [
-          {
-            "href": "https://play-with-fint.felleskomponent.no/utdanning/utdanningsprogram/arstrinn/systemid/vg1"
-          }
-        ],
-        "skole": [
-          {
-            "href": "bo.vgs.no"
-          }
-        ],
-        "elevforhold": [
-          {
-            "href": "https://play-with-fint.felleskomponent.no/utdanning/elev/elevforhold/systemid/E_500001_1"
-          },
-          {
-            "href": "https://play-with-fint.felleskomponent.no/utdanning/elev/elevforhold/systemid/E_500002_1"
-          },
-          {
-            "href": "https://play-with-fint.felleskomponent.no/utdanning/elev/elevforhold/systemid/E_500003_1"
-          },
-          {
-            "href": "https://play-with-fint.felleskomponent.no/utdanning/elev/elevforhold/systemid/E_ZZZZZZ_2"
-          }
-        ]
+  "_embedded": {
+    "_entries": [
+      {
+        "navn": "1STA",
+        "_links": {
+          "trinn": [
+            {
+              "href": "https://play-with-fint.felleskomponent.no/utdanning/utdanningsprogram/arstrinn/systemid/vg1"
+            }
+          ],
+          "skole": [
+            {
+              "href": "bo.vgs.no"
+            }
+          ],
+          "elevforhold": [
+            {
+              "href": "https://play-with-fint.felleskomponent.no/utdanning/elev/elevforhold/systemid/E_500001_1"
+            },
+            {
+              "href": "https://play-with-fint.felleskomponent.no/utdanning/elev/elevforhold/systemid/E_500002_1"
+            },
+            {
+              "href": "https://play-with-fint.felleskomponent.no/utdanning/elev/elevforhold/systemid/E_500003_1"
+            },
+            {
+              "href": "https://play-with-fint.felleskomponent.no/utdanning/elev/elevforhold/systemid/E_ZZZZZZ_2"
+            }
+          ]
+        }
+      },
+      {
+        "navn": "1OLA",
+        "_links": {
+          "trinn": [
+            {
+              "href": "https://play-with-fint.felleskomponent.no/utdanning/utdanningsprogram/arstrinn/systemid/vg1"
+            }
+          ],
+          "skole": [
+            {
+              "href": "bo.vgs.no"
+            }
+          ],
+          "elevforhold": [
+            {
+              "href": "https://play-with-fint.felleskomponent.no/utdanning/elev/elevforhold/systemid/E_500001_1"
+            },
+            {
+              "href": "https://play-with-fint.felleskomponent.no/utdanning/elev/elevforhold/systemid/E_500002_1"
+            },
+            {
+              "href": "https://play-with-fint.felleskomponent.no/utdanning/elev/elevforhold/systemid/E_500003_1"
+            },
+            {
+              "href": "https://play-with-fint.felleskomponent.no/utdanning/elev/elevforhold/systemid/E_ZZZZZZ_2"
+            }
+          ]
+        }
+      },
+      {
+        "navn": "2OLA",
+        "_links": {
+          "trinn": [
+            {
+              "href": "https://play-with-fint.felleskomponent.no/utdanning/utdanningsprogram/arstrinn/systemid/vg2"
+            }
+          ],
+          "skole": [
+            {
+              "href": "bo.vgs.no"
+            }
+          ],
+          "elevforhold": [
+            {
+              "href": "https://play-with-fint.felleskomponent.no/utdanning/elev/elevforhold/systemid/E_500001_1"
+            },
+            {
+              "href": "https://play-with-fint.felleskomponent.no/utdanning/elev/elevforhold/systemid/E_500002_1"
+            },
+            {
+              "href": "https://play-with-fint.felleskomponent.no/utdanning/elev/elevforhold/systemid/E_500003_1"
+            },
+            {
+              "href": "https://play-with-fint.felleskomponent.no/utdanning/elev/elevforhold/systemid/E_ZZZZZZ_2"
+            }
+          ]
+        }
+      },
+      {
+        "navn": "1LAT",
+        "_links": {
+          "trinn": [
+            {
+              "href": "https://play-with-fint.felleskomponent.no/utdanning/utdanningsprogram/arstrinn/systemid/vg1"
+            }
+          ],
+          "skole": [
+            {
+              "href": "https://play-with-fint.felleskomponent.no/utdanning/utdanningsprogram/skole/skolenummer/123456"
+            }
+          ],
+          "elevforhold": [
+            {
+              "href": "https://play-with-fint.felleskomponent.no/utdanning/elev/elevforhold/systemid/E_500001_1"
+            },
+            {
+              "href": "https://play-with-fint.felleskomponent.no/utdanning/elev/elevforhold/systemid/E_500002_1"
+            },
+            {
+              "href": "https://play-with-fint.felleskomponent.no/utdanning/elev/elevforhold/systemid/E_500003_1"
+            },
+            {
+              "href": "https://play-with-fint.felleskomponent.no/utdanning/elev/elevforhold/systemid/E_ZZZZZZ_2"
+            }
+          ]
+        }
+      },
+      {
+        "navn": "2LAT",
+        "_links": {
+          "trinn": [
+            {
+              "href": "https://play-with-fint.felleskomponent.no/utdanning/utdanningsprogram/arstrinn/systemid/vg2"
+            }
+          ],
+          "skole": [
+            {
+              "href": "https://play-with-fint.felleskomponent.no/utdanning/utdanningsprogram/skole/skolenummer/123456"
+            }
+          ],
+          "elevforhold": [
+            {
+              "href": "https://play-with-fint.felleskomponent.no/utdanning/elev/elevforhold/systemid/E_500001_1"
+            },
+            {
+              "href": "https://play-with-fint.felleskomponent.no/utdanning/elev/elevforhold/systemid/E_500002_1"
+            },
+            {
+              "href": "https://play-with-fint.felleskomponent.no/utdanning/elev/elevforhold/systemid/E_500003_1"
+            },
+            {
+              "href": "https://play-with-fint.felleskomponent.no/utdanning/elev/elevforhold/systemid/E_ZZZZZZ_2"
+            }
+          ]
+        }
       }
-    },
-    {
-      "navn": "1OLA",
-      "_links": {
-        "trinn": [
-          {
-            "href": "https://play-with-fint.felleskomponent.no/utdanning/utdanningsprogram/arstrinn/systemid/vg1"
-          }
-        ],
-        "skole": [
-          {
-            "href": "bo.vgs.no"
-          }
-        ],
-        "elevforhold": [
-          {
-            "href": "https://play-with-fint.felleskomponent.no/utdanning/elev/elevforhold/systemid/E_500001_1"
-          },
-          {
-            "href": "https://play-with-fint.felleskomponent.no/utdanning/elev/elevforhold/systemid/E_500002_1"
-          },
-          {
-            "href": "https://play-with-fint.felleskomponent.no/utdanning/elev/elevforhold/systemid/E_500003_1"
-          },
-          {
-            "href": "https://play-with-fint.felleskomponent.no/utdanning/elev/elevforhold/systemid/E_ZZZZZZ_2"
-          }
-        ]
-      }
-    },
-    {
-      "navn": "2OLA",
-      "_links": {
-        "trinn": [
-          {
-            "href": "https://play-with-fint.felleskomponent.no/utdanning/utdanningsprogram/arstrinn/systemid/vg2"
-          }
-        ],
-        "skole": [
-          {
-            "href": "bo.vgs.no"
-          }
-        ],
-        "elevforhold": [
-          {
-            "href": "https://play-with-fint.felleskomponent.no/utdanning/elev/elevforhold/systemid/E_500001_1"
-          },
-          {
-            "href": "https://play-with-fint.felleskomponent.no/utdanning/elev/elevforhold/systemid/E_500002_1"
-          },
-          {
-            "href": "https://play-with-fint.felleskomponent.no/utdanning/elev/elevforhold/systemid/E_500003_1"
-          },
-          {
-            "href": "https://play-with-fint.felleskomponent.no/utdanning/elev/elevforhold/systemid/E_ZZZZZZ_2"
-          }
-        ]
-      }
-    },
-    {
-      "navn": "1LAT",
-      "_links": {
-        "trinn": [
-          {
-            "href": "https://play-with-fint.felleskomponent.no/utdanning/utdanningsprogram/arstrinn/systemid/vg1"
-          }
-        ],
-        "skole": [
-          {
-            "href": "https://play-with-fint.felleskomponent.no/utdanning/utdanningsprogram/skole/skolenummer/123456"
-          }
-        ],
-        "elevforhold": [
-          {
-            "href": "https://play-with-fint.felleskomponent.no/utdanning/elev/elevforhold/systemid/E_500001_1"
-          },
-          {
-            "href": "https://play-with-fint.felleskomponent.no/utdanning/elev/elevforhold/systemid/E_500002_1"
-          },
-          {
-            "href": "https://play-with-fint.felleskomponent.no/utdanning/elev/elevforhold/systemid/E_500003_1"
-          },
-          {
-            "href": "https://play-with-fint.felleskomponent.no/utdanning/elev/elevforhold/systemid/E_ZZZZZZ_2"
-          }
-        ]
-      }
-    },
-    {
-      "navn": "2LAT",
-      "_links": {
-        "trinn": [
-          {
-            "href": "https://play-with-fint.felleskomponent.no/utdanning/utdanningsprogram/arstrinn/systemid/vg2"
-          }
-        ],
-        "skole": [
-          {
-            "href": "https://play-with-fint.felleskomponent.no/utdanning/utdanningsprogram/skole/skolenummer/123456"
-          }
-        ],
-        "elevforhold": [
-          {
-            "href": "https://play-with-fint.felleskomponent.no/utdanning/elev/elevforhold/systemid/E_500001_1"
-          },
-          {
-            "href": "https://play-with-fint.felleskomponent.no/utdanning/elev/elevforhold/systemid/E_500002_1"
-          },
-          {
-            "href": "https://play-with-fint.felleskomponent.no/utdanning/elev/elevforhold/systemid/E_500003_1"
-          },
-          {
-            "href": "https://play-with-fint.felleskomponent.no/utdanning/elev/elevforhold/systemid/E_ZZZZZZ_2"
-          }
-        ]
-      }
-    }
-  ]
+    ]
+  }
 }

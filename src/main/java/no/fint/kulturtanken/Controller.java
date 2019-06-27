@@ -31,8 +31,4 @@ public class Controller {
 
         return fintService.getSkoleOrganisasjon(bearer);
     }
-    @GetMapping("/test")
-    public void getTest() {
-        fintService.test();
-    }
 }

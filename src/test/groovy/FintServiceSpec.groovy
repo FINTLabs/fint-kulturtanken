@@ -1,7 +1,5 @@
 import no.fint.kulturtanken.FintServiceTestComponents
-import no.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementResources
-import no.fint.model.resource.utdanning.elev.BasisgruppeResources
-import no.fint.model.resource.utdanning.utdanningsprogram.SkoleResources
+import no.fint.kulturtanken.model.SkoleOrganisasjon
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.springframework.core.io.ClassPathResource
@@ -16,83 +14,156 @@ class FintServiceSpec extends Specification {
     private def fintserviceTestComponents = new FintServiceTestComponents(webClient: webClient)
 
 
-    def "Get OrganisasjonselementResources from webclient and build SkoleOrganisasjon"(){
+    def "Get OrganisasjonselementResources from webclient and build SkoleOrganisasjon"() {
         given:
         server.enqueue(
                 new MockResponse().setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                         .setBody(new ClassPathResource("skoleOrganisasjonResources.json").getFile().text))
         when:
-        OrganisasjonselementResources reply = fintserviceTestComponents.getOrganisasjonselementResources("test")
+        SkoleOrganisasjon skoleOrganisasjon = new SkoleOrganisasjon()
+        fintserviceTestComponents.addOrganisationInfo(skoleOrganisasjon, "testBearer");
 
         then:
-        print(reply.toString())
+        skoleOrganisasjon.navn == "Haugaland fylkeskommune"
+        skoleOrganisasjon.kontaktinformasjon.mobiltelefonnummer == "47474747"
+        skoleOrganisasjon.kontaktinformasjon.epostadresse == "post@haugfk.no"
+        skoleOrganisasjon.skole == null
     }
 
-    def "Get SkoleResources from webclient and build Skole"(){
+    def "Get SkoleResources from webclient and build 2 Skoler with no Levels"() {
         given:
         server.enqueue(
                 new MockResponse().setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                         .setBody(new ClassPathResource("skoleResources.json").getFile().text))
         when:
-        SkoleResources reply = fintserviceTestComponents.getSkoleResources("test")
+        def schoolList = fintserviceTestComponents.getSchool("testBearer")
 
         then:
-        print(reply.toString())
+        schoolList.size() == 2
+        schoolList[0].navn == "Bø VGS"
+        schoolList[0].trinn == null
+        schoolList[0].organisasjonsnummer == "98765432"
+        schoolList[0].skolenummer == "12345"
+        schoolList[1].navn == "Sundet VGS"
+        schoolList[1].trinn == null
+        schoolList[1].organisasjonsnummer == "970123458"
+        schoolList[1].skolenummer == "123456"
     }
-
-    def "Get basisgrupper from webclient and build basisgruppe"(){
+    def "Get SkoleOrganisasjon, Skoler, Arstrinn and Basisgrupper from webclient check that levels are initated and correct"() {
         given:
+        server.enqueue(
+                new MockResponse().setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                        .setBody(new ClassPathResource("skoleOrganisasjonResources.json").getFile().text))
+        server.enqueue(
+                new MockResponse().setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                        .setBody(new ClassPathResource("skoleResources.json").getFile().text))
+        server.enqueue(
+                new MockResponse().setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                        .setBody(new ClassPathResource("skoleResources.json").getFile().text))
+        server.enqueue(
+                new MockResponse().setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                        .setBody(new ClassPathResource("aarstrinnResources.json").getFile().text))
         server.enqueue(
                 new MockResponse().setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                         .setBody(new ClassPathResource("basisgrupperResources.json").getFile().text))
         when:
-        BasisgruppeResources reply = fintserviceTestComponents.getBasisgruppeResources("test")
+        SkoleOrganisasjon skoleOrganisasjon = new SkoleOrganisasjon()
+        fintserviceTestComponents.addOrganisationInfo(skoleOrganisasjon, "testBearer")
+        skoleOrganisasjon.skole = fintserviceTestComponents.getSchool("testBearer")
+        fintserviceTestComponents.setSchoolLevelsAndGroups(skoleOrganisasjon, "testBearer")
 
         then:
-        print(reply.getContent().toString())
+        skoleOrganisasjon.skole[0].trinn.size() == 2
+        skoleOrganisasjon.skole[0].trinn[0].niva == "1VGS"
+        skoleOrganisasjon.skole[0].trinn[1].niva == "2VGS"
+        skoleOrganisasjon.skole[1].trinn.size() == 2
+        skoleOrganisasjon.skole[1].trinn[0].niva == "1VGS"
+        skoleOrganisasjon.skole[1].trinn[1].niva == "2VGS"
     }
 
-    def "Get skoleOrganisasjonTestData check school size is four"() {
+    def "Get SkoleOrganisasjon, Skoler, Arstrinn and Basisgrupper from webclient check that groups are initated and correct"() {
         given:
-
+        server.enqueue(
+                new MockResponse().setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                        .setBody(new ClassPathResource("skoleOrganisasjonResources.json").getFile().text))
+        server.enqueue(
+                new MockResponse().setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                        .setBody(new ClassPathResource("skoleResources.json").getFile().text))
+        server.enqueue(
+                new MockResponse().setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                        .setBody(new ClassPathResource("skoleResources.json").getFile().text))
+        server.enqueue(
+                new MockResponse().setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                        .setBody(new ClassPathResource("aarstrinnResources.json").getFile().text))
+        server.enqueue(
+                new MockResponse().setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                        .setBody(new ClassPathResource("basisgrupperResources.json").getFile().text))
         when:
-        def skoleOrganisasjon = fintserviceTestComponents.skoleOrganisasjonTestData
-
-        then:
-        skoleOrganisasjon.skole.size() == 2
-    }
-    def "Get skoleOrganisasjonTestData check school level size is three and zero"() {
-        given:
-
-        when:
-        def skoleOrganisasjon = fintserviceTestComponents.skoleOrganisasjonTestData
-
-        then:
-        skoleOrganisasjon.skole[0].trinn.size() == 3
-        skoleOrganisasjon.skole[1].trinn.size() == 0
-    }
-
-    def "Get skoleOrganisasjonTestData check if school basisgruppe has correct amount"() {
-        given:
-
-        when:
-        def skoleOrganisasjon = fintserviceTestComponents.skoleOrganisasjonTestData
+        SkoleOrganisasjon skoleOrganisasjon = new SkoleOrganisasjon()
+        fintserviceTestComponents.addOrganisationInfo(skoleOrganisasjon, "testBearer")
+        skoleOrganisasjon.skole = fintserviceTestComponents.getSchool("testBearer")
+        fintserviceTestComponents.setSchoolLevelsAndGroups(skoleOrganisasjon, "testBearer")
 
         then:
         skoleOrganisasjon.skole[0].trinn[0].basisgrupper.size() == 2
         skoleOrganisasjon.skole[0].trinn[1].basisgrupper.size() == 1
-        skoleOrganisasjon.skole[0].trinn[2].basisgrupper.size() == 1
+        skoleOrganisasjon.skole[0].trinn[0].basisgrupper[0].navn == "1STA"
+        skoleOrganisasjon.skole[0].trinn[0].basisgrupper[1].navn == "1OLA"
+        skoleOrganisasjon.skole[0].trinn[1].basisgrupper[0].navn == "2OLA"
+        skoleOrganisasjon.skole[0].trinn[0].basisgrupper[0].antall == 4
+        skoleOrganisasjon.skole[0].trinn[0].basisgrupper[1].antall == 4
+        skoleOrganisasjon.skole[0].trinn[1].basisgrupper[0].antall == 4
+        skoleOrganisasjon.skole[1].trinn[0].basisgrupper.size() == 1
+        skoleOrganisasjon.skole[1].trinn[1].basisgrupper.size() == 1
+        skoleOrganisasjon.skole[1].trinn[0].basisgrupper[0].navn == "1LAT"
+        skoleOrganisasjon.skole[1].trinn[1].basisgrupper[0].navn == "2LAT"
+        skoleOrganisasjon.skole[1].trinn[0].basisgrupper[0].antall == 4
+        skoleOrganisasjon.skole[1].trinn[1].basisgrupper[0].antall == 4
     }
-    def "Get skoleOrganisasjonTestData check if school basisgruppe has students"() {
-        given:
 
+    def "Get SkoleOrganisasjon, Skoler, Arstrinn and Basisgrupper from webclient and build levels and groups correct"() {
+        given:
+        server.enqueue(
+                new MockResponse().setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                        .setBody(new ClassPathResource("skoleOrganisasjonResources.json").getFile().text))
+        server.enqueue(
+                new MockResponse().setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                        .setBody(new ClassPathResource("skoleResources.json").getFile().text))
+        server.enqueue(
+                new MockResponse().setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                        .setBody(new ClassPathResource("skoleResources.json").getFile().text))
+        server.enqueue(
+                new MockResponse().setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                        .setBody(new ClassPathResource("aarstrinnResources.json").getFile().text))
+        server.enqueue(
+                new MockResponse().setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                        .setBody(new ClassPathResource("basisgrupperResources.json").getFile().text))
         when:
-        def skoleOrganisasjon = fintserviceTestComponents.skoleOrganisasjonTestData
+        SkoleOrganisasjon skoleOrganisasjon = new SkoleOrganisasjon()
+        fintserviceTestComponents.addOrganisationInfo(skoleOrganisasjon, "testBearer")
+        skoleOrganisasjon.skole = fintserviceTestComponents.getSchool("testBearer")
+        fintserviceTestComponents.setSchoolLevelsAndGroups(skoleOrganisasjon, "testBearer")
 
         then:
-        skoleOrganisasjon.skole[0].trinn[0].basisgrupper.each {
-            it.antall>0
-        }
+        skoleOrganisasjon.skole[0].trinn.size() == 2
+        skoleOrganisasjon.skole[0].trinn[0].niva == "1VGS"
+        skoleOrganisasjon.skole[0].trinn[1].niva == "2VGS"
+        skoleOrganisasjon.skole[0].trinn[0].basisgrupper.size() == 2
+        skoleOrganisasjon.skole[0].trinn[1].basisgrupper.size() == 1
+        skoleOrganisasjon.skole[0].trinn[0].basisgrupper[0].navn == "1STA"
+        skoleOrganisasjon.skole[0].trinn[0].basisgrupper[1].navn == "1OLA"
+        skoleOrganisasjon.skole[0].trinn[1].basisgrupper[0].navn == "2OLA"
+        skoleOrganisasjon.skole[0].trinn[0].basisgrupper[0].antall == 4
+        skoleOrganisasjon.skole[0].trinn[0].basisgrupper[1].antall == 4
+        skoleOrganisasjon.skole[0].trinn[1].basisgrupper[0].antall == 4
+        skoleOrganisasjon.skole[1].trinn.size() == 2
+        skoleOrganisasjon.skole[1].trinn[0].niva == "1VGS"
+        skoleOrganisasjon.skole[1].trinn[1].niva == "2VGS"
+        skoleOrganisasjon.skole[1].trinn[0].basisgrupper.size() == 1
+        skoleOrganisasjon.skole[1].trinn[1].basisgrupper.size() == 1
+        skoleOrganisasjon.skole[1].trinn[0].basisgrupper[0].navn == "1LAT"
+        skoleOrganisasjon.skole[1].trinn[1].basisgrupper[0].navn == "2LAT"
+        skoleOrganisasjon.skole[1].trinn[0].basisgrupper[0].antall == 4
+        skoleOrganisasjon.skole[1].trinn[1].basisgrupper[0].antall == 4
     }
-
 }
