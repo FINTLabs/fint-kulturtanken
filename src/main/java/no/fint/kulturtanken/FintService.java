@@ -43,7 +43,7 @@ public class FintService {
 
     private void addOrganisationInfo(SkoleOrganisasjon schoolOrganisation, String bearer) {
         OrganisasjonselementResources organisasjonselementResources = getOrganisasjonselementResources(bearer);
-        if (organisasjonselementResources.getContent().size()==0){
+        if (organisasjonselementResources.getContent().get(0).getNavn() == null){
             return;
         }
         Optional<OrganisasjonselementResource> topLevelOrg = getTopElement(organisasjonselementResources);
