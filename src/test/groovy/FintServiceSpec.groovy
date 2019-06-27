@@ -1,10 +1,14 @@
 import no.fint.kulturtanken.FintServiceTestComponents
+import no.fint.kulturtanken.URINotFoundException
 import no.fint.kulturtanken.model.SkoleOrganisasjon
 import no.fint.model.felles.kompleksedatatyper.Kontaktinformasjon
+import no.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementResource
+import no.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementResources
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.springframework.core.io.ClassPathResource
 import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.web.reactive.function.client.WebClient
 import spock.lang.Specification
@@ -191,5 +195,35 @@ class FintServiceSpec extends Specification {
         skoleOrganisasjon.skole[1].trinn[1].basisgrupper[0].navn == "2LAT"
         skoleOrganisasjon.skole[1].trinn[0].basisgrupper[0].antall == 4
         skoleOrganisasjon.skole[1].trinn[1].basisgrupper[0].antall == 4
+    }
+    def "When server responds HTTP.NOT_FOUND cast URINotFoundException"() {
+        given:
+        server.enqueue(new MockResponse().setResponseCode(HttpStatus.NOT_FOUND.value()))
+
+        when:
+        Exception errorException = new Exception();
+        OrganisasjonselementResources organisasjonselementResources = new OrganisasjonselementResources();
+        try{
+        AbstractCollection abstractCollection= fintserviceTestComponents.getResources(fintserviceTestComponents.GET_ORGANISATION_URI, "testBearer", organisasjonselementResources)
+        }catch(Exception e){
+            errorException = e;
+        }
+        then:
+        errorException instanceof URINotFoundException
+    }
+    def "When URI is wrong cast URINotFoundException"() {
+        given:
+        String a404URI = "https://play-with-fint.felleskomponent.no/administrasjon/organisasjon/organisasjonselementer"
+
+        when:
+        Exception errorException = new Exception();
+        OrganisasjonselementResources organisasjonselementResources = new OrganisasjonselementResources();
+        try{
+            AbstractCollection abstractCollection= fintserviceTestComponents.getResources(a404URI, "testBearer", organisasjonselementResources)
+        }catch(Exception e){
+            errorException = e;
+        }
+        then:
+        errorException instanceof URINotFoundException
     }
 }
