@@ -2,7 +2,6 @@ package no.fint.kulturtanken;
 
 import lombok.extern.slf4j.Slf4j;
 import no.fint.kulturtanken.model.*;
-import no.fint.model.felles.kompleksedatatyper.Identifikator;
 import no.fint.model.resource.Link;
 import no.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementResource;
 import no.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementResources;
@@ -17,7 +16,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -34,7 +35,7 @@ public class FintService {
     private SkoleOrganisasjon setUpSchoolOrganisation(String bearer) {
         SkoleOrganisasjon schoolOrganisation = new SkoleOrganisasjon();
         addOrganisationInfo(schoolOrganisation, bearer);
-        schoolOrganisation.setSkole(getSchool(bearer));
+        schoolOrganisation.setSkole(getSkoleList(bearer));
         setSchoolLevelsAndGroups(schoolOrganisation, bearer);
         return schoolOrganisation;
     }
@@ -46,11 +47,11 @@ public class FintService {
         topLevelOrg.ifPresent(o -> {
             schoolOrganisation.setNavn(o.getNavn());
             schoolOrganisation.setOrganisasjonsnummer(o.getOrganisasjonsnummer().getIdentifikatorverdi());
-            schoolOrganisation.setKontaktinformasjon(getContactInformasjon(o.getKontaktinformasjon()));
+            schoolOrganisation.setKontaktinformasjon(getKontaktInformasjon(o.getKontaktinformasjon()));
         });
     }
 
-    private List<Skole> getSchool(String bearer) {
+    private List<Skole> getSkoleList(String bearer) {
         SkoleResources skoleResources = getSkoleResources(bearer);
         return
                 skoleResources.getContent()
@@ -59,7 +60,7 @@ public class FintService {
                             Skole skole = new Skole();
                             skole.setNavn(s.getNavn());
                             skole.setSkolenummer(s.getSkolenummer().getIdentifikatorverdi());
-                            skole.setKontaktinformasjon(getContactInformasjon(s.getKontaktinformasjon()));
+                            skole.setKontaktinformasjon(getKontaktInformasjon(s.getKontaktinformasjon()));
                             skole.setOrganisasjonsnummer(s.getOrganisasjonsnummer().getIdentifikatorverdi());
                             return skole;
                         })
@@ -158,7 +159,7 @@ public class FintService {
                 .block();
     }
 
-    private Kontaktinformasjon getContactInformasjon(no.fint.model.felles.kompleksedatatyper.Kontaktinformasjon contactInformation1) {
+    private Kontaktinformasjon getKontaktInformasjon(no.fint.model.felles.kompleksedatatyper.Kontaktinformasjon contactInformation1) {
         Kontaktinformasjon contactInformation = new Kontaktinformasjon();
         contactInformation.setEpostadresse(contactInformation1.getEpostadresse());
         contactInformation.setMobiltelefonnummer(contactInformation1.getMobiltelefonnummer());

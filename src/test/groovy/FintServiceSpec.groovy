@@ -1,5 +1,6 @@
 import no.fint.kulturtanken.FintServiceTestComponents
 import no.fint.kulturtanken.model.SkoleOrganisasjon
+import no.fint.model.felles.kompleksedatatyper.Kontaktinformasjon
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.springframework.core.io.ClassPathResource
@@ -21,7 +22,7 @@ class FintServiceSpec extends Specification {
                         .setBody(new ClassPathResource("skoleOrganisasjonResources.json").getFile().text))
         when:
         SkoleOrganisasjon skoleOrganisasjon = new SkoleOrganisasjon()
-        fintserviceTestComponents.addOrganisationInfo(skoleOrganisasjon, "testBearer");
+        fintserviceTestComponents.addOrganisationInfo(skoleOrganisasjon, "testBearer")
 
         then:
         skoleOrganisasjon.navn == "Haugaland fylkeskommune"
@@ -30,13 +31,26 @@ class FintServiceSpec extends Specification {
         skoleOrganisasjon.skole == null
     }
 
+    def "Get ContactInformation and check if extracts email and phone number to new Object"() {
+        given:
+        Kontaktinformasjon kontaktinformasjon = new Kontaktinformasjon()
+        kontaktinformasjon.setEpostadresse("test-email@testing.test")
+        kontaktinformasjon.setMobiltelefonnummer("99999999")
+        when:
+        def returnedKontaktInformasjon = fintserviceTestComponents.getKontaktInformasjon(kontaktinformasjon)
+
+        then:
+        returnedKontaktInformasjon.epostadresse == "test-email@testing.test"
+        returnedKontaktInformasjon.mobiltelefonnummer == "99999999"
+    }
+
     def "Get SkoleResources from webclient and build 2 Skoler with no Levels"() {
         given:
         server.enqueue(
                 new MockResponse().setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                         .setBody(new ClassPathResource("skoleResources.json").getFile().text))
         when:
-        def schoolList = fintserviceTestComponents.getSchool("testBearer")
+        def schoolList = fintserviceTestComponents.getSkoleList("testBearer")
 
         then:
         schoolList.size() == 2
@@ -69,7 +83,7 @@ class FintServiceSpec extends Specification {
         when:
         SkoleOrganisasjon skoleOrganisasjon = new SkoleOrganisasjon()
         fintserviceTestComponents.addOrganisationInfo(skoleOrganisasjon, "testBearer")
-        skoleOrganisasjon.skole = fintserviceTestComponents.getSchool("testBearer")
+        skoleOrganisasjon.skole = fintserviceTestComponents.getSkoleList("testBearer")
         fintserviceTestComponents.setSchoolLevelsAndGroups(skoleOrganisasjon, "testBearer")
 
         then:
@@ -101,7 +115,7 @@ class FintServiceSpec extends Specification {
         when:
         SkoleOrganisasjon skoleOrganisasjon = new SkoleOrganisasjon()
         fintserviceTestComponents.addOrganisationInfo(skoleOrganisasjon, "testBearer")
-        skoleOrganisasjon.skole = fintserviceTestComponents.getSchool("testBearer")
+        skoleOrganisasjon.skole = fintserviceTestComponents.getSkoleList("testBearer")
         fintserviceTestComponents.setSchoolLevelsAndGroups(skoleOrganisasjon, "testBearer")
 
         then:
@@ -141,7 +155,7 @@ class FintServiceSpec extends Specification {
         when:
         SkoleOrganisasjon skoleOrganisasjon = new SkoleOrganisasjon()
         fintserviceTestComponents.addOrganisationInfo(skoleOrganisasjon, "testBearer")
-        skoleOrganisasjon.skole = fintserviceTestComponents.getSchool("testBearer")
+        skoleOrganisasjon.skole = fintserviceTestComponents.getSkoleList("testBearer")
         fintserviceTestComponents.setSchoolLevelsAndGroups(skoleOrganisasjon, "testBearer")
 
         then:
