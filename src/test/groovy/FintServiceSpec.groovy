@@ -1,8 +1,11 @@
+import io.netty.channel.ChannelOption
+import io.netty.handler.timeout.ReadTimeoutHandler
+import io.netty.handler.timeout.WriteTimeoutHandler
+import no.fint.ApplicationConfiguration
 import no.fint.kulturtanken.FintServiceTestComponents
 import no.fint.kulturtanken.URINotFoundException
 import no.fint.kulturtanken.model.SkoleOrganisasjon
 import no.fint.model.felles.kompleksedatatyper.Kontaktinformasjon
-import no.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementResource
 import no.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementResources
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -10,7 +13,9 @@ import org.springframework.core.io.ClassPathResource
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
+import org.springframework.http.client.reactive.ClientHttpConnector
 import org.springframework.web.reactive.function.client.WebClient
+import reactor.netty.tcp.TcpClient
 import spock.lang.Specification
 
 class FintServiceSpec extends Specification {
@@ -201,12 +206,12 @@ class FintServiceSpec extends Specification {
         server.enqueue(new MockResponse().setResponseCode(HttpStatus.NOT_FOUND.value()))
 
         when:
-        Exception errorException = new Exception();
-        OrganisasjonselementResources organisasjonselementResources = new OrganisasjonselementResources();
+        Exception errorException = new Exception()
+        OrganisasjonselementResources organisasjonselementResources = new OrganisasjonselementResources()
         try{
         AbstractCollection abstractCollection= fintserviceTestComponents.getResources(fintserviceTestComponents.GET_ORGANISATION_URI, "testBearer", organisasjonselementResources)
         }catch(Exception e){
-            errorException = e;
+            errorException = e
         }
         then:
         errorException instanceof URINotFoundException
@@ -216,12 +221,28 @@ class FintServiceSpec extends Specification {
         String a404URI = "https://play-with-fint.felleskomponent.no/administrasjon/organisasjon/organisasjonselementer"
 
         when:
-        Exception errorException = new Exception();
-        OrganisasjonselementResources organisasjonselementResources = new OrganisasjonselementResources();
+        Exception errorException = new Exception()
+        OrganisasjonselementResources organisasjonselementResources = new OrganisasjonselementResources()
         try{
             AbstractCollection abstractCollection= fintserviceTestComponents.getResources(a404URI, "testBearer", organisasjonselementResources)
         }catch(Exception e){
-            errorException = e;
+            errorException = e
+        }
+        then:
+        errorException instanceof URINotFoundException
+    }
+    def "When request not answered within {time-out-time} cast ResourceRequestTimeoutException"() {
+        given:
+        ApplicationConfiguration applicationConfiguration = new ApplicationConfiguration()
+        webClient = applicationConfiguration.webClient()
+
+        when:
+        Exception errorException = new Exception()
+        OrganisasjonselementResources organisasjonselementResources = new OrganisasjonselementResources()
+        try{
+            organisasjonselementResources = fintserviceTestComponents.getResources(fintserviceTestComponents.GET_ORGANISATION_URI, "testBearer", organisasjonselementResources)
+        }catch(Exception e){
+            errorException = e
         }
         then:
         errorException instanceof URINotFoundException
