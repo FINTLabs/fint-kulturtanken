@@ -29,13 +29,19 @@ public class Controller {
         log.info("Id: {}", id);
         log.info("Bearer token: {}", bearer);
 
-        //List<ArstrinnResource> arstrinn = arstrinnResources.getContent().stream().peek(System.out::println).collect(Collectors.toList());
-
         return fintService.getSkoleOrganisasjon(bearer);
     }
 
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity handelException(RuntimeException e) {
+    @ExceptionHandler(ResourceRequestTimeoutException.class)
+    public ResponseEntity handleTimeOutException(ResourceRequestTimeoutException e) {
+        return ResponseEntity.status(HttpStatus.REQUEST_TIMEOUT).build();
+    }
+    @ExceptionHandler(UnableToCreateResourceException.class)
+    public ResponseEntity handleCreateResourceFailed(UnableToCreateResourceException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    }
+    @ExceptionHandler(URINotFoundException.class)
+    public ResponseEntity handleWrongURI(URINotFoundException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 }

@@ -1,5 +1,9 @@
 package no.fint.kulturtanken;
 
+import io.netty.channel.ChannelOption;
+import io.netty.handler.timeout.ReadTimeoutException;
+import io.netty.handler.timeout.ReadTimeoutHandler;
+import io.netty.handler.timeout.WriteTimeoutHandler;
 import lombok.extern.slf4j.Slf4j;
 import no.fint.kulturtanken.model.*;
 import no.fint.model.resource.AbstractCollectionResources;
@@ -13,13 +17,20 @@ import no.fint.model.resource.utdanning.utdanningsprogram.ArstrinnResources;
 import no.fint.model.resource.utdanning.utdanningsprogram.SkoleResource;
 import no.fint.model.resource.utdanning.utdanningsprogram.SkoleResources;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
+import reactor.netty.http.client.HttpClient;
+import reactor.netty.tcp.TcpClient;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -73,9 +84,12 @@ public class FintServiceTestComponents {
     }
 
     private void setSchoolLevelsAndGroups(SkoleOrganisasjon schoolOrganisation, String bearer) {
-        List<SkoleResource> schoolResourceList = getSkoleResources(bearer).getContent();
-        List<ArstrinnResource> levelResourceList = getArstrinnResources(bearer).getContent();
-        List<BasisgruppeResource> groupResourceList = getBasisgruppeResources(bearer).getContent();
+        SkoleResources skoleResources = new SkoleResources();
+        ArstrinnResources arstrinnResources = new ArstrinnResources();
+        BasisgruppeResources basisgruppeResources = new BasisgruppeResources();
+        List<SkoleResource> schoolResourceList = ((SkoleResources)(getResources(GET_SCHOOL_URI, bearer, skoleResources))).getContent();
+        List<ArstrinnResource> levelResourceList = ((ArstrinnResources)(getResources(GET_LEVEL_URI, bearer, arstrinnResources))).getContent();
+        List<BasisgruppeResource> groupResourceList = ((BasisgruppeResources)(getResources(GET_GROUP_URI, bearer, basisgruppeResources))).getContent();
 
         schoolResourceList.forEach(schoolResource -> {
             Link schoolResouceLink = schoolResource.getSelfLinks().get(0);
@@ -137,20 +151,13 @@ public class FintServiceTestComponents {
                             return Mono.error(new ResourceRequestTimeoutException(response1.getStatusText()));
                         }
                     }
+                    if (response instanceof ReadTimeoutException) {
+                        return Mono.error(new ResourceRequestTimeoutException(response.getMessage()));
+                    }
                     return Mono.error(new UnableToCreateResourceException(response.getMessage()));
                 })
                 .block();
 
-    }
-
-    private OrganisasjonselementResources getOrganisasjonselementResources(String bearer){
-        return
-                webClient.get()
-                        .uri("/administrasjon/organisasjon/organisasjonselement")
-                        .header(HttpHeaders.AUTHORIZATION, bearer)
-                        .retrieve()
-                        .bodyToMono(OrganisasjonselementResources.class)
-                        .block();
     }
 
     private Optional<OrganisasjonselementResource> getTopElement(OrganisasjonselementResources organisasjonselementResources) {
@@ -160,37 +167,18 @@ public class FintServiceTestComponents {
                 .findFirst();
     }
 
-    private SkoleResources getSkoleResources(String bearer) {
-        return webClient.get()
-                .uri("/utdanning/utdanningsprogram/skole")
-                .header(HttpHeaders.AUTHORIZATION, bearer)
-                .retrieve()
-                .bodyToMono(SkoleResources.class)
-                .block();
-    }
-
-    private ArstrinnResources getArstrinnResources(String bearer) {
-        return webClient.get()
-                .uri("/utdanning/utdanningsprogram/arstrinn")
-                .header(HttpHeaders.AUTHORIZATION, bearer)
-                .retrieve()
-                .bodyToMono(ArstrinnResources.class)
-                .block();
-    }
-
-    private BasisgruppeResources getBasisgruppeResources(String bearer) {
-        return webClient.get()
-                .uri("/utdanning/utdanningsprogram/basisgruppe")
-                .header(HttpHeaders.AUTHORIZATION, bearer)
-                .retrieve()
-                .bodyToMono(BasisgruppeResources.class)
-                .block();
-    }
-
     private Kontaktinformasjon getKontaktInformasjon(no.fint.model.felles.kompleksedatatyper.Kontaktinformasjon contactInformation1) {
         Kontaktinformasjon contactInformation = new Kontaktinformasjon();
         contactInformation.setEpostadresse(contactInformation1.getEpostadresse());
         contactInformation.setMobiltelefonnummer(contactInformation1.getMobiltelefonnummer());
         return contactInformation;
+    }
+
+    public ReactorClientHttpConnector tcp(){
+        return new ReactorClientHttpConnector(HttpClient.from(TcpClient.create()
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 1000)
+                .doOnConnected(connection ->
+                        connection.addHandlerLast(new ReadTimeoutHandler(3))
+                                .addHandlerLast(new WriteTimeoutHandler(3)))));
     }
 }

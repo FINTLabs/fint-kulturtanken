@@ -1,7 +1,9 @@
 package no.fint.kulturtanken;
 
+import io.netty.handler.timeout.ReadTimeoutException;
 import lombok.extern.slf4j.Slf4j;
 import no.fint.kulturtanken.model.*;
+import no.fint.model.resource.AbstractCollectionResources;
 import no.fint.model.resource.Link;
 import no.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementResource;
 import no.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementResources;
@@ -13,8 +15,11 @@ import no.fint.model.resource.utdanning.utdanningsprogram.SkoleResource;
 import no.fint.model.resource.utdanning.utdanningsprogram.SkoleResources;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,27 +30,29 @@ import java.util.stream.Collectors;
 @Service
 public class FintService {
 
+    private final String GET_ORGANISATION_URI = "/administrasjon/organisasjon/organisasjonselement";
+    private final String GET_SCHOOL_URI = "/utdanning/utdanningsprogram/skole";
+    private final String GET_LEVEL_URI = "/utdanning/utdanningsprogram/arstrinn";
+    private final String GET_GROUP_URI = "/utdanning/utdanningsprogram/basisgruppe";
+
     @Autowired
     private WebClient webClient;
 
     public SkoleOrganisasjon getSkoleOrganisasjon(String bearer) {
-        return setUpSchoolOrganisation(bearer);
+            return setUpSchoolOrganisation(bearer);
     }
 
     private SkoleOrganisasjon setUpSchoolOrganisation(String bearer) {
         SkoleOrganisasjon schoolOrganisation = new SkoleOrganisasjon();
         addOrganisationInfo(schoolOrganisation, bearer);
-        if (schoolOrganisation.getNavn() == null) return null;
         schoolOrganisation.setSkole(getSkoleList(bearer));
         setSchoolLevelsAndGroups(schoolOrganisation, bearer);
         return schoolOrganisation;
     }
 
     private void addOrganisationInfo(SkoleOrganisasjon schoolOrganisation, String bearer) {
-        OrganisasjonselementResources organisasjonselementResources = getOrganisasjonselementResources(bearer);
-        if (organisasjonselementResources.getContent().get(0).getNavn() == null){
-            return;
-        }
+        OrganisasjonselementResources organisasjonselementResources = new OrganisasjonselementResources();
+        organisasjonselementResources = (OrganisasjonselementResources) getResources(GET_ORGANISATION_URI, bearer, organisasjonselementResources);
         Optional<OrganisasjonselementResource> topLevelOrg = getTopElement(organisasjonselementResources);
         topLevelOrg.ifPresent(o -> {
             schoolOrganisation.setNavn(o.getNavn());
@@ -55,7 +62,8 @@ public class FintService {
     }
 
     private List<Skole> getSkoleList(String bearer) {
-        SkoleResources skoleResources = getSkoleResources(bearer);
+        SkoleResources skoleResources = new SkoleResources();
+        skoleResources = (SkoleResources) getResources(GET_SCHOOL_URI, bearer, skoleResources);
         return
                 skoleResources.getContent()
                         .stream()
@@ -71,9 +79,12 @@ public class FintService {
     }
 
     private void setSchoolLevelsAndGroups(SkoleOrganisasjon schoolOrganisation, String bearer) {
-        List<SkoleResource> schoolResourceList = getSkoleResources(bearer).getContent();
-        List<ArstrinnResource> levelResourceList = getArstrinnResources(bearer).getContent();
-        List<BasisgruppeResource> groupResourceList = getBasisgruppeResources(bearer).getContent();
+        SkoleResources skoleResources = new SkoleResources();
+        ArstrinnResources arstrinnResources = new ArstrinnResources();
+        BasisgruppeResources basisgruppeResources = new BasisgruppeResources();
+        List<SkoleResource> schoolResourceList = ((SkoleResources)(getResources(GET_SCHOOL_URI, bearer, skoleResources))).getContent();
+        List<ArstrinnResource> levelResourceList = ((ArstrinnResources)(getResources(GET_LEVEL_URI, bearer, arstrinnResources))).getContent();
+        List<BasisgruppeResource> groupResourceList = ((BasisgruppeResources)(getResources(GET_GROUP_URI, bearer, basisgruppeResources))).getContent();
 
         schoolResourceList.forEach(schoolResource -> {
             Link schoolResouceLink = schoolResource.getSelfLinks().get(0);
@@ -118,14 +129,30 @@ public class FintService {
         }
     }
 
-    private OrganisasjonselementResources getOrganisasjonselementResources(String bearer) {
+    private AbstractCollectionResources getResources(String uri, String bearer, AbstractCollectionResources resourceClass){
         return
                 webClient.get()
-                        .uri("/administrasjon/organisasjon/organisasjonselement")
+                        .uri(uri)
                         .header(HttpHeaders.AUTHORIZATION, bearer)
                         .retrieve()
-                        .bodyToMono(OrganisasjonselementResources.class)
+                        .bodyToMono(resourceClass.getClass())
+                        .onErrorResume(response -> {
+                            if (response instanceof WebClientResponseException) {
+                                WebClientResponseException response1 = (WebClientResponseException) response;
+                                if (response1.getStatusCode() == HttpStatus.NOT_FOUND) {
+                                    return Mono.error(new URINotFoundException(response1.getStatusText()));
+                                }
+                                if (response1.getStatusCode() == HttpStatus.REQUEST_TIMEOUT) {
+                                    return Mono.error(new ResourceRequestTimeoutException(response1.getStatusText()));
+                                }
+                            }
+                            if (response instanceof ReadTimeoutException) {
+                                return Mono.error(new ResourceRequestTimeoutException(response.getMessage()));
+                            }
+                            return Mono.error(new UnableToCreateResourceException(response.getMessage()));
+                        })
                         .block();
+
     }
 
     private Optional<OrganisasjonselementResource> getTopElement(OrganisasjonselementResources organisasjonselementResources) {
@@ -133,33 +160,6 @@ public class FintService {
                 .stream()
                 .filter(it -> it.getSelfLinks().stream().anyMatch(l -> it.getOverordnet().stream().anyMatch(l::equals)))
                 .findFirst();
-    }
-
-    private SkoleResources getSkoleResources(String bearer) {
-        return webClient.get()
-                .uri("/utdanning/utdanningsprogram/skole")
-                .header(HttpHeaders.AUTHORIZATION, bearer)
-                .retrieve()
-                .bodyToMono(SkoleResources.class)
-                .block();
-    }
-
-    private ArstrinnResources getArstrinnResources(String bearer) {
-        return webClient.get()
-                .uri("/utdanning/utdanningsprogram/arstrinn")
-                .header(HttpHeaders.AUTHORIZATION, bearer)
-                .retrieve()
-                .bodyToMono(ArstrinnResources.class)
-                .block();
-    }
-
-    private BasisgruppeResources getBasisgruppeResources(String bearer) {
-        return webClient.get()
-                .uri("/utdanning/utdanningsprogram/basisgruppe")
-                .header(HttpHeaders.AUTHORIZATION, bearer)
-                .retrieve()
-                .bodyToMono(BasisgruppeResources.class)
-                .block();
     }
 
     private Kontaktinformasjon getKontaktInformasjon(no.fint.model.felles.kompleksedatatyper.Kontaktinformasjon contactInformation1) {
