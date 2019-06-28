@@ -33,15 +33,15 @@ public class Controller {
     }
 
     @ExceptionHandler(ResourceRequestTimeoutException.class)
-    public ResponseEntity handleTimeOutException(ResourceRequestTimeoutException e) {
+    public ResponseEntity handleTimeOutException(Exception e) {
         return ResponseEntity.status(HttpStatus.REQUEST_TIMEOUT).build();
     }
     @ExceptionHandler(UnableToCreateResourceException.class)
-    public ResponseEntity handleCreateResourceFailed(UnableToCreateResourceException e) {
+    public ResponseEntity handleCreateResourceFailed(Exception e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
     @ExceptionHandler(URINotFoundException.class)
-    public ResponseEntity handleWrongURI(URINotFoundException e) {
+    public ResponseEntity handleWrongURI(Exception e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 }
