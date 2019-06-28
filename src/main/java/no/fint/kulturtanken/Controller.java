@@ -38,10 +38,10 @@ public class Controller {
     }
     @ExceptionHandler(UnableToCreateResourceException.class)
     public ResponseEntity handleCreateResourceFailed(UnableToCreateResourceException e) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
     @ExceptionHandler(URINotFoundException.class)
     public ResponseEntity handleWrongURI(URINotFoundException e) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 }
