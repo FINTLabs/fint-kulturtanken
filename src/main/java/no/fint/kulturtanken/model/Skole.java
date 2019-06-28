@@ -6,9 +6,9 @@ import java.util.List;
 
 @Data
 public class Skole {
+	private String navn;
+	private String skolenummer;
+	private String organisasjonsnummer;
 	private Kontaktinformasjon kontaktinformasjon;
 	private List<Trinn> trinn;
-	private String navn;
-	private String organisasjonsnummer;
-	private String skolenummer;
 }

@@ -1,0 +1,511 @@
+{
+  "_embedded": {
+    "_entries": [
+      {
+        "kontaktinformasjon": {
+          "epostadresse": "post@haugfk.no",
+          "mobiltelefonnummer": "47474747",
+          "nettsted": "http://www.haugfk.no",
+          "sip": "kundesenter@haugfk.no",
+          "telefonnummer": "52525252"
+        },
+        "postadresse": {
+          "adresselinje": [
+            "PB 69"
+          ],
+          "postnummer": "5501",
+          "poststed": "Haugesund"
+        },
+        "forretningsadresse": {
+          "adresselinje": [
+            "Marilyn Monroe 1"
+          ],
+          "postnummer": "5520",
+          "poststed": "Haugesund"
+        },
+        "organisasjonsnavn": "Sundet videregåendeskole",
+        "organisasjonsnummer": {
+          "identifikatorverdi": "970123458"
+        },
+        "gyldighetsperiode": {
+          "slutt": "2017-06-04T19:53:36Z",
+          "start": "2017-06-04T19:53:36Z"
+        },
+        "kortnavn": "Sundet vgs",
+        "navn": "Sundet videregående skole",
+        "organisasjonsId": {
+          "identifikatorverdi": "560000"
+        },
+        "organisasjonsKode": {
+          "gyldighetsperiode": {
+            "slutt": "2017-06-04T19:53:36Z",
+            "start": "2017-06-04T19:53:36Z"
+          },
+          "identifikatorverdi": "SUNDETVGS"
+        },
+        "_links": {
+          "overordnet": [
+            {
+              "href": "https://play-with-fint.felleskomponent.no/administrasjon/organisasjon/organisasjonselement/organisasjonsid/550001"
+            }
+          ],
+          "underordnet": [
+            {
+              "href": "https://play-with-fint.felleskomponent.no/administrasjon/organisasjon/organisasjonselement/organisasjonsid/561000"
+            },
+            {
+              "href": "https://play-with-fint.felleskomponent.no/administrasjon/organisasjon/organisasjonselement/organisasjonsid/562000"
+            }
+          ],
+          "leder": [
+            {
+              "href": "https://play-with-fint.felleskomponent.no/administrasjon/personal/personalressurs/ansattnummer/100002"
+            }
+          ],
+          "arbeidsforhold": [
+            {
+              "href": "https://play-with-fint.felleskomponent.no/administrasjon/personal/arbeidsforhold/systemid/100002_1"
+            },
+            {
+              "href": "https://play-with-fint.felleskomponent.no/administrasjon/personal/arbeidsforhold/systemid/100004_1"
+            }
+          ],
+          "self": [
+            {
+              "href": "https://play-with-fint.felleskomponent.no/administrasjon/organisasjon/organisasjonselement/organisasjonsid/560000"
+            }
+          ]
+        }
+      },
+      {
+        "kontaktinformasjon": {
+          "epostadresse": "post@haugfk.no",
+          "mobiltelefonnummer": "47474747",
+          "nettsted": "http://www.haugfk.no",
+          "sip": "kundesenter@haugfk.no",
+          "telefonnummer": "52525252"
+        },
+        "postadresse": {
+          "adresselinje": [
+            "PB 69"
+          ],
+          "postnummer": "5501",
+          "poststed": "Haugesund"
+        },
+        "forretningsadresse": {
+          "adresselinje": [
+            "Marilyn Monroe 1"
+          ],
+          "postnummer": "5520",
+          "poststed": "Haugesund"
+        },
+        "gyldighetsperiode": {
+          "start": "2017-06-04T19:53:36Z"
+        },
+        "kortnavn": "Drift og miljø",
+        "navn": "Avdeling for drift og miljø",
+        "organisasjonsId": {
+          "identifikatorverdi": "561000"
+        },
+        "organisasjonsKode": {
+          "gyldighetsperiode": {
+            "start": "2017-06-04T19:53:36Z"
+          },
+          "identifikatorverdi": "SVG-DM"
+        },
+        "_links": {
+          "overordnet": [
+            {
+              "href": "https://play-with-fint.felleskomponent.no/administrasjon/organisasjon/organisasjonselement/organisasjonsid/560000"
+            }
+          ],
+          "leder": [
+            {
+              "href": "https://play-with-fint.felleskomponent.no/administrasjon/personal/personalressurs/ansattnummer/100002"
+            }
+          ],
+          "self": [
+            {
+              "href": "https://play-with-fint.felleskomponent.no/administrasjon/organisasjon/organisasjonselement/organisasjonsid/561000"
+            }
+          ]
+        }
+      },
+      {
+        "kontaktinformasjon": {
+          "epostadresse": "post@haugfk.no",
+          "mobiltelefonnummer": "47474747",
+          "nettsted": "http://www.haugfk.no",
+          "sip": "kundesenter@haugfk.no",
+          "telefonnummer": "52525252"
+        },
+        "postadresse": {
+          "adresselinje": [
+            "PB 69"
+          ],
+          "postnummer": "5501",
+          "poststed": "Haugesund"
+        },
+        "forretningsadresse": {
+          "adresselinje": [
+            "Marilyn Monroe 1"
+          ],
+          "postnummer": "5520",
+          "poststed": "Haugesund"
+        },
+        "gyldighetsperiode": {
+          "start": "2017-06-04T19:53:36Z"
+        },
+        "kortnavn": "Musikk, dans og drama",
+        "navn": "Avdeling for musikk, dans og drama",
+        "organisasjonsId": {
+          "identifikatorverdi": "569000"
+        },
+        "organisasjonsKode": {
+          "gyldighetsperiode": {
+            "start": "2017-06-04T19:53:36Z"
+          },
+          "identifikatorverdi": "SVG-MDD"
+        },
+        "_links": {
+          "overordnet": [
+            {
+              "href": "https://play-with-fint.felleskomponent.no/administrasjon/organisasjon/organisasjonselement/organisasjonsid/560000"
+            }
+          ],
+          "leder": [
+            {
+              "href": "https://play-with-fint.felleskomponent.no/administrasjon/personal/personalressurs/ansattnummer/100003"
+            }
+          ],
+          "self": [
+            {
+              "href": "https://play-with-fint.felleskomponent.no/administrasjon/organisasjon/organisasjonselement/organisasjonsid/569000"
+            }
+          ]
+        }
+      },
+      {
+        "kontaktinformasjon": {
+          "epostadresse": "post@haugfk.no",
+          "mobiltelefonnummer": "47474747",
+          "nettsted": "http://www.haugfk.no",
+          "sip": "kundesenter@haugfk.no",
+          "telefonnummer": "52525252"
+        },
+        "postadresse": {
+          "adresselinje": [
+            "PB 69"
+          ],
+          "postnummer": "5501",
+          "poststed": "Haugesund"
+        },
+        "forretningsadresse": {
+          "adresselinje": [
+            "Marilyn Monroe 1"
+          ],
+          "postnummer": "5520",
+          "poststed": "Haugesund"
+        },
+        "gyldighetsperiode": {
+          "start": "2017-06-04T19:53:36Z"
+        },
+        "kortnavn": "Helsefag",
+        "navn": "Avdeling for helsefag",
+        "organisasjonsId": {
+          "identifikatorverdi": "568000"
+        },
+        "organisasjonsKode": {
+          "gyldighetsperiode": {
+            "start": "2017-06-04T19:53:36Z"
+          },
+          "identifikatorverdi": "SVG-HE"
+        },
+        "_links": {
+          "overordnet": [
+            {
+              "href": "https://play-with-fint.felleskomponent.no/administrasjon/organisasjon/organisasjonselement/organisasjonsid/560000"
+            }
+          ],
+          "leder": [
+            {
+              "href": "https://play-with-fint.felleskomponent.no/administrasjon/personal/personalressurs/ansattnummer/100003"
+            }
+          ],
+          "arbeidsforhold": [
+            {
+              "href": "https://play-with-fint.felleskomponent.no/administrasjon/personal/arbeidsforhold/systemid/100004_2"
+            }
+          ],
+          "self": [
+            {
+              "href": "https://play-with-fint.felleskomponent.no/administrasjon/organisasjon/organisasjonselement/organisasjonsid/568000"
+            }
+          ]
+        }
+      },
+      {
+        "kontaktinformasjon": {
+          "epostadresse": "post@haugfk.no",
+          "mobiltelefonnummer": "47474747",
+          "nettsted": "http://www.haugfk.no",
+          "sip": "kundesenter@haugfk.no",
+          "telefonnummer": "52525252"
+        },
+        "postadresse": {
+          "adresselinje": [
+            "PB 1"
+          ],
+          "postnummer": "5501",
+          "poststed": "Haugesund"
+        },
+        "forretningsadresse": {
+          "adresselinje": [
+            "Haraldsgaten 1"
+          ],
+          "postnummer": "5500",
+          "poststed": "Haugesund"
+        },
+        "organisasjonsnavn": "Haugaland fylkeskommune, Opplæringsavdelingen",
+        "organisasjonsnummer": {
+          "identifikatorverdi": "970123457"
+        },
+        "gyldighetsperiode": {
+          "slutt": "2017-06-04T19:53:36Z",
+          "start": "2017-06-04T19:53:36Z"
+        },
+        "kortnavn": "Opplæring",
+        "navn": "Opplæringsavdelingen",
+        "organisasjonsId": {
+          "identifikatorverdi": "550001"
+        },
+        "organisasjonsKode": {
+          "gyldighetsperiode": {
+            "slutt": "2017-06-04T19:53:36Z",
+            "start": "2017-06-04T19:53:36Z"
+          },
+          "identifikatorverdi": "OPPLAVD"
+        },
+        "_links": {
+          "overordnet": [
+            {
+              "href": "https://play-with-fint.felleskomponent.no/administrasjon/organisasjon/organisasjonselement/organisasjonsid/550000"
+            }
+          ],
+          "underordnet": [
+            {
+              "href": "https://play-with-fint.felleskomponent.no/administrasjon/organisasjon/organisasjonselement/organisasjonsid/560000"
+            }
+          ],
+          "leder": [
+            {
+              "href": "https://play-with-fint.felleskomponent.no/administrasjon/personal/personalressurs/ansattnummer/100000"
+            }
+          ],
+          "arbeidsforhold": [
+            {
+              "href": "https://play-with-fint.felleskomponent.no/administrasjon/personal/arbeidsforhold/systemid/100001_1"
+            }
+          ],
+          "self": [
+            {
+              "href": "https://play-with-fint.felleskomponent.no/administrasjon/organisasjon/organisasjonselement/organisasjonsid/550001"
+            }
+          ]
+        }
+      },
+      {
+        "kontaktinformasjon": {
+          "epostadresse": "post@fagerslott.osloskole.no",
+          "mobiltelefonnummer": "4747474",
+          "nettsted": "http://www.fagerslott.osloskole.no",
+          "sip": "adm@fagerslott.osloskole.no",
+          "telefonnummer": "2525252"
+        },
+        "postadresse": {
+          "adresselinje": [
+            "Oscars gate 1"
+          ],
+          "postnummer": "0352",
+          "poststed": "Oslo"
+        },
+        "forretningsadresse": {
+          "adresselinje": [
+            "Oscars gate 1"
+          ],
+          "postnummer": "0352",
+          "poststed": "Oslo"
+        },
+        "organisasjonsnavn": "Fagerslott barneskole",
+        "organisasjonsnummer": {
+          "identifikatorverdi": "970123459"
+        },
+        "kortnavn": "Fagerslott barneskole",
+        "navn": "Fagerslott skole",
+        "organisasjonsId": {
+          "identifikatorverdi": "XX6543"
+        },
+        "organisasjonsKode": {
+          "identifikatorverdi": "654321"
+        },
+        "_links": {
+          "skole": [
+            {
+              "href": "https://play-with-fint.felleskomponent.no/skolenummer/654321"
+            }
+          ],
+          "arbeidsforhold": [
+            {
+              "href": "https://play-with-fint.felleskomponent.no/administrasjon/personal/arbeidsforhold/systemid/AF_NORA"
+            },
+            {
+              "href": "https://play-with-fint.felleskomponent.no/administrasjon/personal/arbeidsforhold/systemid/AF_ANNA"
+            }
+          ],
+          "self": [
+            {
+              "href": "https://play-with-fint.felleskomponent.no/administrasjon/organisasjon/organisasjonselement/organisasjonsid/XX6543"
+            }
+          ]
+        }
+      },
+      {
+        "kontaktinformasjon": {
+          "epostadresse": "post@haugfk.no",
+          "mobiltelefonnummer": "47474747",
+          "nettsted": "http://www.haugfk.no",
+          "sip": "kundesenter@haugfk.no",
+          "telefonnummer": "52525252"
+        },
+        "postadresse": {
+          "adresselinje": [
+            "PB 69"
+          ],
+          "postnummer": "5501",
+          "poststed": "Haugesund"
+        },
+        "forretningsadresse": {
+          "adresselinje": [
+            "Marilyn Monroe 1"
+          ],
+          "postnummer": "5520",
+          "poststed": "Haugesund"
+        },
+        "gyldighetsperiode": {
+          "start": "2017-06-04T19:53:36Z"
+        },
+        "kortnavn": "Fellesfag",
+        "navn": "Avdeling for fellesfag",
+        "organisasjonsId": {
+          "identifikatorverdi": "562000"
+        },
+        "organisasjonsKode": {
+          "gyldighetsperiode": {
+            "start": "2017-06-04T19:53:36Z"
+          },
+          "identifikatorverdi": "SVG-FF"
+        },
+        "_links": {
+          "overordnet": [
+            {
+              "href": "https://play-with-fint.felleskomponent.no/administrasjon/organisasjon/organisasjonselement/organisasjonsid/560000"
+            }
+          ],
+          "leder": [
+            {
+              "href": "https://play-with-fint.felleskomponent.no/administrasjon/personal/personalressurs/ansattnummer/100002"
+            }
+          ],
+          "arbeidsforhold": [
+            {
+              "href": "https://play-with-fint.felleskomponent.no/administrasjon/personal/arbeidsforhold/systemid/100003_1"
+            }
+          ],
+          "self": [
+            {
+              "href": "https://play-with-fint.felleskomponent.no/administrasjon/organisasjon/organisasjonselement/organisasjonsid/562000"
+            }
+          ]
+        }
+      },
+      {
+        "kontaktinformasjon": {
+          "epostadresse": "post@haugfk.no",
+          "mobiltelefonnummer": "47474747",
+          "nettsted": "http://www.haugfk.no",
+          "sip": "kundesenter@haugfk.no",
+          "telefonnummer": "52525252"
+        },
+        "postadresse": {
+          "adresselinje": [
+            "PB 1"
+          ],
+          "postnummer": "5501",
+          "poststed": "Haugesund"
+        },
+        "forretningsadresse": {
+          "adresselinje": [
+            "Haraldsgaten 1"
+          ],
+          "postnummer": "5500",
+          "poststed": "Haugesund"
+        },
+        "organisasjonsnavn": "Haugaland fylkeskommune",
+        "organisasjonsnummer": {
+          "identifikatorverdi": "970123456"
+        },
+        "gyldighetsperiode": {
+          "slutt": "2017-06-04T19:53:36Z",
+          "start": "2017-06-04T19:53:36Z"
+        },
+        "kortnavn": "Haugaland",
+        "navn": "Haugaland fylkeskommune",
+        "organisasjonsId": {
+          "identifikatorverdi": "550000"
+        },
+        "organisasjonsKode": {
+          "gyldighetsperiode": {
+            "slutt": "2017-06-04T19:53:36Z",
+            "start": "2017-06-04T19:53:36Z"
+          },
+          "identifikatorverdi": "HAUGFK"
+        },
+        "_links": {
+          "overordnet": [
+            {
+              "href": "https://play-with-fint.felleskomponent.no/administrasjon/organisasjon/organisasjonselement/organisasjonsid/550000"
+            }
+          ],
+          "underordnet": [
+            {
+              "href": "https://play-with-fint.felleskomponent.no/administrasjon/organisasjon/organisasjonselement/organisasjonsid/550001"
+            }
+          ],
+          "leder": [
+            {
+              "href": "https://play-with-fint.felleskomponent.no/administrasjon/personal/personalressurs/ansattnummer/100000"
+            }
+          ],
+          "arbeidsforhold": [
+            {
+              "href": "https://play-with-fint.felleskomponent.no/administrasjon/personal/arbeidsforhold/systemid/100000_1"
+            }
+          ],
+          "self": [
+            {
+              "href": "https://play-with-fint.felleskomponent.no/administrasjon/organisasjon/organisasjonselement/organisasjonsid/550000"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "_links": {
+    "self": [
+      {
+        "href": "https://play-with-fint.felleskomponent.no/administrasjon/organisasjon/organisasjonselement/"
+      }
+    ]
+  },
+  "total_items": 8
+}
