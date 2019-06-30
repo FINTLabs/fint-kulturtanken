@@ -132,23 +132,25 @@ public class FintService {
                         .header(HttpHeaders.AUTHORIZATION, bearer)
                         .retrieve()
                         .bodyToMono(resourceClass.getClass())
-                        .onErrorResume(response -> {
-                            if (response instanceof WebClientResponseException) {
-                                WebClientResponseException clientResponseException = (WebClientResponseException) response;
-                                if (clientResponseException.getStatusCode() == HttpStatus.NOT_FOUND) {
-                                    return Mono.error(new URINotFoundException(clientResponseException.getStatusText()));
-                                }
-                                if (clientResponseException.getStatusCode() == HttpStatus.REQUEST_TIMEOUT) {
-                                    return Mono.error(new ResourceRequestTimeoutException(clientResponseException.getStatusText()));
-                                }
-                            }
-                            if (response instanceof ReadTimeoutException) {
-                                return Mono.error(new ResourceRequestTimeoutException(response.getMessage()));
-                            }
-                            return Mono.error(new UnableToCreateResourceException(response.getMessage()));
-                        })
+                        .onErrorResume(this::handleWebClientErrors)
                         .block();
 
+    }
+
+    private Mono handleWebClientErrors(Throwable response) {
+        if (response instanceof WebClientResponseException) {
+            WebClientResponseException clientResponseException = (WebClientResponseException) response;
+            if (clientResponseException.getStatusCode() == HttpStatus.NOT_FOUND) {
+                return Mono.error(new URINotFoundException(clientResponseException.getStatusText()));
+            }
+            if (clientResponseException.getStatusCode() == HttpStatus.REQUEST_TIMEOUT) {
+                return Mono.error(new ResourceRequestTimeoutException(clientResponseException.getStatusText()));
+            }
+        }
+        if (response instanceof ReadTimeoutException) {
+            return Mono.error(new ResourceRequestTimeoutException(response.getMessage()));
+        }
+        return Mono.error(new UnableToCreateResourceException(response.getMessage()));
     }
 
     private Optional<OrganisasjonselementResource> getTopElement(OrganisasjonselementResources organisasjonselementResources) {

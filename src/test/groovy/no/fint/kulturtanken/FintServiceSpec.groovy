@@ -1,8 +1,5 @@
 package no.fint.kulturtanken
 
-import no.fint.kulturtanken.FintServiceTestComponents
-import no.fint.kulturtanken.ResourceRequestTimeoutException
-import no.fint.kulturtanken.URINotFoundException
 import no.fint.kulturtanken.model.SkoleOrganisasjon
 import no.fint.model.felles.kompleksedatatyper.Kontaktinformasjon
 import no.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementResources
@@ -18,7 +15,7 @@ import spock.lang.Specification
 class FintServiceSpec extends Specification {
     private def server = new MockWebServer()
     private def webClient = WebClient.create(server.url('/').toString())
-    private def fintserviceTestComponents = new FintServiceTestComponents(webClient: webClient)
+    private def fintserviceTestComponents = new FintService(webClient: webClient)
 
 
     def "Use addOrganisationInfo() and receive Name, Kontaktinformasjon and emtpty school"() {
@@ -176,7 +173,7 @@ class FintServiceSpec extends Specification {
     def "When request not answered within {time-out-time} cast ResourceRequestTimeoutException"() {
         given:
         def build = WebClient.builder().clientConnector(fintserviceTestComponents.tcp()).baseUrl(server.url('/').toString()).build()
-        def fintserviceTestComponents2 = new FintServiceTestComponents(webClient: build)
+        def fintserviceTestComponents2 = new FintService(webClient: build)
         when:
         Exception errorException = new Exception()
         OrganisasjonselementResources organisasjonselementResources = new OrganisasjonselementResources()
