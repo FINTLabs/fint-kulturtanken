@@ -1,5 +1,5 @@
-import no.fint.ApplicationConfiguration
-import no.fint.kulturtanken.FintService
+package no.fint.kulturtanken
+
 import no.fint.kulturtanken.FintServiceTestComponents
 import no.fint.kulturtanken.ResourceRequestTimeoutException
 import no.fint.kulturtanken.URINotFoundException
@@ -69,6 +69,7 @@ class FintServiceSpec extends Specification {
         schoolList[1].organisasjonsnummer == "970123458"
         schoolList[1].skolenummer == "123456"
     }
+
     def "Add SkoleOrganisasjon, Skole, Trinn and Basisgrupper. Then test Trinn-structure"() {
         given:
         server.enqueue(
@@ -147,14 +148,15 @@ class FintServiceSpec extends Specification {
 
         when:
         Exception errorException = new Exception()
-        try{
-        AbstractCollection abstractCollection= fintserviceTestComponents.getSkoleList("testBearer")
-        }catch(Exception e){
+        try {
+            AbstractCollection abstractCollection = fintserviceTestComponents.getSkoleList("testBearer")
+        } catch (Exception e) {
             errorException = e
         }
         then:
         errorException instanceof URINotFoundException
     }
+
     def "When URI is wrong cast URINotFoundException"() {
         given:
         String a404URI = "https://play-with-fint.felleskomponent.no/administrasjon/organisasjon/organisasjonselementer"
@@ -162,14 +164,15 @@ class FintServiceSpec extends Specification {
         when:
         Exception errorException = new Exception()
         OrganisasjonselementResources organisasjonselementResources = new OrganisasjonselementResources()
-        try{
-            AbstractCollection abstractCollection= fintserviceTestComponents.getResources(a404URI, "testBearer", organisasjonselementResources)
-        }catch(Exception e){
+        try {
+            AbstractCollection abstractCollection = fintserviceTestComponents.getResources(a404URI, "testBearer", organisasjonselementResources)
+        } catch (Exception e) {
             errorException = e
         }
         then:
         errorException instanceof URINotFoundException
     }
+
     def "When request not answered within {time-out-time} cast ResourceRequestTimeoutException"() {
         given:
         def build = WebClient.builder().clientConnector(fintserviceTestComponents.tcp()).baseUrl(server.url('/').toString()).build()
@@ -177,26 +180,26 @@ class FintServiceSpec extends Specification {
         when:
         Exception errorException = new Exception()
         OrganisasjonselementResources organisasjonselementResources = new OrganisasjonselementResources()
-        try{
+        try {
             organisasjonselementResources = fintserviceTestComponents2.getResources(fintserviceTestComponents.GET_ORGANISATION_URI, "testBearer", organisasjonselementResources)
-        }catch(Exception e){
+        } catch (Exception e) {
             errorException = e
         }
         then:
         errorException instanceof ResourceRequestTimeoutException
     }
 
-   /* def "Test cast ResourceRequestTimeoutException to Controller"() {
-        given:
-        ApplicationConfiguration applicationConfiguration = new ApplicationConfiguration()
-        def client = applicationConfiguration.webClient()
-        def fintservice = new FintService(webClient: client)
-        when:
-        Exception errorException = new Exception()
-        OrganisasjonselementResources organisasjonselementResources = new OrganisasjonselementResources()
-        organisasjonselementResources = fintservice.getResources(fintservice.GET_ORGANISATION_URI, "testBearer", organisasjonselementResources)
+    /* def "Test cast ResourceRequestTimeoutException to Controller"() {
+         given:
+         ApplicationConfiguration applicationConfiguration = new ApplicationConfiguration()
+         def client = applicationConfiguration.webClient()
+         def fintservice = new FintService(webClient: client)
+         when:
+         Exception errorException = new Exception()
+         OrganisasjonselementResources organisasjonselementResources = new OrganisasjonselementResources()
+         organisasjonselementResources = fintservice.getResources(fintservice.GET_ORGANISATION_URI, "testBearer", organisasjonselementResources)
 
-        then:
-        print("Hipp")
-    }*/
+         then:
+         print("Hipp")
+     }*/
 }

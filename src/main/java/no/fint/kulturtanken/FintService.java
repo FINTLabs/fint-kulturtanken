@@ -39,15 +39,11 @@ public class FintService {
     private WebClient webClient;
 
     public SkoleOrganisasjon getSkoleOrganisasjon(String bearer) {
-            return setUpSchoolOrganisation(bearer);
-    }
-
-    private SkoleOrganisasjon setUpSchoolOrganisation(String bearer) {
-        SkoleOrganisasjon schoolOrganisation = new SkoleOrganisasjon();
-        addOrganisationInfo(schoolOrganisation, bearer);
-        schoolOrganisation.setSkole(getSkoleList(bearer));
-        setSchoolLevelsAndGroups(schoolOrganisation, bearer);
-        return schoolOrganisation;
+        SkoleOrganisasjon skoleOrganisasjon = new SkoleOrganisasjon();
+        addOrganisationInfo(skoleOrganisasjon, bearer);
+        skoleOrganisasjon.setSkole(getSkoleList(bearer));
+        setSchoolLevelsAndGroups(skoleOrganisasjon, bearer);
+        return skoleOrganisasjon;
     }
 
     private void addOrganisationInfo(SkoleOrganisasjon schoolOrganisation, String bearer) {
@@ -82,9 +78,9 @@ public class FintService {
         SkoleResources skoleResources = new SkoleResources();
         ArstrinnResources arstrinnResources = new ArstrinnResources();
         BasisgruppeResources basisgruppeResources = new BasisgruppeResources();
-        List<SkoleResource> schoolResourceList = ((SkoleResources)(getResources(GET_SCHOOL_URI, bearer, skoleResources))).getContent();
-        List<ArstrinnResource> levelResourceList = ((ArstrinnResources)(getResources(GET_LEVEL_URI, bearer, arstrinnResources))).getContent();
-        List<BasisgruppeResource> groupResourceList = ((BasisgruppeResources)(getResources(GET_GROUP_URI, bearer, basisgruppeResources))).getContent();
+        List<SkoleResource> schoolResourceList = ((SkoleResources) (getResources(GET_SCHOOL_URI, bearer, skoleResources))).getContent();
+        List<ArstrinnResource> levelResourceList = ((ArstrinnResources) (getResources(GET_LEVEL_URI, bearer, arstrinnResources))).getContent();
+        List<BasisgruppeResource> groupResourceList = ((BasisgruppeResources) (getResources(GET_GROUP_URI, bearer, basisgruppeResources))).getContent();
 
         schoolResourceList.forEach(schoolResource -> {
             Link schoolResouceLink = schoolResource.getSelfLinks().get(0);
@@ -98,7 +94,7 @@ public class FintService {
         levelResourceList.forEach(level -> {
             Link levelSelfLink = level.getSelfLinks().get(0);
             List<Basisgrupper> filteredGroups = filterGroups(levelSelfLink, schoolResouceLink, groupResourceList);
-            addLvlAndGroupToSchool(level, levelList, filteredGroups, schoolOrganisation, schoolResource);
+            addLevelAndGroupToSchool(level, levelList, filteredGroups, schoolOrganisation, schoolResource);
         });
     }
 
@@ -116,7 +112,7 @@ public class FintService {
                 }).collect(Collectors.toList());
     }
 
-    private void addLvlAndGroupToSchool(ArstrinnResource level, List<Trinn> levelList, List<Basisgrupper> filteredGroups, SkoleOrganisasjon schoolOrganisation, SkoleResource skoleResource) {
+    private void addLevelAndGroupToSchool(ArstrinnResource level, List<Trinn> levelList, List<Basisgrupper> filteredGroups, SkoleOrganisasjon schoolOrganisation, SkoleResource skoleResource) {
         Trinn trinn = new Trinn();
         trinn.setNiva(level.getNavn());
         trinn.setBasisgrupper(filteredGroups);
@@ -129,7 +125,7 @@ public class FintService {
         }
     }
 
-    private AbstractCollectionResources getResources(String uri, String bearer, AbstractCollectionResources resourceClass){
+    private AbstractCollectionResources getResources(String uri, String bearer, AbstractCollectionResources resourceClass) {
         return
                 webClient.get()
                         .uri(uri)
@@ -138,12 +134,12 @@ public class FintService {
                         .bodyToMono(resourceClass.getClass())
                         .onErrorResume(response -> {
                             if (response instanceof WebClientResponseException) {
-                                WebClientResponseException response1 = (WebClientResponseException) response;
-                                if (response1.getStatusCode() == HttpStatus.NOT_FOUND) {
-                                    return Mono.error(new URINotFoundException(response1.getStatusText()));
+                                WebClientResponseException clientResponseException = (WebClientResponseException) response;
+                                if (clientResponseException.getStatusCode() == HttpStatus.NOT_FOUND) {
+                                    return Mono.error(new URINotFoundException(clientResponseException.getStatusText()));
                                 }
-                                if (response1.getStatusCode() == HttpStatus.REQUEST_TIMEOUT) {
-                                    return Mono.error(new ResourceRequestTimeoutException(response1.getStatusText()));
+                                if (clientResponseException.getStatusCode() == HttpStatus.REQUEST_TIMEOUT) {
+                                    return Mono.error(new ResourceRequestTimeoutException(clientResponseException.getStatusText()));
                                 }
                             }
                             if (response instanceof ReadTimeoutException) {

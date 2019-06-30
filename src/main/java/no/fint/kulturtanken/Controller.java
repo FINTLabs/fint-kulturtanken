@@ -7,7 +7,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import javax.validation.constraints.NotBlank;
 
@@ -17,16 +16,10 @@ import javax.validation.constraints.NotBlank;
 public class Controller {
 
     @Autowired
-    private WebClient webClient;
-
-    @Autowired
     private FintService fintService;
 
-    @GetMapping("{id}")
-    public SkoleOrganisasjon getSkoleOrganisasjonById(@PathVariable String id,
-                                                      @RequestHeader(name = HttpHeaders.AUTHORIZATION) @NotBlank String bearer
-    ) {
-        log.info("Id: {}", id);
+    @GetMapping
+    public SkoleOrganisasjon getSkoleOrganisasjon(@RequestHeader(name = HttpHeaders.AUTHORIZATION) @NotBlank String bearer) {
         log.info("Bearer token: {}", bearer);
 
         return fintService.getSkoleOrganisasjon(bearer);
@@ -36,12 +29,14 @@ public class Controller {
     public ResponseEntity handleTimeOutException(Exception e) {
         return ResponseEntity.status(HttpStatus.REQUEST_TIMEOUT).build();
     }
+
     @ExceptionHandler(UnableToCreateResourceException.class)
     public ResponseEntity handleCreateResourceFailed(Exception e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
+
     @ExceptionHandler(URINotFoundException.class)
-    public ResponseEntity handleWrongURI(Exception e) {
+    public ResponseEntity handleNotFound(Exception e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 }

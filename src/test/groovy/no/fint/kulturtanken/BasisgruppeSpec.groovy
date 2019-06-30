@@ -1,3 +1,5 @@
+package no.fint.kulturtanken
+
 import no.fint.model.resource.Link
 import no.fint.model.resource.utdanning.elev.BasisgruppeResource
 import spock.lang.Specification
