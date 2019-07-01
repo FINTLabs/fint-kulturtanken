@@ -166,13 +166,4 @@ public class FintService {
         contactInformation.setMobiltelefonnummer(contactInformation1.getMobiltelefonnummer());
         return contactInformation;
     }
-
-
-    public SkoleOrganisasjon throwTimeOutException() {
-        throw new ResourceRequestTimeoutException("test");
-    }
-
-    public Exception throwCreateResourceException() {
-        throw new UnableToCreateResourceException("test");
-    }
 }

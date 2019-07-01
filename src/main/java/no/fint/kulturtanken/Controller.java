@@ -24,15 +24,6 @@ public class Controller {
         return fintService.getSkoleOrganisasjon(bearer);
     }
 
-    @GetMapping("/timeout")
-    public SkoleOrganisasjon testResourceRequestTimeoutException() {
-        return fintService.throwTimeOutException();
-    }
-    @GetMapping("/create")
-    public Exception testUnableToCreateResourceException() {
-        return fintService.throwCreateResourceException();
-    }
-
     @ExceptionHandler(ResourceRequestTimeoutException.class)
     public ResponseEntity handleTimeOutException(Exception e) {
         return ResponseEntity.status(HttpStatus.REQUEST_TIMEOUT).build();
