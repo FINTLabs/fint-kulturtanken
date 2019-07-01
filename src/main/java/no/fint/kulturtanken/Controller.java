@@ -21,8 +21,16 @@ public class Controller {
     @GetMapping
     public SkoleOrganisasjon getSkoleOrganisasjon(@RequestHeader(name = HttpHeaders.AUTHORIZATION) @NotBlank String bearer) {
         log.info("Bearer token: {}", bearer);
-
         return fintService.getSkoleOrganisasjon(bearer);
+    }
+
+    @GetMapping("/timeout")
+    public SkoleOrganisasjon testResourceRequestTimeoutException() {
+        return fintService.throwTimeOutException();
+    }
+    @GetMapping("/create")
+    public Exception testUnableToCreateResourceException() {
+        return fintService.throwCreateResourceException();
     }
 
     @ExceptionHandler(ResourceRequestTimeoutException.class)
@@ -32,11 +40,11 @@ public class Controller {
 
     @ExceptionHandler(UnableToCreateResourceException.class)
     public ResponseEntity handleCreateResourceFailed(Exception e) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
     @ExceptionHandler(URINotFoundException.class)
     public ResponseEntity handleNotFound(Exception e) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 }

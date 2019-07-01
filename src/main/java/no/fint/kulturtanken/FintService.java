@@ -30,10 +30,10 @@ import java.util.stream.Collectors;
 @Service
 public class FintService {
 
-    private final String GET_ORGANISATION_URI = "/administrasjon/organisasjon/organisasjonselement";
-    private final String GET_SCHOOL_URI = "/utdanning/utdanningsprogram/skole";
-    private final String GET_LEVEL_URI = "/utdanning/utdanningsprogram/arstrinn";
-    private final String GET_GROUP_URI = "/utdanning/utdanningsprogram/basisgruppe";
+    private String GET_ORGANISATION_URI = "/administrasjon/organisasjon/organisasjonselement";
+    private String GET_SCHOOL_URI = "/utdanning/utdanningsprogram/skole";
+    private String GET_LEVEL_URI = "/utdanning/utdanningsprogram/arstrinn";
+    private String GET_GROUP_URI = "/utdanning/utdanningsprogram/basisgruppe";
 
     @Autowired
     private WebClient webClient;
@@ -165,5 +165,14 @@ public class FintService {
         contactInformation.setEpostadresse(contactInformation1.getEpostadresse());
         contactInformation.setMobiltelefonnummer(contactInformation1.getMobiltelefonnummer());
         return contactInformation;
+    }
+
+
+    public SkoleOrganisasjon throwTimeOutException() {
+        throw new ResourceRequestTimeoutException("test");
+    }
+
+    public Exception throwCreateResourceException() {
+        throw new UnableToCreateResourceException("test");
     }
 }

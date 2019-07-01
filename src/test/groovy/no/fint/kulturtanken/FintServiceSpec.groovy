@@ -15,7 +15,7 @@ import spock.lang.Specification
 class FintServiceSpec extends Specification {
     private def server = new MockWebServer()
     private def webClient = WebClient.create(server.url('/').toString())
-    private def fintserviceTestComponents = new FintService(webClient: webClient)
+    private def fintService = new FintService(webClient: webClient)
 
 
     def "Use addOrganisationInfo() and receive Name, Kontaktinformasjon and emtpty school"() {
@@ -25,7 +25,7 @@ class FintServiceSpec extends Specification {
                         .setBody(new ClassPathResource("skoleOrganisasjonResources.json").getFile().text))
         when:
         SkoleOrganisasjon skoleOrganisasjon = new SkoleOrganisasjon()
-        fintserviceTestComponents.addOrganisationInfo(skoleOrganisasjon, "testBearer")
+        fintService.addOrganisationInfo(skoleOrganisasjon, "testBearer")
 
         then:
         skoleOrganisasjon.navn == "Haugaland fylkeskommune"
@@ -40,7 +40,7 @@ class FintServiceSpec extends Specification {
         kontaktinformasjon.setEpostadresse("test-email@testing.test")
         kontaktinformasjon.setMobiltelefonnummer("99999999")
         when:
-        def returnedKontaktInformasjon = fintserviceTestComponents.getKontaktInformasjon(kontaktinformasjon)
+        def returnedKontaktInformasjon = fintService.getKontaktInformasjon(kontaktinformasjon)
 
         then:
         returnedKontaktInformasjon.epostadresse == "test-email@testing.test"
@@ -53,7 +53,7 @@ class FintServiceSpec extends Specification {
                 new MockResponse().setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                         .setBody(new ClassPathResource("skoleResources.json").getFile().text))
         when:
-        def schoolList = fintserviceTestComponents.getSkoleList("testBearer")
+        def schoolList = fintService.getSkoleList("testBearer")
 
         then:
         schoolList.size() == 2
@@ -86,9 +86,9 @@ class FintServiceSpec extends Specification {
                         .setBody(new ClassPathResource("basisgrupperResources.json").getFile().text))
         when:
         SkoleOrganisasjon skoleOrganisasjon = new SkoleOrganisasjon()
-        fintserviceTestComponents.addOrganisationInfo(skoleOrganisasjon, "testBearer")
-        skoleOrganisasjon.skole = fintserviceTestComponents.getSkoleList("testBearer")
-        fintserviceTestComponents.setSchoolLevelsAndGroups(skoleOrganisasjon, "testBearer")
+        fintService.addOrganisationInfo(skoleOrganisasjon, "testBearer")
+        skoleOrganisasjon.skole = fintService.getSkoleList("testBearer")
+        fintService.setSchoolLevelsAndGroups(skoleOrganisasjon, "testBearer")
 
         then:
         skoleOrganisasjon.skole[0].trinn.size() == 2
@@ -118,9 +118,9 @@ class FintServiceSpec extends Specification {
                         .setBody(new ClassPathResource("basisgrupperResources.json").getFile().text))
         when:
         SkoleOrganisasjon skoleOrganisasjon = new SkoleOrganisasjon()
-        fintserviceTestComponents.addOrganisationInfo(skoleOrganisasjon, "testBearer")
-        skoleOrganisasjon.skole = fintserviceTestComponents.getSkoleList("testBearer")
-        fintserviceTestComponents.setSchoolLevelsAndGroups(skoleOrganisasjon, "testBearer")
+        fintService.addOrganisationInfo(skoleOrganisasjon, "testBearer")
+        skoleOrganisasjon.skole = fintService.getSkoleList("testBearer")
+        fintService.setSchoolLevelsAndGroups(skoleOrganisasjon, "testBearer")
 
         then:
         skoleOrganisasjon.skole[0].trinn[0].basisgrupper.size() == 2
@@ -146,7 +146,7 @@ class FintServiceSpec extends Specification {
         when:
         Exception errorException = new Exception()
         try {
-            AbstractCollection abstractCollection = fintserviceTestComponents.getSkoleList("testBearer")
+            AbstractCollection abstractCollection = fintService.getSkoleList("testBearer")
         } catch (Exception e) {
             errorException = e
         }
@@ -162,41 +162,11 @@ class FintServiceSpec extends Specification {
         Exception errorException = new Exception()
         OrganisasjonselementResources organisasjonselementResources = new OrganisasjonselementResources()
         try {
-            AbstractCollection abstractCollection = fintserviceTestComponents.getResources(a404URI, "testBearer", organisasjonselementResources)
+            AbstractCollection abstractCollection = fintService.getResources(a404URI, "testBearer", organisasjonselementResources)
         } catch (Exception e) {
             errorException = e
         }
         then:
         errorException instanceof URINotFoundException
     }
-
-    def "When request not answered within {time-out-time} cast ResourceRequestTimeoutException"() {
-        given:
-        def build = WebClient.builder().clientConnector(fintserviceTestComponents.tcp()).baseUrl(server.url('/').toString()).build()
-        def fintserviceTestComponents2 = new FintService(webClient: build)
-        when:
-        Exception errorException = new Exception()
-        OrganisasjonselementResources organisasjonselementResources = new OrganisasjonselementResources()
-        try {
-            organisasjonselementResources = fintserviceTestComponents2.getResources(fintserviceTestComponents.GET_ORGANISATION_URI, "testBearer", organisasjonselementResources)
-        } catch (Exception e) {
-            errorException = e
-        }
-        then:
-        errorException instanceof ResourceRequestTimeoutException
-    }
-
-    /* def "Test cast ResourceRequestTimeoutException to Controller"() {
-         given:
-         ApplicationConfiguration applicationConfiguration = new ApplicationConfiguration()
-         def client = applicationConfiguration.webClient()
-         def fintservice = new FintService(webClient: client)
-         when:
-         Exception errorException = new Exception()
-         OrganisasjonselementResources organisasjonselementResources = new OrganisasjonselementResources()
-         organisasjonselementResources = fintservice.getResources(fintservice.GET_ORGANISATION_URI, "testBearer", organisasjonselementResources)
-
-         then:
-         print("Hipp")
-     }*/
 }
