@@ -12,7 +12,7 @@ import javax.validation.constraints.NotBlank;
 
 @Slf4j
 @RestController
-@RequestMapping("api/skoleorganisasjon")
+@RequestMapping("/api/skoleorganisasjon")
 public class Controller {
 
     @Autowired
@@ -32,11 +32,11 @@ public class Controller {
 
     @ExceptionHandler(UnableToCreateResourceException.class)
     public ResponseEntity handleCreateResourceFailed(Exception e) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @ExceptionHandler(URINotFoundException.class)
     public ResponseEntity handleNotFound(Exception e) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 }
