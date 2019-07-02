@@ -42,6 +42,7 @@ public class FintService {
         SkoleOrganisasjon skoleOrganisasjon = new SkoleOrganisasjon();
         addOrganisationInfo(skoleOrganisasjon, bearer);
         skoleOrganisasjon.setSkole(getSkoleList(bearer));
+        if (skoleOrganisasjon.getSkole().size() > 0)
         setSchoolLevelsAndGroups(skoleOrganisasjon, bearer);
         return skoleOrganisasjon;
     }
@@ -59,7 +60,15 @@ public class FintService {
 
     private List<Skole> getSkoleList(String bearer) {
         SkoleResources skoleResources = new SkoleResources();
-        skoleResources = (SkoleResources) getResources(GET_SCHOOL_URI, bearer, skoleResources);
+        try{
+            skoleResources = (SkoleResources) getResources(GET_SCHOOL_URI, bearer, skoleResources);
+        }catch (URINotFoundException | ResourceRequestTimeoutException | UnableToCreateResourceException e){
+            log.error(e.getMessage());
+            skoleResources = new SkoleResources();
+        }
+        if (skoleResources.getContent().isEmpty() || (skoleResources.getContent().size()==1 && skoleResources.getContent().get(0).getNavn()==null)){
+            return new ArrayList<>();
+        }
         return
                 skoleResources.getContent()
                         .stream()
@@ -78,23 +87,44 @@ public class FintService {
         SkoleResources skoleResources = new SkoleResources();
         ArstrinnResources arstrinnResources = new ArstrinnResources();
         BasisgruppeResources basisgruppeResources = new BasisgruppeResources();
-        List<SkoleResource> schoolResourceList = ((SkoleResources) (getResources(GET_SCHOOL_URI, bearer, skoleResources))).getContent();
-        List<ArstrinnResource> levelResourceList = ((ArstrinnResources) (getResources(GET_LEVEL_URI, bearer, arstrinnResources))).getContent();
-        List<BasisgruppeResource> groupResourceList = ((BasisgruppeResources) (getResources(GET_GROUP_URI, bearer, basisgruppeResources))).getContent();
+        List<SkoleResource> schoolResourceList;
+        List<ArstrinnResource> levelResourceList;
+        List<BasisgruppeResource> groupResourceList;
+        try{
+            schoolResourceList = ((SkoleResources) (getResources(GET_SCHOOL_URI, bearer, skoleResources))).getContent();
+            levelResourceList = ((ArstrinnResources) (getResources(GET_LEVEL_URI, bearer, arstrinnResources))).getContent();
+        }catch (URINotFoundException | ResourceRequestTimeoutException | UnableToCreateResourceException e){
+            return;
+        }
+        if (levelResourceList.isEmpty() || (levelResourceList.size()==1 && levelResourceList.get(0).getNavn()==null)){
+            return;
+        }
+        try{
+            groupResourceList = ((BasisgruppeResources) (getResources(GET_GROUP_URI, bearer, basisgruppeResources))).getContent();
+        }catch (URINotFoundException | ResourceRequestTimeoutException | UnableToCreateResourceException e){
+            groupResourceList = new ArrayList<>();
+        }
 
+        List<BasisgruppeResource> finalGroupResourceList = groupResourceList;
         schoolResourceList.forEach(schoolResource -> {
             Link schoolResouceLink = schoolResource.getSelfLinks().get(0);
-            filterLevelsAndGroups(levelResourceList, schoolResouceLink, groupResourceList, schoolOrganisation, schoolResource);
+            String schoolName = schoolResource.getNavn();
+            filterLevelsAndGroups(levelResourceList, schoolResouceLink, finalGroupResourceList, schoolOrganisation, schoolName);
         });
 
     }
 
-    private void filterLevelsAndGroups(List<ArstrinnResource> levelResourceList, Link schoolResouceLink, List<BasisgruppeResource> groupResourceList, SkoleOrganisasjon schoolOrganisation, SkoleResource schoolResource) {
+    private void filterLevelsAndGroups(List<ArstrinnResource> levelResourceList, Link schoolResourceLink, List<BasisgruppeResource> groupResourceList, SkoleOrganisasjon schoolOrganisation, String schoolName) {
         List<Trinn> levelList = new ArrayList<>();
         levelResourceList.forEach(level -> {
             Link levelSelfLink = level.getSelfLinks().get(0);
-            List<Basisgrupper> filteredGroups = filterGroups(levelSelfLink, schoolResouceLink, groupResourceList);
-            addLevelAndGroupToSchool(level, levelList, filteredGroups, schoolOrganisation, schoolResource);
+            List<Basisgrupper> filteredGroups =
+                    (groupResourceList.isEmpty() || (groupResourceList.size()==1 && groupResourceList.get(0).getTrinn()==null))
+                            ?
+                            new ArrayList<>()
+                            :
+                            filterGroups(levelSelfLink, schoolResourceLink, groupResourceList);
+            addLevelAndGroupToSchool(level, levelList, filteredGroups, schoolOrganisation, schoolName);
         });
     }
 
@@ -112,14 +142,14 @@ public class FintService {
                 }).collect(Collectors.toList());
     }
 
-    private void addLevelAndGroupToSchool(ArstrinnResource level, List<Trinn> levelList, List<Basisgrupper> filteredGroups, SkoleOrganisasjon schoolOrganisation, SkoleResource skoleResource) {
+    private void addLevelAndGroupToSchool(ArstrinnResource level, List<Trinn> levelList, List<Basisgrupper> filteredGroups, SkoleOrganisasjon schoolOrganisation, String schoolName) {
         Trinn trinn = new Trinn();
         trinn.setNiva(level.getNavn());
         trinn.setBasisgrupper(filteredGroups);
         if (filteredGroups.size() > 0)
             levelList.add(trinn);
         for (Skole skole : schoolOrganisation.getSkole()) {
-            if (skole.getNavn().equals(skoleResource.getNavn())) {
+            if (skole.getNavn().equals(schoolName)) {
                 skole.setTrinn(levelList);
             }
         }

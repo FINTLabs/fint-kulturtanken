@@ -13,8 +13,8 @@ class ControllerSpec extends MockMvcSpecification {
 
     private MockMvc mockMvc
     private FintService fintService
-    private Controller controller
     private def server = new MockWebServer()
+    private Controller controller
 
     void setup() {
         fintService = new FintService(webClient: WebClient.create(server.url('/').toString()))

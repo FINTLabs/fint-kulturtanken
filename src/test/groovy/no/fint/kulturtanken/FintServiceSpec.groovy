@@ -3,20 +3,28 @@ package no.fint.kulturtanken
 import no.fint.kulturtanken.model.SkoleOrganisasjon
 import no.fint.model.felles.kompleksedatatyper.Kontaktinformasjon
 import no.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementResources
+import no.fint.test.utils.MockMvcSpecification
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.springframework.core.io.ClassPathResource
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
+import org.springframework.test.web.servlet.MockMvc
 import org.springframework.web.reactive.function.client.WebClient
-import spock.lang.Specification
 
-class FintServiceSpec extends Specification {
+class FintServiceSpec extends MockMvcSpecification {
+
+    private MockMvc mockMvc
+    private FintService fintService
     private def server = new MockWebServer()
-    private def webClient = WebClient.create(server.url('/').toString())
-    private def fintserviceTestComponents = new FintService(webClient: webClient)
+    private Controller controller
 
+    void setup() {
+        fintService = new FintService(webClient: WebClient.create(server.url('/').toString()))
+        controller = new Controller(fintService: fintService)
+        mockMvc = standaloneSetup(controller)
+    }
 
     def "Use addOrganisationInfo() and receive Name, Kontaktinformasjon and emtpty school"() {
         given:
@@ -25,7 +33,7 @@ class FintServiceSpec extends Specification {
                         .setBody(new ClassPathResource("skoleOrganisasjonResources.json").getFile().text))
         when:
         SkoleOrganisasjon skoleOrganisasjon = new SkoleOrganisasjon()
-        fintserviceTestComponents.addOrganisationInfo(skoleOrganisasjon, "testBearer")
+        fintService.addOrganisationInfo(skoleOrganisasjon, "testBearer")
 
         then:
         skoleOrganisasjon.navn == "Haugaland fylkeskommune"
@@ -40,7 +48,7 @@ class FintServiceSpec extends Specification {
         kontaktinformasjon.setEpostadresse("test-email@testing.test")
         kontaktinformasjon.setMobiltelefonnummer("99999999")
         when:
-        def returnedKontaktInformasjon = fintserviceTestComponents.getKontaktInformasjon(kontaktinformasjon)
+        def returnedKontaktInformasjon = fintService.getKontaktInformasjon(kontaktinformasjon)
 
         then:
         returnedKontaktInformasjon.epostadresse == "test-email@testing.test"
@@ -53,7 +61,7 @@ class FintServiceSpec extends Specification {
                 new MockResponse().setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                         .setBody(new ClassPathResource("skoleResources.json").getFile().text))
         when:
-        def schoolList = fintserviceTestComponents.getSkoleList("testBearer")
+        def schoolList = fintService.getSkoleList("testBearer")
 
         then:
         schoolList.size() == 2
@@ -86,9 +94,9 @@ class FintServiceSpec extends Specification {
                         .setBody(new ClassPathResource("basisgrupperResources.json").getFile().text))
         when:
         SkoleOrganisasjon skoleOrganisasjon = new SkoleOrganisasjon()
-        fintserviceTestComponents.addOrganisationInfo(skoleOrganisasjon, "testBearer")
-        skoleOrganisasjon.skole = fintserviceTestComponents.getSkoleList("testBearer")
-        fintserviceTestComponents.setSchoolLevelsAndGroups(skoleOrganisasjon, "testBearer")
+        fintService.addOrganisationInfo(skoleOrganisasjon, "testBearer")
+        skoleOrganisasjon.skole = fintService.getSkoleList("testBearer")
+        fintService.setSchoolLevelsAndGroups(skoleOrganisasjon, "testBearer")
 
         then:
         skoleOrganisasjon.skole[0].trinn.size() == 2
@@ -118,9 +126,9 @@ class FintServiceSpec extends Specification {
                         .setBody(new ClassPathResource("basisgrupperResources.json").getFile().text))
         when:
         SkoleOrganisasjon skoleOrganisasjon = new SkoleOrganisasjon()
-        fintserviceTestComponents.addOrganisationInfo(skoleOrganisasjon, "testBearer")
-        skoleOrganisasjon.skole = fintserviceTestComponents.getSkoleList("testBearer")
-        fintserviceTestComponents.setSchoolLevelsAndGroups(skoleOrganisasjon, "testBearer")
+        fintService.addOrganisationInfo(skoleOrganisasjon, "testBearer")
+        skoleOrganisasjon.skole = fintService.getSkoleList("testBearer")
+        fintService.setSchoolLevelsAndGroups(skoleOrganisasjon, "testBearer")
 
         then:
         skoleOrganisasjon.skole[0].trinn[0].basisgrupper.size() == 2
@@ -146,7 +154,7 @@ class FintServiceSpec extends Specification {
         when:
         Exception errorException = new Exception()
         try {
-            AbstractCollection abstractCollection = fintserviceTestComponents.getSkoleList("testBearer")
+            AbstractCollection abstractCollection = fintService.getSkoleOrganisasjon("testBearer")
         } catch (Exception e) {
             errorException = e
         }
@@ -162,7 +170,7 @@ class FintServiceSpec extends Specification {
         Exception errorException = new Exception()
         OrganisasjonselementResources organisasjonselementResources = new OrganisasjonselementResources()
         try {
-            AbstractCollection abstractCollection = fintserviceTestComponents.getResources(a404URI, "testBearer", organisasjonselementResources)
+            AbstractCollection abstractCollection = fintService.getResources(a404URI, "testBearer", organisasjonselementResources)
         } catch (Exception e) {
             errorException = e
         }
@@ -172,13 +180,11 @@ class FintServiceSpec extends Specification {
 
     def "When request not answered within {time-out-time} cast ResourceRequestTimeoutException"() {
         given:
-        def build = WebClient.builder().clientConnector(fintserviceTestComponents.tcp()).baseUrl(server.url('/').toString()).build()
-        def fintserviceTestComponents2 = new FintService(webClient: build)
+        server.enqueue(new MockResponse().setResponseCode(HttpStatus.REQUEST_TIMEOUT.value()))
         when:
         Exception errorException = new Exception()
-        OrganisasjonselementResources organisasjonselementResources = new OrganisasjonselementResources()
         try {
-            organisasjonselementResources = fintserviceTestComponents2.getResources(fintserviceTestComponents.GET_ORGANISATION_URI, "testBearer", organisasjonselementResources)
+            AbstractCollection abstractCollection = fintService.getSkoleOrganisasjon( "testBearer")
         } catch (Exception e) {
             errorException = e
         }
@@ -186,17 +192,117 @@ class FintServiceSpec extends Specification {
         errorException instanceof ResourceRequestTimeoutException
     }
 
-    /* def "Test cast ResourceRequestTimeoutException to Controller"() {
-         given:
-         ApplicationConfiguration applicationConfiguration = new ApplicationConfiguration()
-         def client = applicationConfiguration.webClient()
-         def fintservice = new FintService(webClient: client)
-         when:
-         Exception errorException = new Exception()
-         OrganisasjonselementResources organisasjonselementResources = new OrganisasjonselementResources()
-         organisasjonselementResources = fintservice.getResources(fintservice.GET_ORGANISATION_URI, "testBearer", organisasjonselementResources)
+    def "When getSkoleList()->getResources() has exception or is empty. Return empty skoleList "() {
+        given:
+        server.enqueue(
+                new MockResponse().setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                        .setBody(new ClassPathResource("skoleOrganisasjonResources.json").getFile().text))
+        server.enqueue(
+                new MockResponse().setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                        .setBody(new ClassPathResource("emptyResource.json").getFile().text))
 
-         then:
-         print("Hipp")
-     }*/
+        when:
+        def skoleOrganisasjon = fintService.getSkoleOrganisasjon()
+
+        then:
+        skoleOrganisasjon.getSkole().size() == 0
+    }
+    def "When setSchoolLevelsAndGroups()->getResources() for levels returns empty. LevelLists are null "() {
+        given:
+        server.enqueue(
+                new MockResponse().setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                        .setBody(new ClassPathResource("skoleOrganisasjonResources.json").getFile().text))
+        server.enqueue(
+                new MockResponse().setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                        .setBody(new ClassPathResource("skoleResources.json").getFile().text))
+        server.enqueue(
+                new MockResponse().setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                        .setBody(new ClassPathResource("skoleResources.json").getFile().text))
+        server.enqueue(
+                new MockResponse().setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                        .setBody(new ClassPathResource("emptyResource.json").getFile().text))
+
+        when:
+        def skoleOrganisasjon = fintService.getSkoleOrganisasjon()
+
+        then:
+        print(skoleOrganisasjon.toString())
+        skoleOrganisasjon.getSkole().size() == 2
+        skoleOrganisasjon.getSkole().get(0).trinn == null
+        skoleOrganisasjon.getSkole().get(1).trinn == null
+    }
+    def "When setSchoolLevelsAndGroups()->getResources() for levels returns 404. LevelLists are null "() {
+        given:
+        server.enqueue(
+                new MockResponse().setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                        .setBody(new ClassPathResource("skoleOrganisasjonResources.json").getFile().text))
+        server.enqueue(
+                new MockResponse().setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                        .setBody(new ClassPathResource("skoleResources.json").getFile().text))
+        server.enqueue(
+                new MockResponse().setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                        .setBody(new ClassPathResource("skoleResources.json").getFile().text))
+        server.enqueue(new MockResponse().setResponseCode(HttpStatus.NOT_FOUND.value()))
+
+        when:
+        def skoleOrganisasjon = fintService.getSkoleOrganisasjon()
+
+        then:
+        print(skoleOrganisasjon.toString())
+        skoleOrganisasjon.getSkole().size() == 2
+        skoleOrganisasjon.getSkole().get(0).trinn == null
+        skoleOrganisasjon.getSkole().get(1).trinn == null
+    }
+    def "When setSchoolLevelsAndGroups()->getResources() for groups returns empty. Groups are null "() {
+        given:
+        server.enqueue(
+                new MockResponse().setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                        .setBody(new ClassPathResource("skoleOrganisasjonResources.json").getFile().text))
+        server.enqueue(
+                new MockResponse().setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                        .setBody(new ClassPathResource("skoleResources.json").getFile().text))
+        server.enqueue(
+                new MockResponse().setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                        .setBody(new ClassPathResource("skoleResources.json").getFile().text))
+        server.enqueue(
+                new MockResponse().setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                        .setBody(new ClassPathResource("aarstrinnResources.json").getFile().text))
+        server.enqueue(
+                new MockResponse().setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                        .setBody(new ClassPathResource("emptyResource.json").getFile().text))
+
+        when:
+        def skoleOrganisasjon = fintService.getSkoleOrganisasjon()
+
+        then:
+        skoleOrganisasjon.getSkole().size() == 2
+        skoleOrganisasjon.getSkole().get(0).trinn.size() == 0
+        skoleOrganisasjon.getSkole().get(1).trinn.size() == 0
+    }
+    def "When setSchoolLevelsAndGroups()->getResources() for groups returns 404. Groups are null "() {
+        given:
+        server.enqueue(
+                new MockResponse().setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                        .setBody(new ClassPathResource("skoleOrganisasjonResources.json").getFile().text))
+        server.enqueue(
+                new MockResponse().setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                        .setBody(new ClassPathResource("skoleResources.json").getFile().text))
+        server.enqueue(
+                new MockResponse().setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                        .setBody(new ClassPathResource("skoleResources.json").getFile().text))
+        server.enqueue(
+                new MockResponse().setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                        .setBody(new ClassPathResource("aarstrinnResources.json").getFile().text))
+        server.enqueue(
+                new MockResponse().setResponseCode(HttpStatus.NOT_FOUND.value()))
+
+        when:
+        def skoleOrganisasjon = fintService.getSkoleOrganisasjon()
+
+        then:
+        skoleOrganisasjon.getSkole().size() == 2
+        print(skoleOrganisasjon.toString())
+        skoleOrganisasjon.getSkole().get(0).trinn.size() == 0
+        skoleOrganisasjon.getSkole().get(1).trinn.size() == 0
+    }
 }
