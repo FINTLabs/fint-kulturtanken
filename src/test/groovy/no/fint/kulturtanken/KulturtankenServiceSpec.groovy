@@ -4,7 +4,6 @@ import no.fint.kulturtanken.Exceptions.ResourceRequestTimeoutException
 import no.fint.kulturtanken.Exceptions.URINotFoundException
 import no.fint.kulturtanken.model.SkoleOrganisasjon
 import no.fint.model.felles.kompleksedatatyper.Kontaktinformasjon
-import no.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementResources
 import no.fint.test.utils.MockMvcSpecification
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -34,8 +33,7 @@ class KulturtankenServiceSpec extends MockMvcSpecification {
                 new MockResponse().setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                         .setBody(new ClassPathResource("skoleOrganisasjonResources.json").getFile().text))
         when:
-        SkoleOrganisasjon skoleOrganisasjon = new SkoleOrganisasjon()
-        kulturtankenService.addOrganisationInfo(skoleOrganisasjon, "testBearer")
+        SkoleOrganisasjon skoleOrganisasjon = kulturtankenService.getTopOrganisation("testBearer")
 
         then:
         skoleOrganisasjon.navn == "Haugaland fylkeskommune"
@@ -95,8 +93,7 @@ class KulturtankenServiceSpec extends MockMvcSpecification {
                 new MockResponse().setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                         .setBody(new ClassPathResource("basisgrupperResources.json").getFile().text))
         when:
-        SkoleOrganisasjon skoleOrganisasjon = new SkoleOrganisasjon()
-        kulturtankenService.addOrganisationInfo(skoleOrganisasjon, "testBearer")
+        SkoleOrganisasjon skoleOrganisasjon = kulturtankenService.getTopOrganisation("testBearer")
         skoleOrganisasjon.skole = kulturtankenService.getSkoleList("testBearer")
         kulturtankenService.setSchoolLevelsAndGroups(skoleOrganisasjon, "testBearer")
 
@@ -127,8 +124,7 @@ class KulturtankenServiceSpec extends MockMvcSpecification {
                 new MockResponse().setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                         .setBody(new ClassPathResource("basisgrupperResources.json").getFile().text))
         when:
-        SkoleOrganisasjon skoleOrganisasjon = new SkoleOrganisasjon()
-        kulturtankenService.addOrganisationInfo(skoleOrganisasjon, "testBearer")
+        SkoleOrganisasjon skoleOrganisasjon = kulturtankenService.getTopOrganisation("testBearer")
         skoleOrganisasjon.skole = kulturtankenService.getSkoleList("testBearer")
         kulturtankenService.setSchoolLevelsAndGroups(skoleOrganisasjon, "testBearer")
 
@@ -170,9 +166,8 @@ class KulturtankenServiceSpec extends MockMvcSpecification {
 
         when:
         Exception errorException = new Exception()
-        OrganisasjonselementResources organisasjonselementResources = new OrganisasjonselementResources()
         try {
-            AbstractCollection abstractCollection = kulturtankenService.getResources(a404URI, "testBearer", organisasjonselementResources)
+            AbstractCollection abstractCollection = kulturtankenService.getResources(a404URI, "testBearer")
         } catch (Exception e) {
             errorException = e
         }
@@ -186,7 +181,7 @@ class KulturtankenServiceSpec extends MockMvcSpecification {
         when:
         Exception errorException = new Exception()
         try {
-            AbstractCollection abstractCollection = kulturtankenService.getSkoleOrganisasjon( "testBearer")
+            AbstractCollection abstractCollection = kulturtankenService.getSkoleOrganisasjon("testBearer")
         } catch (Exception e) {
             errorException = e
         }
@@ -209,6 +204,7 @@ class KulturtankenServiceSpec extends MockMvcSpecification {
         then:
         skoleOrganisasjon.getSkole().size() == 0
     }
+
     def "When setSchoolLevelsAndGroups()->getResources() for levels returns empty. LevelLists are null "() {
         given:
         server.enqueue(
@@ -233,6 +229,7 @@ class KulturtankenServiceSpec extends MockMvcSpecification {
         skoleOrganisasjon.getSkole().get(0).trinn == null
         skoleOrganisasjon.getSkole().get(1).trinn == null
     }
+
     def "When setSchoolLevelsAndGroups()->getResources() for levels returns 404. LevelLists are null "() {
         given:
         server.enqueue(
@@ -255,6 +252,7 @@ class KulturtankenServiceSpec extends MockMvcSpecification {
         skoleOrganisasjon.getSkole().get(0).trinn == null
         skoleOrganisasjon.getSkole().get(1).trinn == null
     }
+
     def "When setSchoolLevelsAndGroups()->getResources() for groups returns empty. Groups are null "() {
         given:
         server.enqueue(
@@ -281,6 +279,7 @@ class KulturtankenServiceSpec extends MockMvcSpecification {
         skoleOrganisasjon.getSkole().get(0).trinn.size() == 0
         skoleOrganisasjon.getSkole().get(1).trinn.size() == 0
     }
+
     def "When setSchoolLevelsAndGroups()->getResources() for groups returns 404. Groups are null "() {
         given:
         server.enqueue(

@@ -42,29 +42,29 @@ public class KulturtankenService {
     private WebClient webClient;
 
     public SkoleOrganisasjon getSkoleOrganisasjon(String bearer) {
-        SkoleOrganisasjon skoleOrganisasjon = new SkoleOrganisasjon();
-        addOrganisationInfo(skoleOrganisasjon, bearer);
+        SkoleOrganisasjon skoleOrganisasjon = getTopOrganisation(bearer);
         skoleOrganisasjon.setSkole(getSkoleList(bearer));
         if (skoleOrganisasjon.getSkole().size() > 0)
         setSchoolLevelsAndGroups(skoleOrganisasjon, bearer);
         return skoleOrganisasjon;
     }
 
-    private void addOrganisationInfo(SkoleOrganisasjon schoolOrganisation, String bearer) {
-        OrganisasjonselementResources organisasjonselementResources = new OrganisasjonselementResources();
-        organisasjonselementResources = (OrganisasjonselementResources) getResources(GET_ORGANISATION_URI, bearer, organisasjonselementResources);
+    private SkoleOrganisasjon getTopOrganisation(String bearer) {
+        SkoleOrganisasjon schoolOrganisation = new SkoleOrganisasjon();
+        OrganisasjonselementResources organisasjonselementResources = (OrganisasjonselementResources) getResources(GET_ORGANISATION_URI, bearer);
         Optional<OrganisasjonselementResource> topLevelOrg = getTopElement(organisasjonselementResources);
         topLevelOrg.ifPresent(o -> {
             schoolOrganisation.setNavn(o.getNavn());
             schoolOrganisation.setOrganisasjonsnummer(o.getOrganisasjonsnummer().getIdentifikatorverdi());
             schoolOrganisation.setKontaktinformasjon(getKontaktInformasjon(o.getKontaktinformasjon()));
         });
+        return schoolOrganisation;
     }
 
     private List<Skole> getSkoleList(String bearer) {
-        SkoleResources skoleResources = new SkoleResources();
+        SkoleResources skoleResources;
         try{
-            skoleResources = (SkoleResources) getResources(GET_SCHOOL_URI, bearer, skoleResources);
+            skoleResources = (SkoleResources) getResources(GET_SCHOOL_URI, bearer);
         }catch (URINotFoundException | ResourceRequestTimeoutException | UnableToCreateResourceException e){
             log.error(e.getMessage());
             skoleResources = new SkoleResources();
@@ -87,15 +87,12 @@ public class KulturtankenService {
     }
 
     private void setSchoolLevelsAndGroups(SkoleOrganisasjon schoolOrganisation, String bearer) {
-        SkoleResources skoleResources = new SkoleResources();
-        ArstrinnResources arstrinnResources = new ArstrinnResources();
-        BasisgruppeResources basisgruppeResources = new BasisgruppeResources();
         List<SkoleResource> schoolResourceList;
         List<ArstrinnResource> levelResourceList;
         List<BasisgruppeResource> groupResourceList;
         try{
-            schoolResourceList = ((SkoleResources) (getResources(GET_SCHOOL_URI, bearer, skoleResources))).getContent();
-            levelResourceList = ((ArstrinnResources) (getResources(GET_LEVEL_URI, bearer, arstrinnResources))).getContent();
+            schoolResourceList = ((SkoleResources) (getResources(GET_SCHOOL_URI, bearer))).getContent();
+            levelResourceList = ((ArstrinnResources) (getResources(GET_LEVEL_URI, bearer))).getContent();
         }catch (URINotFoundException | ResourceRequestTimeoutException | UnableToCreateResourceException e){
             return;
         }
@@ -103,7 +100,7 @@ public class KulturtankenService {
             return;
         }
         try{
-            groupResourceList = ((BasisgruppeResources) (getResources(GET_GROUP_URI, bearer, basisgruppeResources))).getContent();
+            groupResourceList = ((BasisgruppeResources) (getResources(GET_GROUP_URI, bearer))).getContent();
         }catch (URINotFoundException | ResourceRequestTimeoutException | UnableToCreateResourceException e){
             groupResourceList = new ArrayList<>();
         }
@@ -158,7 +155,11 @@ public class KulturtankenService {
         }
     }
 
-    private AbstractCollectionResources getResources(String uri, String bearer, AbstractCollectionResources resourceClass) {
+    private AbstractCollectionResources getResources(String uri, String bearer) {
+        AbstractCollectionResources resourceClass =
+                (uri.equals(GET_ORGANISATION_URI) ? new OrganisasjonselementResources() :
+                        (uri.equals(GET_SCHOOL_URI) ? new SkoleResources() :
+                                (uri.equals(GET_LEVEL_URI)? new ArstrinnResources() : new BasisgruppeResources())));
         return
                 webClient.get()
                         .uri(uri)
