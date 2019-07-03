@@ -45,7 +45,7 @@ public class KulturtankenService {
         SkoleOrganisasjon skoleOrganisasjon = getTopOrganisation(bearer);
         skoleOrganisasjon.setSkole(getSkoleList(bearer));
         if (skoleOrganisasjon.getSkole().size() > 0)
-        setSchoolLevelsAndGroups(skoleOrganisasjon, bearer);
+            setSchoolLevelsAndGroups(skoleOrganisasjon, bearer);
         return skoleOrganisasjon;
     }
 
@@ -63,13 +63,13 @@ public class KulturtankenService {
 
     private List<Skole> getSkoleList(String bearer) {
         SkoleResources skoleResources;
-        try{
+        try {
             skoleResources = (SkoleResources) getResources(GET_SCHOOL_URI, bearer);
-        }catch (URINotFoundException | ResourceRequestTimeoutException | UnableToCreateResourceException e){
+        } catch (URINotFoundException | ResourceRequestTimeoutException | UnableToCreateResourceException e) {
             log.error(e.getMessage());
             skoleResources = new SkoleResources();
         }
-        if (skoleResources.getContent().isEmpty() || (skoleResources.getContent().size()==1 && skoleResources.getContent().get(0).getNavn()==null)){
+        if (skoleResources.getContent().isEmpty() || (skoleResources.getContent().size() == 1 && skoleResources.getContent().get(0).getNavn() == null)) {
             return new ArrayList<>();
         }
         return
@@ -90,18 +90,18 @@ public class KulturtankenService {
         List<SkoleResource> schoolResourceList;
         List<ArstrinnResource> levelResourceList;
         List<BasisgruppeResource> groupResourceList;
-        try{
+        try {
             schoolResourceList = ((SkoleResources) (getResources(GET_SCHOOL_URI, bearer))).getContent();
             levelResourceList = ((ArstrinnResources) (getResources(GET_LEVEL_URI, bearer))).getContent();
-        }catch (URINotFoundException | ResourceRequestTimeoutException | UnableToCreateResourceException e){
+        } catch (URINotFoundException | ResourceRequestTimeoutException | UnableToCreateResourceException e) {
             return;
         }
-        if (levelResourceList.isEmpty() || (levelResourceList.size()==1 && levelResourceList.get(0).getNavn()==null)){
+        if (levelResourceList.isEmpty() || (levelResourceList.size() == 1 && levelResourceList.get(0).getNavn() == null)) {
             return;
         }
-        try{
+        try {
             groupResourceList = ((BasisgruppeResources) (getResources(GET_GROUP_URI, bearer))).getContent();
-        }catch (URINotFoundException | ResourceRequestTimeoutException | UnableToCreateResourceException e){
+        } catch (URINotFoundException | ResourceRequestTimeoutException | UnableToCreateResourceException e) {
             groupResourceList = new ArrayList<>();
         }
 
@@ -111,7 +111,6 @@ public class KulturtankenService {
             String schoolName = schoolResource.getNavn();
             filterLevelsAndGroups(levelResourceList, schoolResouceLink, finalGroupResourceList, schoolOrganisation, schoolName);
         });
-
     }
 
     private void filterLevelsAndGroups(List<ArstrinnResource> levelResourceList, Link schoolResourceLink, List<BasisgruppeResource> groupResourceList, SkoleOrganisasjon schoolOrganisation, String schoolName) {
@@ -119,7 +118,7 @@ public class KulturtankenService {
         levelResourceList.forEach(level -> {
             Link levelSelfLink = level.getSelfLinks().get(0);
             List<Basisgrupper> filteredGroups =
-                    (groupResourceList.isEmpty() || (groupResourceList.size()==1 && groupResourceList.get(0).getTrinn()==null))
+                    (groupResourceList.isEmpty() || (groupResourceList.size() == 1 && groupResourceList.get(0).getTrinn() == null))
                             ?
                             new ArrayList<>()
                             :
@@ -159,7 +158,7 @@ public class KulturtankenService {
         AbstractCollectionResources resourceClass =
                 (uri.equals(GET_ORGANISATION_URI) ? new OrganisasjonselementResources() :
                         (uri.equals(GET_SCHOOL_URI) ? new SkoleResources() :
-                                (uri.equals(GET_LEVEL_URI)? new ArstrinnResources() : new BasisgruppeResources())));
+                                (uri.equals(GET_LEVEL_URI) ? new ArstrinnResources() : new BasisgruppeResources())));
         return
                 webClient.get()
                         .uri(uri)
