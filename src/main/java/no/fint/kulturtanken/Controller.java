@@ -1,6 +1,9 @@
 package no.fint.kulturtanken;
 
 import lombok.extern.slf4j.Slf4j;
+import no.fint.kulturtanken.Exceptions.ResourceRequestTimeoutException;
+import no.fint.kulturtanken.Exceptions.URINotFoundException;
+import no.fint.kulturtanken.Exceptions.UnableToCreateResourceException;
 import no.fint.kulturtanken.model.SkoleOrganisasjon;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -16,13 +19,13 @@ import javax.validation.constraints.NotBlank;
 public class Controller {
 
     @Autowired
-    private FintService fintService;
+    private KulturtankenService kulturtankenService;
 
     @GetMapping
     public SkoleOrganisasjon getSkoleOrganisasjon(@RequestHeader(name = HttpHeaders.AUTHORIZATION) @NotBlank String bearer) {
         log.info("Bearer token: {}", bearer);
 
-        return fintService.getSkoleOrganisasjon(bearer);
+        return kulturtankenService.getSkoleOrganisasjon(bearer);
     }
 
     @ExceptionHandler(ResourceRequestTimeoutException.class)

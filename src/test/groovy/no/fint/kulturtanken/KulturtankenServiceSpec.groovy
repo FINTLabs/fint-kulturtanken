@@ -1,5 +1,7 @@
 package no.fint.kulturtanken
 
+import no.fint.kulturtanken.Exceptions.ResourceRequestTimeoutException
+import no.fint.kulturtanken.Exceptions.URINotFoundException
 import no.fint.kulturtanken.model.SkoleOrganisasjon
 import no.fint.model.felles.kompleksedatatyper.Kontaktinformasjon
 import no.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementResources
@@ -13,16 +15,16 @@ import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.web.reactive.function.client.WebClient
 
-class FintServiceSpec extends MockMvcSpecification {
+class KulturtankenServiceSpec extends MockMvcSpecification {
 
     private MockMvc mockMvc
-    private FintService fintService
+    private KulturtankenService kulturtankenService
     private def server = new MockWebServer()
     private Controller controller
 
     void setup() {
-        fintService = new FintService(webClient: WebClient.create(server.url('/').toString()))
-        controller = new Controller(fintService: fintService)
+        kulturtankenService = new KulturtankenService(webClient: WebClient.create(server.url('/').toString()))
+        controller = new Controller(kulturtankenService: kulturtankenService)
         mockMvc = standaloneSetup(controller)
     }
 
@@ -33,7 +35,7 @@ class FintServiceSpec extends MockMvcSpecification {
                         .setBody(new ClassPathResource("skoleOrganisasjonResources.json").getFile().text))
         when:
         SkoleOrganisasjon skoleOrganisasjon = new SkoleOrganisasjon()
-        fintService.addOrganisationInfo(skoleOrganisasjon, "testBearer")
+        kulturtankenService.addOrganisationInfo(skoleOrganisasjon, "testBearer")
 
         then:
         skoleOrganisasjon.navn == "Haugaland fylkeskommune"
@@ -48,7 +50,7 @@ class FintServiceSpec extends MockMvcSpecification {
         kontaktinformasjon.setEpostadresse("test-email@testing.test")
         kontaktinformasjon.setMobiltelefonnummer("99999999")
         when:
-        def returnedKontaktInformasjon = fintService.getKontaktInformasjon(kontaktinformasjon)
+        def returnedKontaktInformasjon = kulturtankenService.getKontaktInformasjon(kontaktinformasjon)
 
         then:
         returnedKontaktInformasjon.epostadresse == "test-email@testing.test"
@@ -61,7 +63,7 @@ class FintServiceSpec extends MockMvcSpecification {
                 new MockResponse().setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                         .setBody(new ClassPathResource("skoleResources.json").getFile().text))
         when:
-        def schoolList = fintService.getSkoleList("testBearer")
+        def schoolList = kulturtankenService.getSkoleList("testBearer")
 
         then:
         schoolList.size() == 2
@@ -94,9 +96,9 @@ class FintServiceSpec extends MockMvcSpecification {
                         .setBody(new ClassPathResource("basisgrupperResources.json").getFile().text))
         when:
         SkoleOrganisasjon skoleOrganisasjon = new SkoleOrganisasjon()
-        fintService.addOrganisationInfo(skoleOrganisasjon, "testBearer")
-        skoleOrganisasjon.skole = fintService.getSkoleList("testBearer")
-        fintService.setSchoolLevelsAndGroups(skoleOrganisasjon, "testBearer")
+        kulturtankenService.addOrganisationInfo(skoleOrganisasjon, "testBearer")
+        skoleOrganisasjon.skole = kulturtankenService.getSkoleList("testBearer")
+        kulturtankenService.setSchoolLevelsAndGroups(skoleOrganisasjon, "testBearer")
 
         then:
         skoleOrganisasjon.skole[0].trinn.size() == 2
@@ -126,9 +128,9 @@ class FintServiceSpec extends MockMvcSpecification {
                         .setBody(new ClassPathResource("basisgrupperResources.json").getFile().text))
         when:
         SkoleOrganisasjon skoleOrganisasjon = new SkoleOrganisasjon()
-        fintService.addOrganisationInfo(skoleOrganisasjon, "testBearer")
-        skoleOrganisasjon.skole = fintService.getSkoleList("testBearer")
-        fintService.setSchoolLevelsAndGroups(skoleOrganisasjon, "testBearer")
+        kulturtankenService.addOrganisationInfo(skoleOrganisasjon, "testBearer")
+        skoleOrganisasjon.skole = kulturtankenService.getSkoleList("testBearer")
+        kulturtankenService.setSchoolLevelsAndGroups(skoleOrganisasjon, "testBearer")
 
         then:
         skoleOrganisasjon.skole[0].trinn[0].basisgrupper.size() == 2
@@ -154,7 +156,7 @@ class FintServiceSpec extends MockMvcSpecification {
         when:
         Exception errorException = new Exception()
         try {
-            AbstractCollection abstractCollection = fintService.getSkoleOrganisasjon("testBearer")
+            AbstractCollection abstractCollection = kulturtankenService.getSkoleOrganisasjon("testBearer")
         } catch (Exception e) {
             errorException = e
         }
@@ -170,7 +172,7 @@ class FintServiceSpec extends MockMvcSpecification {
         Exception errorException = new Exception()
         OrganisasjonselementResources organisasjonselementResources = new OrganisasjonselementResources()
         try {
-            AbstractCollection abstractCollection = fintService.getResources(a404URI, "testBearer", organisasjonselementResources)
+            AbstractCollection abstractCollection = kulturtankenService.getResources(a404URI, "testBearer", organisasjonselementResources)
         } catch (Exception e) {
             errorException = e
         }
@@ -184,7 +186,7 @@ class FintServiceSpec extends MockMvcSpecification {
         when:
         Exception errorException = new Exception()
         try {
-            AbstractCollection abstractCollection = fintService.getSkoleOrganisasjon( "testBearer")
+            AbstractCollection abstractCollection = kulturtankenService.getSkoleOrganisasjon( "testBearer")
         } catch (Exception e) {
             errorException = e
         }
@@ -202,7 +204,7 @@ class FintServiceSpec extends MockMvcSpecification {
                         .setBody(new ClassPathResource("emptyResource.json").getFile().text))
 
         when:
-        def skoleOrganisasjon = fintService.getSkoleOrganisasjon()
+        def skoleOrganisasjon = kulturtankenService.getSkoleOrganisasjon()
 
         then:
         skoleOrganisasjon.getSkole().size() == 0
@@ -223,7 +225,7 @@ class FintServiceSpec extends MockMvcSpecification {
                         .setBody(new ClassPathResource("emptyResource.json").getFile().text))
 
         when:
-        def skoleOrganisasjon = fintService.getSkoleOrganisasjon()
+        def skoleOrganisasjon = kulturtankenService.getSkoleOrganisasjon()
 
         then:
         print(skoleOrganisasjon.toString())
@@ -245,7 +247,7 @@ class FintServiceSpec extends MockMvcSpecification {
         server.enqueue(new MockResponse().setResponseCode(HttpStatus.NOT_FOUND.value()))
 
         when:
-        def skoleOrganisasjon = fintService.getSkoleOrganisasjon()
+        def skoleOrganisasjon = kulturtankenService.getSkoleOrganisasjon()
 
         then:
         print(skoleOrganisasjon.toString())
@@ -272,7 +274,7 @@ class FintServiceSpec extends MockMvcSpecification {
                         .setBody(new ClassPathResource("emptyResource.json").getFile().text))
 
         when:
-        def skoleOrganisasjon = fintService.getSkoleOrganisasjon()
+        def skoleOrganisasjon = kulturtankenService.getSkoleOrganisasjon()
 
         then:
         skoleOrganisasjon.getSkole().size() == 2
@@ -297,7 +299,7 @@ class FintServiceSpec extends MockMvcSpecification {
                 new MockResponse().setResponseCode(HttpStatus.NOT_FOUND.value()))
 
         when:
-        def skoleOrganisasjon = fintService.getSkoleOrganisasjon()
+        def skoleOrganisasjon = kulturtankenService.getSkoleOrganisasjon()
 
         then:
         skoleOrganisasjon.getSkole().size() == 2

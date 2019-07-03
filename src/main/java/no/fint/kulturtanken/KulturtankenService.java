@@ -2,6 +2,9 @@ package no.fint.kulturtanken;
 
 import io.netty.handler.timeout.ReadTimeoutException;
 import lombok.extern.slf4j.Slf4j;
+import no.fint.kulturtanken.Exceptions.ResourceRequestTimeoutException;
+import no.fint.kulturtanken.Exceptions.URINotFoundException;
+import no.fint.kulturtanken.Exceptions.UnableToCreateResourceException;
 import no.fint.kulturtanken.model.*;
 import no.fint.model.resource.AbstractCollectionResources;
 import no.fint.model.resource.Link;
@@ -28,7 +31,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-public class FintService {
+public class KulturtankenService {
 
     private final String GET_ORGANISATION_URI = "/administrasjon/organisasjon/organisasjonselement";
     private final String GET_SCHOOL_URI = "/utdanning/utdanningsprogram/skole";

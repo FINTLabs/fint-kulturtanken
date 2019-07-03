@@ -12,13 +12,13 @@ import org.springframework.web.reactive.function.client.WebClient
 class ControllerSpec extends MockMvcSpecification {
 
     private MockMvc mockMvc
-    private FintService fintService
+    private KulturtankenService kulturtankenService
     private def server = new MockWebServer()
     private Controller controller
 
     void setup() {
-        fintService = new FintService(webClient: WebClient.create(server.url('/').toString()))
-        controller = new Controller(fintService: fintService)
+        kulturtankenService = new KulturtankenService(webClient: WebClient.create(server.url('/').toString()))
+        controller = new Controller(kulturtankenService: kulturtankenService)
         mockMvc = standaloneSetup(controller)
     }
 
