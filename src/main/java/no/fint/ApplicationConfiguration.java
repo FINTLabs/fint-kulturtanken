@@ -17,14 +17,17 @@ public class ApplicationConfiguration {
     @Value("${fint.dks.baseUrl:https://beta.felleskomponent.no/}")
     private String baseUrl;
 
+    @Value("${webclient.handler.timeout.value}")
+    private int timeoutValue;
+
     @Bean
     public WebClient webClient() {
 
         TcpClient tcpClient = TcpClient.create()
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 1000)
                 .doOnConnected(connection ->
-                        connection.addHandlerLast(new ReadTimeoutHandler(3))
-                                .addHandlerLast(new WriteTimeoutHandler(3)));
+                        connection.addHandlerLast(new ReadTimeoutHandler(timeoutValue))
+                                .addHandlerLast(new WriteTimeoutHandler(timeoutValue)));
         return WebClient.builder()
                 .baseUrl(baseUrl)
                 .clientConnector(new ReactorClientHttpConnector(HttpClient.from(tcpClient)))

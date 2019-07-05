@@ -2,6 +2,9 @@ package no.fint.kulturtanken;
 
 import io.netty.handler.timeout.ReadTimeoutException;
 import lombok.extern.slf4j.Slf4j;
+import no.fint.kulturtanken.Exceptions.ResourceRequestTimeoutException;
+import no.fint.kulturtanken.Exceptions.URINotFoundException;
+import no.fint.kulturtanken.Exceptions.UnableToCreateResourceException;
 import no.fint.kulturtanken.model.*;
 import no.fint.model.resource.AbstractCollectionResources;
 import no.fint.model.resource.Link;
@@ -28,7 +31,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-public class FintService {
+public class KulturtankenService {
 
     private final String GET_ORGANISATION_URI = "/administrasjon/organisasjon/organisasjonselement";
     private final String GET_SCHOOL_URI = "/utdanning/utdanningsprogram/skole";
@@ -39,27 +42,36 @@ public class FintService {
     private WebClient webClient;
 
     public SkoleOrganisasjon getSkoleOrganisasjon(String bearer) {
-        SkoleOrganisasjon skoleOrganisasjon = new SkoleOrganisasjon();
-        addOrganisationInfo(skoleOrganisasjon, bearer);
+        SkoleOrganisasjon skoleOrganisasjon = getTopOrganisation(bearer);
         skoleOrganisasjon.setSkole(getSkoleList(bearer));
-        setSchoolLevelsAndGroups(skoleOrganisasjon, bearer);
+        if (skoleOrganisasjon.getSkole().size() > 0)
+            setSchoolLevelsAndGroups(skoleOrganisasjon, bearer);
         return skoleOrganisasjon;
     }
 
-    private void addOrganisationInfo(SkoleOrganisasjon schoolOrganisation, String bearer) {
-        OrganisasjonselementResources organisasjonselementResources = new OrganisasjonselementResources();
-        organisasjonselementResources = (OrganisasjonselementResources) getResources(GET_ORGANISATION_URI, bearer, organisasjonselementResources);
+    private SkoleOrganisasjon getTopOrganisation(String bearer) {
+        SkoleOrganisasjon schoolOrganisation = new SkoleOrganisasjon();
+        OrganisasjonselementResources organisasjonselementResources = (OrganisasjonselementResources) getResources(GET_ORGANISATION_URI, bearer);
         Optional<OrganisasjonselementResource> topLevelOrg = getTopElement(organisasjonselementResources);
         topLevelOrg.ifPresent(o -> {
             schoolOrganisation.setNavn(o.getNavn());
             schoolOrganisation.setOrganisasjonsnummer(o.getOrganisasjonsnummer().getIdentifikatorverdi());
             schoolOrganisation.setKontaktinformasjon(getKontaktInformasjon(o.getKontaktinformasjon()));
         });
+        return schoolOrganisation;
     }
 
     private List<Skole> getSkoleList(String bearer) {
-        SkoleResources skoleResources = new SkoleResources();
-        skoleResources = (SkoleResources) getResources(GET_SCHOOL_URI, bearer, skoleResources);
+        SkoleResources skoleResources;
+        try {
+            skoleResources = (SkoleResources) getResources(GET_SCHOOL_URI, bearer);
+        } catch (URINotFoundException | ResourceRequestTimeoutException | UnableToCreateResourceException e) {
+            log.error(e.getMessage());
+            skoleResources = new SkoleResources();
+        }
+        if (skoleResources.getContent().isEmpty() || (skoleResources.getContent().size() == 1 && skoleResources.getContent().get(0).getNavn() == null)) {
+            return new ArrayList<>();
+        }
         return
                 skoleResources.getContent()
                         .stream()
@@ -75,26 +87,43 @@ public class FintService {
     }
 
     private void setSchoolLevelsAndGroups(SkoleOrganisasjon schoolOrganisation, String bearer) {
-        SkoleResources skoleResources = new SkoleResources();
-        ArstrinnResources arstrinnResources = new ArstrinnResources();
-        BasisgruppeResources basisgruppeResources = new BasisgruppeResources();
-        List<SkoleResource> schoolResourceList = ((SkoleResources) (getResources(GET_SCHOOL_URI, bearer, skoleResources))).getContent();
-        List<ArstrinnResource> levelResourceList = ((ArstrinnResources) (getResources(GET_LEVEL_URI, bearer, arstrinnResources))).getContent();
-        List<BasisgruppeResource> groupResourceList = ((BasisgruppeResources) (getResources(GET_GROUP_URI, bearer, basisgruppeResources))).getContent();
+        List<SkoleResource> schoolResourceList;
+        List<ArstrinnResource> levelResourceList;
+        List<BasisgruppeResource> groupResourceList;
+        try {
+            schoolResourceList = ((SkoleResources) (getResources(GET_SCHOOL_URI, bearer))).getContent();
+            levelResourceList = ((ArstrinnResources) (getResources(GET_LEVEL_URI, bearer))).getContent();
+        } catch (URINotFoundException | ResourceRequestTimeoutException | UnableToCreateResourceException e) {
+            return;
+        }
+        if (levelResourceList.isEmpty() || (levelResourceList.size() == 1 && levelResourceList.get(0).getNavn() == null)) {
+            return;
+        }
+        try {
+            groupResourceList = ((BasisgruppeResources) (getResources(GET_GROUP_URI, bearer))).getContent();
+        } catch (URINotFoundException | ResourceRequestTimeoutException | UnableToCreateResourceException e) {
+            groupResourceList = new ArrayList<>();
+        }
 
+        List<BasisgruppeResource> finalGroupResourceList = groupResourceList;
         schoolResourceList.forEach(schoolResource -> {
             Link schoolResouceLink = schoolResource.getSelfLinks().get(0);
-            filterLevelsAndGroups(levelResourceList, schoolResouceLink, groupResourceList, schoolOrganisation, schoolResource);
+            String schoolName = schoolResource.getNavn();
+            filterLevelsAndGroups(levelResourceList, schoolResouceLink, finalGroupResourceList, schoolOrganisation, schoolName);
         });
-
     }
 
-    private void filterLevelsAndGroups(List<ArstrinnResource> levelResourceList, Link schoolResouceLink, List<BasisgruppeResource> groupResourceList, SkoleOrganisasjon schoolOrganisation, SkoleResource schoolResource) {
+    private void filterLevelsAndGroups(List<ArstrinnResource> levelResourceList, Link schoolResourceLink, List<BasisgruppeResource> groupResourceList, SkoleOrganisasjon schoolOrganisation, String schoolName) {
         List<Trinn> levelList = new ArrayList<>();
         levelResourceList.forEach(level -> {
             Link levelSelfLink = level.getSelfLinks().get(0);
-            List<Basisgrupper> filteredGroups = filterGroups(levelSelfLink, schoolResouceLink, groupResourceList);
-            addLevelAndGroupToSchool(level, levelList, filteredGroups, schoolOrganisation, schoolResource);
+            List<Basisgrupper> filteredGroups =
+                    (groupResourceList.isEmpty() || (groupResourceList.size() == 1 && groupResourceList.get(0).getTrinn() == null))
+                            ?
+                            new ArrayList<>()
+                            :
+                            filterGroups(levelSelfLink, schoolResourceLink, groupResourceList);
+            addLevelAndGroupToSchool(level, levelList, filteredGroups, schoolOrganisation, schoolName);
         });
     }
 
@@ -112,20 +141,24 @@ public class FintService {
                 }).collect(Collectors.toList());
     }
 
-    private void addLevelAndGroupToSchool(ArstrinnResource level, List<Trinn> levelList, List<Basisgrupper> filteredGroups, SkoleOrganisasjon schoolOrganisation, SkoleResource skoleResource) {
+    private void addLevelAndGroupToSchool(ArstrinnResource level, List<Trinn> levelList, List<Basisgrupper> filteredGroups, SkoleOrganisasjon schoolOrganisation, String schoolName) {
         Trinn trinn = new Trinn();
         trinn.setNiva(level.getNavn());
         trinn.setBasisgrupper(filteredGroups);
         if (filteredGroups.size() > 0)
             levelList.add(trinn);
         for (Skole skole : schoolOrganisation.getSkole()) {
-            if (skole.getNavn().equals(skoleResource.getNavn())) {
+            if (skole.getNavn().equals(schoolName)) {
                 skole.setTrinn(levelList);
             }
         }
     }
 
-    private AbstractCollectionResources getResources(String uri, String bearer, AbstractCollectionResources resourceClass) {
+    private AbstractCollectionResources getResources(String uri, String bearer) {
+        AbstractCollectionResources resourceClass =
+                (uri.equals(GET_ORGANISATION_URI) ? new OrganisasjonselementResources() :
+                        (uri.equals(GET_SCHOOL_URI) ? new SkoleResources() :
+                                (uri.equals(GET_LEVEL_URI) ? new ArstrinnResources() : new BasisgruppeResources())));
         return
                 webClient.get()
                         .uri(uri)

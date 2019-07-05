@@ -1,0 +1,4 @@
+webclient:
+  handler:
+    timeout:
+      value: 8
