@@ -7,8 +7,8 @@ import java.util.List;
 @Data
 public class Skole {
 	private String navn;
-	private String skolenummer;
 	private String organisasjonsnummer;
+	private String skolenummer;
 	private Kontaktinformasjon kontaktinformasjon;
 	private List<Trinn> trinn;
 }
