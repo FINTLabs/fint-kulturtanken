@@ -36,7 +36,7 @@ public class KulturtankenService {
     private final String GET_ORGANISATION_URI = "/administrasjon/organisasjon/organisasjonselement";
     private final String GET_SCHOOL_URI = "/utdanning/utdanningsprogram/skole";
     private final String GET_LEVEL_URI = "/utdanning/utdanningsprogram/arstrinn";
-    private final String GET_GROUP_URI = "/utdanning/utdanningsprogram/basisgruppe";
+    private final String GET_GROUP_URI = "/utdanning/elev/basisgruppe";
 
     @Autowired
     private WebClient webClient;
@@ -196,7 +196,7 @@ public class KulturtankenService {
     private Kontaktinformasjon getKontaktInformasjon(no.fint.model.felles.kompleksedatatyper.Kontaktinformasjon contactInformation1) {
         Kontaktinformasjon contactInformation = new Kontaktinformasjon();
         contactInformation.setEpostadresse(contactInformation1.getEpostadresse());
-        contactInformation.setMobiltelefonnummer(contactInformation1.getMobiltelefonnummer());
+        contactInformation.setTelefonnummer(contactInformation1.getTelefonnummer());
         return contactInformation;
     }
 }

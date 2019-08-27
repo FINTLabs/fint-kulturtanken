@@ -37,7 +37,7 @@ class KulturtankenServiceSpec extends MockMvcSpecification {
 
         then:
         skoleOrganisasjon.navn == "Haugaland fylkeskommune"
-        skoleOrganisasjon.kontaktinformasjon.mobiltelefonnummer == "47474747"
+        skoleOrganisasjon.kontaktinformasjon.telefonnummer == "52525252"
         skoleOrganisasjon.kontaktinformasjon.epostadresse == "post@haugfk.no"
         skoleOrganisasjon.skole == null
     }
@@ -46,13 +46,13 @@ class KulturtankenServiceSpec extends MockMvcSpecification {
         given:
         Kontaktinformasjon kontaktinformasjon = new Kontaktinformasjon()
         kontaktinformasjon.setEpostadresse("test-email@testing.test")
-        kontaktinformasjon.setMobiltelefonnummer("99999999")
+        kontaktinformasjon.setTelefonnummer("99999999")
         when:
         def returnedKontaktInformasjon = kulturtankenService.getKontaktInformasjon(kontaktinformasjon)
 
         then:
         returnedKontaktInformasjon.epostadresse == "test-email@testing.test"
-        returnedKontaktInformasjon.mobiltelefonnummer == "99999999"
+        returnedKontaktInformasjon.telefonnummer == "99999999"
     }
 
     def "Use getSkoleList to receive List with Skole"() {
