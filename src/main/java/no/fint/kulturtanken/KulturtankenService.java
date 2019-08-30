@@ -41,16 +41,16 @@ public class KulturtankenService {
     @Autowired
     private WebClient webClient;
 
-    public SkoleOrganisasjon getSkoleOrganisasjon(String bearer) {
-        SkoleOrganisasjon skoleOrganisasjon = getTopOrganisation(bearer);
-        skoleOrganisasjon.setSkole(getSkoleList(bearer));
-        if (skoleOrganisasjon.getSkole().size() > 0)
-            setSchoolLevelsAndGroups(skoleOrganisasjon, bearer);
-        return skoleOrganisasjon;
+    public SkoleEier getSkoleOrganisasjon(String bearer) {
+        SkoleEier skoleEier = getTopOrganisation(bearer);
+        skoleEier.setSkole(getSkoleList(bearer));
+        if (skoleEier.getSkole().size() > 0)
+            setSchoolLevelsAndGroups(skoleEier, bearer);
+        return skoleEier;
     }
 
-    private SkoleOrganisasjon getTopOrganisation(String bearer) {
-        SkoleOrganisasjon schoolOrganisation = new SkoleOrganisasjon();
+    private SkoleEier getTopOrganisation(String bearer) {
+        SkoleEier schoolOrganisation = new SkoleEier();
         OrganisasjonselementResources organisasjonselementResources = (OrganisasjonselementResources) getResources(GET_ORGANISATION_URI, bearer);
         Optional<OrganisasjonselementResource> topLevelOrg = getTopElement(organisasjonselementResources);
         topLevelOrg.ifPresent(o -> {
@@ -86,7 +86,7 @@ public class KulturtankenService {
                         .collect(Collectors.toList());
     }
 
-    private void setSchoolLevelsAndGroups(SkoleOrganisasjon schoolOrganisation, String bearer) {
+    private void setSchoolLevelsAndGroups(SkoleEier schoolOrganisation, String bearer) {
         List<SkoleResource> schoolResourceList;
         List<ArstrinnResource> levelResourceList;
         List<BasisgruppeResource> groupResourceList;
@@ -113,7 +113,7 @@ public class KulturtankenService {
         });
     }
 
-    private void filterLevelsAndGroups(List<ArstrinnResource> levelResourceList, Link schoolResourceLink, List<BasisgruppeResource> groupResourceList, SkoleOrganisasjon schoolOrganisation, String schoolName) {
+    private void filterLevelsAndGroups(List<ArstrinnResource> levelResourceList, Link schoolResourceLink, List<BasisgruppeResource> groupResourceList, SkoleEier schoolOrganisation, String schoolName) {
         List<Trinn> levelList = new ArrayList<>();
         levelResourceList.forEach(level -> {
             Link levelSelfLink = level.getSelfLinks().get(0);
@@ -141,7 +141,7 @@ public class KulturtankenService {
                 }).collect(Collectors.toList());
     }
 
-    private void addLevelAndGroupToSchool(ArstrinnResource level, List<Trinn> levelList, List<Basisgrupper> filteredGroups, SkoleOrganisasjon schoolOrganisation, String schoolName) {
+    private void addLevelAndGroupToSchool(ArstrinnResource level, List<Trinn> levelList, List<Basisgrupper> filteredGroups, SkoleEier schoolOrganisation, String schoolName) {
         Trinn trinn = new Trinn();
         trinn.setNiva(level.getNavn());
         trinn.setBasisgrupper(filteredGroups);

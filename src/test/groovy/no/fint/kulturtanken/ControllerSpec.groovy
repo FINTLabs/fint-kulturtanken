@@ -27,7 +27,7 @@ class ControllerSpec extends MockMvcSpecification {
         server.enqueue(new MockResponse().setResponseCode(HttpStatus.NOT_FOUND.value()))
 
         when:
-        def response = mockMvc.perform(get('/api/skoleorganisasjon').header(HttpHeaders.AUTHORIZATION, "bearer"))
+        def response = mockMvc.perform(get('/skoleeier').header(HttpHeaders.AUTHORIZATION, "bearer"))
 
         then:
 
@@ -39,7 +39,7 @@ class ControllerSpec extends MockMvcSpecification {
         server.enqueue(new MockResponse().setResponseCode(HttpStatus.REQUEST_TIMEOUT.value()))
 
         when:
-        def response = mockMvc.perform(get('/api/skoleorganisasjon').header(HttpHeaders.AUTHORIZATION, "bearer"))
+        def response = mockMvc.perform(get('/skoleeier').header(HttpHeaders.AUTHORIZATION, "bearer"))
 
         then:
 

@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import no.fint.kulturtanken.Exceptions.ResourceRequestTimeoutException;
 import no.fint.kulturtanken.Exceptions.URINotFoundException;
 import no.fint.kulturtanken.Exceptions.UnableToCreateResourceException;
-import no.fint.kulturtanken.model.SkoleOrganisasjon;
+import no.fint.kulturtanken.model.SkoleEier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -15,14 +15,14 @@ import javax.validation.constraints.NotBlank;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/skoleorganisasjon")
+@RequestMapping("skoleeier")
 public class Controller {
 
     @Autowired
     private KulturtankenService kulturtankenService;
 
     @GetMapping
-    public SkoleOrganisasjon getSkoleOrganisasjon(@RequestHeader(name = HttpHeaders.AUTHORIZATION) @NotBlank String bearer) {
+    public SkoleEier getSkoleeier(@RequestHeader(name = HttpHeaders.AUTHORIZATION) @NotBlank String bearer) {
         log.info("Bearer token: {}", bearer);
 
         return kulturtankenService.getSkoleOrganisasjon(bearer);

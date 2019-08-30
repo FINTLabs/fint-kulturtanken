@@ -2,7 +2,7 @@ package no.fint.kulturtanken
 
 import no.fint.kulturtanken.Exceptions.ResourceRequestTimeoutException
 import no.fint.kulturtanken.Exceptions.URINotFoundException
-import no.fint.kulturtanken.model.SkoleOrganisasjon
+import no.fint.kulturtanken.model.SkoleEier
 import no.fint.model.felles.kompleksedatatyper.Kontaktinformasjon
 import no.fint.test.utils.MockMvcSpecification
 import okhttp3.mockwebserver.MockResponse
@@ -33,7 +33,7 @@ class KulturtankenServiceSpec extends MockMvcSpecification {
                 new MockResponse().setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                         .setBody(new ClassPathResource("skoleOrganisasjonResources.json").getFile().text))
         when:
-        SkoleOrganisasjon skoleOrganisasjon = kulturtankenService.getTopOrganisation("testBearer")
+        SkoleEier skoleOrganisasjon = kulturtankenService.getTopOrganisation("testBearer")
 
         then:
         skoleOrganisasjon.navn == "Haugaland fylkeskommune"
@@ -93,7 +93,7 @@ class KulturtankenServiceSpec extends MockMvcSpecification {
                 new MockResponse().setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                         .setBody(new ClassPathResource("basisgrupperResources.json").getFile().text))
         when:
-        SkoleOrganisasjon skoleOrganisasjon = kulturtankenService.getTopOrganisation("testBearer")
+        SkoleEier skoleOrganisasjon = kulturtankenService.getTopOrganisation("testBearer")
         skoleOrganisasjon.skole = kulturtankenService.getSkoleList("testBearer")
         kulturtankenService.setSchoolLevelsAndGroups(skoleOrganisasjon, "testBearer")
 
@@ -124,7 +124,7 @@ class KulturtankenServiceSpec extends MockMvcSpecification {
                 new MockResponse().setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                         .setBody(new ClassPathResource("basisgrupperResources.json").getFile().text))
         when:
-        SkoleOrganisasjon skoleOrganisasjon = kulturtankenService.getTopOrganisation("testBearer")
+        SkoleEier skoleOrganisasjon = kulturtankenService.getTopOrganisation("testBearer")
         skoleOrganisasjon.skole = kulturtankenService.getSkoleList("testBearer")
         kulturtankenService.setSchoolLevelsAndGroups(skoleOrganisasjon, "testBearer")
 

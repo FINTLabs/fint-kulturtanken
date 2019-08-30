@@ -21,7 +21,7 @@ metadata:
     io.kompose.service: kulturtanken
   name: kulturtanken
 spec:
-  replicas: 3
+  replicas: 1
   minReadySeconds: 30
   revisionHistoryLimit: 0
   strategy:
@@ -39,7 +39,7 @@ spec:
     spec:
       containers:
         - name: kulturtanken-beta
-          image: fintlabs.azurecr.io/kulturtanken:1.1.0-rc-1
+          image: fintlabs.azurecr.io/kulturtanken:build.3
           ports:
             - containerPort: 8080
           readinessProbe:
@@ -47,7 +47,7 @@ spec:
             timeoutSeconds: 5
             httpGet:
               port: 8080
-              path: /health
+              path: /kulturtanken/actuator/health
           resources:
             limits:
               memory: "1.5Gi"
@@ -56,16 +56,9 @@ spec:
               cpu: "100m"
               memory: "256Mi"
           env:
-            - name: JAVA_TOOL_OPTIONS
-              value: "-XX:+ExitOnOutOfMemoryError -Xmx1G -verbose:gc"
             - name: TZ
               value: Europe/Oslo
-            - name: server.context-path
-              value: ""
-            - name: fint.audit.mongo.databasename
-              value: fint-audit-beta
-            - name: fint.audit.mongo.connection-string
-              valueFrom:
-                secretKeyRef:
-                  name: fint-audit
-                  key: mongodb
+            - name: server.servlet.context-path
+              value: "/kulturtanken"
+            - name: webclient.handler.timeout.value
+              value: "8"
