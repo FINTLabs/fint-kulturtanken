@@ -4,33 +4,31 @@ metadata:
   name: kulturtanken
   annotations:
     service.beta.kubernetes.io/azure-load-balancer-internal: "true"
-  labels:
-    app: kulturtanken
 spec:
   type: LoadBalancer
   ports:
     - port: 8080
   selector:
-    app: kulturtanken
+    io.kompose.service: kulturtanken
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: kulturtanken
   labels:
-    app: kulturtanken
+    io.kompose.service: kulturtanken
 spec:
   selector:
     matchLabels:
-      app: kulturtanken
+      io.kompose.service: kulturtanken
   template:
     metadata:
       labels:
-        app: kulturtanken
+        io.kompose.service: kulturtanken
     spec:
       containers:
         - name: kulturtanken-beta
-          image: fintlabs.azurecr.io/kulturtanken:resttemplate.build.1
+          image: fintlabs.azurecr.io/kulturtanken:resttemplate.3
           resources:
             limits:
               memory: "1.5Gi"
