@@ -1,0 +1,10 @@
+fint:
+  client:
+    connectTimeout: 10
+    readTimeout: 10
+  environment:
+    rootUri: https://beta.felleskomponent.no
+
+server:
+  servlet:
+    context-path: "/tjenester/kulturtanken"
