@@ -35,8 +35,8 @@ public class KulturtankenService {
     private final RestTemplate restTemplate;
     private String bearer;
 
-    private OrganisasjonselementResources organizationElementResources;
-    private SkoleResources schoolResources;
+    private OrganisasjonselementResources organizationElements;
+    private SkoleResources schools;
     private ArstrinnResources levels;
     private BasisgruppeResources basisGroups;
     private UndervisningsgruppeResources teachingGroups;
@@ -46,22 +46,13 @@ public class KulturtankenService {
         this.restTemplate = restTemplate;
     }
 
-    private void fetchData() {
-        organizationElementResources = getResources("/administrasjon/organisasjon/organisasjonselement", OrganisasjonselementResources.class);
-        schoolResources = getResources("/utdanning/utdanningsprogram/skole", SkoleResources.class);
-        basisGroups = getResources("/utdanning/elev/basisgruppe", BasisgruppeResources.class);
-        levels = getResources("/utdanning/utdanningsprogram/arstrinn", ArstrinnResources.class);
-        teachingGroups = getResources("/utdanning/timeplan/undervisningsgruppe", UndervisningsgruppeResources.class);
-        subjects = getResources("/utdanning/timeplan/fag", FagResources.class);
-    }
-
     public Skoleeier getSchoolOwner(final String bearer) {
         this.bearer = bearer;
 
         fetchData();
 
-        Skoleeier schoolOwner = (organizationElementResources != null) ?
-                organizationElementResources.getContent().stream()
+        Skoleeier schoolOwner = (organizationElements != null) ?
+                organizationElements.getContent().stream()
                         .filter(p -> p.getSelfLinks().equals(p.getOverordnet()))
                         .map(this::schoolOwner)
                         .findFirst()
@@ -75,7 +66,7 @@ public class KulturtankenService {
     private Skoleeier schoolOwner(OrganisasjonselementResource resource) {
         Skoleeier schoolOwner = new Skoleeier();
 
-        Optional<OrganisasjonselementResource> organizationElementResource = Optional.ofNullable(resource);
+        Optional<OrganisasjonselementResource> organizationElementResource = Optional.of(resource);
         organizationElementResource.map(OrganisasjonselementResource::getNavn).ifPresent(schoolOwner::setNavn);
         organizationElementResource.map(OrganisasjonselementResource::getKontaktinformasjon).map(this::getContactInformation).ifPresent(schoolOwner::setKontaktinformasjon);
         organizationElementResource.map(OrganisasjonselementResource::getOrganisasjonsnummer).map(Identifikator::getIdentifikatorverdi).ifPresent(schoolOwner::setOrganisasjonsnummer);
@@ -84,15 +75,15 @@ public class KulturtankenService {
     }
 
     private List<Skole> getSchools() {
-        if (schoolResources == null) return Collections.emptyList();
+        if (schools == null) return Collections.emptyList();
 
-        return schoolResources.getContent().stream().map(this::school).collect(Collectors.toList());
+        return schools.getContent().stream().map(this::school).collect(Collectors.toList());
     }
 
     private Skole school(SkoleResource resource) {
         Skole school = new Skole();
 
-        Optional<SkoleResource> schoolResource = Optional.ofNullable(resource);
+        Optional<SkoleResource> schoolResource = Optional.of(resource);
         schoolResource.map(SkoleResource::getNavn).ifPresent(school::setNavn);
         schoolResource.map(SkoleResource::getKontaktinformasjon).map(this::getContactInformation).ifPresent(school::setKontaktinformasjon);
         schoolResource.map(SkoleResource::getPostadresse).map(this::getVisitingAddress).ifPresent(school::setBesoksadresse);
@@ -107,19 +98,19 @@ public class KulturtankenService {
     private List<Trinn> getLevels(SkoleResource resource) {
         if (basisGroups == null || levels == null) return Collections.emptyList();
 
-        Map<List<Link>, List<BasisgruppeResource>> levelBasisGroupsMap = basisGroups.getContent().stream()
-                .filter(b -> b.getSkole().equals(resource.getSelfLinks()))
-                .collect(Collectors.groupingBy(BasisgruppeResource::getTrinn));
+        Map<Link, List<BasisgruppeResource>> levelBasisGroupsMap = basisGroups.getContent().stream()
+                .filter(b -> resource.getSelfLinks().contains(b.getSkole().stream().findAny().orElse(null)))
+                .collect(Collectors.groupingBy(this::getLevelLink));
 
         return levelBasisGroupsMap.entrySet().stream().map(this::level)
                 .filter(l -> l.getNiva() != null).collect(Collectors.toList());
     }
 
-    private Trinn level(Map.Entry<List<Link>, List<BasisgruppeResource>> levelBasisGroupsEntry) {
+    private Trinn level(Map.Entry<Link, List<BasisgruppeResource>> levelBasisGroupsEntry) {
         Trinn level = new Trinn();
 
         levels.getContent().stream()
-                .filter(l -> l.getSelfLinks().equals(levelBasisGroupsEntry.getKey()))
+                .filter(l -> l.getSelfLinks().contains(levelBasisGroupsEntry.getKey()))
                 .map(ArstrinnResource::getNavn).findAny()
                 .ifPresent(level::setNiva);
 
@@ -134,7 +125,7 @@ public class KulturtankenService {
     private Basisgruppe basisGroup(BasisgruppeResource resource) {
         Basisgruppe basisGroup = new Basisgruppe();
 
-        Optional<BasisgruppeResource> basisGroupResource = Optional.ofNullable(resource);
+        Optional<BasisgruppeResource> basisGroupResource = Optional.of(resource);
         basisGroupResource.map(BasisgruppeResource::getNavn).ifPresent(basisGroup::setNavn);
         basisGroupResource.map(BasisgruppeResource::getElevforhold).map(List::size).ifPresent(basisGroup::setAntall);
 
@@ -144,19 +135,19 @@ public class KulturtankenService {
     private List<Fag> getSubjects(SkoleResource resource) {
         if (teachingGroups == null || subjects == null) return Collections.emptyList();
 
-        Map<List<Link>, List<UndervisningsgruppeResource>> subjectTeachingGroupsMap = teachingGroups.getContent().stream()
-                .filter(t -> t.getSkole().equals(resource.getSelfLinks()))
-                .collect(Collectors.groupingBy(UndervisningsgruppeResource::getFag));
+        Map<Link, List<UndervisningsgruppeResource>> subjectTeachingGroupsMap = teachingGroups.getContent().stream()
+                .filter(t -> resource.getSelfLinks().contains(t.getSkole().stream().findAny().orElse(null)))
+                .collect(Collectors.groupingBy(this::getSubjectLink));
 
         return subjectTeachingGroupsMap.entrySet().stream().map(this::subject)
                 .filter(s -> s.getFagkode() != null).collect(Collectors.toList());
     }
 
-    private Fag subject(Map.Entry<List<Link>, List<UndervisningsgruppeResource>> subjectTeachingGroupsEntry) {
+    private Fag subject(Map.Entry<Link, List<UndervisningsgruppeResource>> subjectTeachingGroupsEntry) {
         Fag subject = new Fag();
 
         subjects.getContent().stream()
-                .filter(s -> s.getSelfLinks().equals(subjectTeachingGroupsEntry.getKey()))
+                .filter(s -> s.getSelfLinks().contains(subjectTeachingGroupsEntry.getKey()))
                 .map(FagResource::getNavn).findAny()
                 .ifPresent(subject::setFagkode);
 
@@ -171,7 +162,7 @@ public class KulturtankenService {
     private Undervisningsgruppe teachingGroup(UndervisningsgruppeResource resource) {
         Undervisningsgruppe teachingGroup = new Undervisningsgruppe();
 
-        Optional<UndervisningsgruppeResource> teachingGroupResource = Optional.ofNullable(resource);
+        Optional<UndervisningsgruppeResource> teachingGroupResource = Optional.of(resource);
         teachingGroupResource.map(UndervisningsgruppeResource::getNavn).ifPresent(teachingGroup::setNavn);
         teachingGroupResource.map(UndervisningsgruppeResource::getElevforhold).map(List::size).ifPresent(teachingGroup::setAntall);
 
@@ -181,7 +172,7 @@ public class KulturtankenService {
     private no.fint.kulturtanken.model.Kontaktinformasjon getContactInformation(Kontaktinformasjon resource) {
         no.fint.kulturtanken.model.Kontaktinformasjon contactInformation = new no.fint.kulturtanken.model.Kontaktinformasjon();
 
-        Optional<Kontaktinformasjon> contactInfomationResource = Optional.ofNullable(resource);
+        Optional<Kontaktinformasjon> contactInfomationResource = Optional.of(resource);
         contactInfomationResource.map(Kontaktinformasjon::getTelefonnummer).ifPresent(contactInformation::setTelefonnummer);
         contactInfomationResource.map(Kontaktinformasjon::getEpostadresse).ifPresent(contactInformation::setEpostadresse);
 
@@ -191,7 +182,7 @@ public class KulturtankenService {
     private Besoksadresse getVisitingAddress(AdresseResource resource) {
         Besoksadresse visitingAddress = new Besoksadresse();
 
-        Optional<AdresseResource> addressResource = Optional.ofNullable(resource);
+        Optional<AdresseResource> addressResource = Optional.of(resource);
         addressResource.map(AdresseResource::getAdresselinje).ifPresent(visitingAddress::setAdresselinje);
         addressResource.map(AdresseResource::getPostnummer).ifPresent(visitingAddress::setPostnummer);
         addressResource.map(AdresseResource::getPoststed).ifPresent(visitingAddress::setPoststed);
@@ -199,7 +190,24 @@ public class KulturtankenService {
         return visitingAddress;
     }
 
-    private <T> T getResources(String uri, Class<T> clazz) {
+    private Link getLevelLink(BasisgruppeResource resource) {
+        return resource.getTrinn().stream().findAny().orElse(null);
+    }
+
+    private Link getSubjectLink(UndervisningsgruppeResource resource) {
+        return resource.getFag().stream().findAny().orElse(null);
+    }
+
+    private void fetchData() {
+        organizationElements = get("/administrasjon/organisasjon/organisasjonselement", OrganisasjonselementResources.class);
+        schools = get("/utdanning/utdanningsprogram/skole", SkoleResources.class);
+        basisGroups = get("/utdanning/elev/basisgruppe", BasisgruppeResources.class);
+        levels = get("/utdanning/utdanningsprogram/arstrinn", ArstrinnResources.class);
+        teachingGroups = get("/utdanning/timeplan/undervisningsgruppe", UndervisningsgruppeResources.class);
+        subjects = get("/utdanning/timeplan/fag", FagResources.class);
+    }
+
+    private <T> T get(String uri, Class<T> clazz) {
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.AUTHORIZATION, bearer);
 
