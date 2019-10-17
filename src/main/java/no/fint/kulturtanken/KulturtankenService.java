@@ -18,10 +18,15 @@ import no.fint.model.resource.utdanning.utdanningsprogram.ArstrinnResource;
 import no.fint.model.resource.utdanning.utdanningsprogram.ArstrinnResources;
 import no.fint.model.resource.utdanning.utdanningsprogram.SkoleResource;
 import no.fint.model.resource.utdanning.utdanningsprogram.SkoleResources;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
@@ -46,6 +51,7 @@ public class KulturtankenService {
         this.restTemplate = restTemplate;
     }
 
+    @Cacheable("kulturtanken")
     public Skoleeier getSchoolOwner(final String bearer) {
         this.bearer = bearer;
 
@@ -206,6 +212,10 @@ public class KulturtankenService {
         teachingGroups = get("/utdanning/timeplan/undervisningsgruppe", UndervisningsgruppeResources.class);
         subjects = get("/utdanning/timeplan/fag", FagResources.class);
     }
+
+    @Scheduled(fixedRate = 3600000)
+    @CacheEvict(cacheNames = "kulturtanken", allEntries = true)
+    public void clearCache() {}
 
     private <T> T get(String uri, Class<T> clazz) {
         HttpHeaders headers = new HttpHeaders();

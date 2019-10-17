@@ -2,7 +2,6 @@ plugins {
     id 'org.springframework.boot' version '2.1.8.RELEASE'
     id 'java'
     id 'groovy'
-
 }
 
 apply plugin: 'io.spring.dependency-management'
@@ -25,13 +24,15 @@ repositories {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
     implementation 'no.fint:fint-administrasjon-resource-model-java:3.2.0'
     implementation 'no.fint:fint-utdanning-resource-model-java:3.2.0'
-    
+
+
     compileOnly 'org.projectlombok:lombok'
-    
+
     annotationProcessor 'org.projectlombok:lombok'
-    
+
     testImplementation('no.fint:fint-test-utils:0.0.4')
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation('org.spockframework:spock-spring:1.2-groovy-2.5')
