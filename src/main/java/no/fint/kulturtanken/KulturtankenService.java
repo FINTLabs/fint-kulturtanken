@@ -59,7 +59,7 @@ public class KulturtankenService {
 
         Skoleeier schoolOwner = (organizationElements != null) ?
                 organizationElements.getContent().stream()
-                        .filter(p -> p.getSelfLinks().equals(p.getOverordnet()))
+                        .filter(o -> o.getSelfLinks().contains(o.getOverordnet().stream().findAny().orElse(null)))
                         .map(this::schoolOwner)
                         .findFirst()
                         .orElse(new Skoleeier()) : new Skoleeier();
