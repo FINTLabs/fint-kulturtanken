@@ -2,12 +2,9 @@ package no.fint.kulturtanken;
 
 import lombok.extern.slf4j.Slf4j;
 import no.fint.kulturtanken.model.Skoleeier;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestClientResponseException;
-
-import javax.validation.constraints.NotBlank;
 
 @Slf4j
 @RestController
