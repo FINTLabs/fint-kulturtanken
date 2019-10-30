@@ -18,17 +18,12 @@ import no.fint.model.resource.utdanning.utdanningsprogram.ArstrinnResource;
 import no.fint.model.resource.utdanning.utdanningsprogram.ArstrinnResources;
 import no.fint.model.resource.utdanning.utdanningsprogram.SkoleResource;
 import no.fint.model.resource.utdanning.utdanningsprogram.SkoleResources;
-import org.springframework.cache.Cache;
-import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
@@ -38,7 +33,6 @@ import java.util.stream.Collectors;
 @Service
 public class KulturtankenService {
     private final RestTemplate restTemplate;
-    private String bearer;
 
     private OrganisasjonselementResources organizationElements;
     private SkoleResources schools;
@@ -52,17 +46,16 @@ public class KulturtankenService {
     }
 
     @Cacheable("kulturtanken")
-    public Skoleeier getSchoolOwner(final String bearer) {
-        this.bearer = bearer;
-
+    public Skoleeier getSchoolOwner() {
         fetchData();
 
-        Skoleeier schoolOwner = (organizationElements != null) ?
-                organizationElements.getContent().stream()
-                        .filter(o -> o.getSelfLinks().contains(o.getOverordnet().stream().findAny().orElse(null)))
-                        .map(this::schoolOwner)
-                        .findFirst()
-                        .orElse(new Skoleeier()) : new Skoleeier();
+        if (organizationElements == null) return new Skoleeier();
+
+        Skoleeier schoolOwner = organizationElements.getContent().stream()
+                .filter(o -> o.getSelfLinks().contains(o.getOverordnet().stream().findAny().orElse(null)))
+                .map(this::schoolOwner)
+                .findFirst()
+                .orElse(new Skoleeier());
 
         schoolOwner.setSkoler(getSchools());
 
@@ -74,7 +67,6 @@ public class KulturtankenService {
 
         Optional<OrganisasjonselementResource> organizationElementResource = Optional.of(resource);
         organizationElementResource.map(OrganisasjonselementResource::getNavn).ifPresent(schoolOwner::setNavn);
-        organizationElementResource.map(OrganisasjonselementResource::getKontaktinformasjon).map(this::getContactInformation).ifPresent(schoolOwner::setKontaktinformasjon);
         organizationElementResource.map(OrganisasjonselementResource::getOrganisasjonsnummer).map(Identifikator::getIdentifikatorverdi).ifPresent(schoolOwner::setOrganisasjonsnummer);
 
         return schoolOwner;
@@ -204,29 +196,25 @@ public class KulturtankenService {
         return resource.getFag().stream().findAny().orElse(null);
     }
 
+    private <T> T get(String uri, Class<T> clazz) {
+        ResponseEntity<T> response = restTemplate.getForEntity(uri, clazz);
+        return response.getBody();
+    }
+
+    @Scheduled(cron = "${fint.kulturtanken.cache-evict-cron:0 0 4 * * *}")
+    @CacheEvict(cacheNames = "kulturtanken", allEntries = true)
+    public void clearCache() {
+        log.info("\uD83D\uDD53 clearing cache...");
+    }
+
     private void fetchData() {
+        log.info("Fetching data from FINT API...");
         organizationElements = get("/administrasjon/organisasjon/organisasjonselement", OrganisasjonselementResources.class);
         schools = get("/utdanning/utdanningsprogram/skole", SkoleResources.class);
         basisGroups = get("/utdanning/elev/basisgruppe", BasisgruppeResources.class);
         levels = get("/utdanning/utdanningsprogram/arstrinn", ArstrinnResources.class);
         teachingGroups = get("/utdanning/timeplan/undervisningsgruppe", UndervisningsgruppeResources.class);
         subjects = get("/utdanning/timeplan/fag", FagResources.class);
-    }
-
-    @Scheduled(fixedRate = 3600000)
-    @CacheEvict(cacheNames = "kulturtanken", allEntries = true)
-    public void clearCache() {}
-
-    private <T> T get(String uri, Class<T> clazz) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.set(HttpHeaders.AUTHORIZATION, bearer);
-
-        try {
-            ResponseEntity<T> response = restTemplate.exchange(uri, HttpMethod.GET, new HttpEntity<>(headers), clazz);
-            return response.getBody();
-        } catch (RestClientResponseException ex) {
-            log.error("Error from RestClient - Status {}, Body {}", ex.getRawStatusCode(), ex.getResponseBodyAsString());
-            return null;
-        }
+        log.info("Finished fetching data");
     }
 }

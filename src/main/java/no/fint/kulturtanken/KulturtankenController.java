@@ -3,7 +3,9 @@ package no.fint.kulturtanken;
 import lombok.extern.slf4j.Slf4j;
 import no.fint.kulturtanken.model.Skoleeier;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestClientResponseException;
 
 import javax.validation.constraints.NotBlank;
 
@@ -19,17 +21,13 @@ public class KulturtankenController {
     }
 
     @GetMapping
-    public Skoleeier getSchoolOwner(@RequestHeader(name = HttpHeaders.AUTHORIZATION) @NotBlank String bearer) {
-        log.info("Bearer token: {}", bearer);
-
-        return kulturtankenService.getSchoolOwner(bearer);
+    public Skoleeier getSchoolOwner() {
+        return kulturtankenService.getSchoolOwner();
     }
 
-    /*
     @ExceptionHandler(RestClientResponseException.class)
     public ResponseEntity<String> handleRestClientResponseException(RestClientResponseException ex) {
-        log.error("Error from RestClient - Status {}, Body {}", ex.getRawStatusCode(), ex.getResponseBodyAsString(), ex);
+        log.error("RestClientException - Status: {}, Body: {}", ex.getRawStatusCode(), ex.getResponseBodyAsString());
         return ResponseEntity.status(ex.getRawStatusCode()).body(ex.getResponseBodyAsString());
     }
-    */
 }
