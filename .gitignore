@@ -4,6 +4,8 @@ build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**
 !**/src/test/**
+application-*.yaml
+k8s-secret.yaml
 
 ### STS ###
 .apt_generated

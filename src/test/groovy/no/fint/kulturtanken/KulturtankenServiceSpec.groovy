@@ -1,6 +1,7 @@
 package no.fint.kulturtanken
 
 import com.fasterxml.jackson.databind.ObjectMapper
+
 import no.fint.test.utils.MockMvcSpecification
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -44,13 +45,11 @@ class KulturtankenServiceSpec extends MockMvcSpecification {
                         .setBody(objectMapper.writeValueAsString(fintObjectFactory.newSubjectResources())))
 
         when:
-        def response = kulturtankenService.getSchoolOwner('bearer')
+        def response = kulturtankenService.getSchoolOwner()
 
         then:
         response.navn == 'Rogaland fylkeskommune'
         response.organisasjonsnummer == '971045698'
-        response.kontaktinformasjon.epostadresse == 'firmapost@rogfk.no'
-        response.kontaktinformasjon.telefonnummer == '51 51 66 00'
 
         response.skoler.size() == 1
         response.skoler[0].navn == 'Haugaland videregående skole'
