@@ -99,8 +99,9 @@ public class KulturtankenService {
                 .filter(b -> resource.getSelfLinks().contains(b.getSkole().stream().findAny().orElse(null)))
                 .collect(Collectors.groupingBy(this::getLevelLink));
 
-        return levelBasisGroupsMap.entrySet().stream().map(this::level)
-                .filter(l -> l.getNiva() != null).collect(Collectors.toList());
+        return levelBasisGroupsMap.entrySet().stream()
+                .map(this::level)
+                .collect(Collectors.toList());
     }
 
     private Trinn level(Map.Entry<Link, List<BasisgruppeResource>> levelBasisGroupsEntry) {
@@ -112,7 +113,8 @@ public class KulturtankenService {
                 .ifPresent(level::setNiva);
 
         List<Basisgruppe> basisGroups = levelBasisGroupsEntry.getValue().stream()
-                .filter(b -> b.getElevforhold().size() > 0).map(this::basisGroup).collect(Collectors.toList());
+                .map(this::basisGroup)
+                .collect(Collectors.toList());
 
         level.setBasisgrupper(basisGroups);
 
@@ -136,8 +138,9 @@ public class KulturtankenService {
                 .filter(t -> resource.getSelfLinks().contains(t.getSkole().stream().findAny().orElse(null)))
                 .collect(Collectors.groupingBy(this::getSubjectLink));
 
-        return subjectTeachingGroupsMap.entrySet().stream().map(this::subject)
-                .filter(s -> s.getFagkode() != null).collect(Collectors.toList());
+        return subjectTeachingGroupsMap.entrySet().stream()
+                .map(this::subject)
+                .collect(Collectors.toList());
     }
 
     private Fag subject(Map.Entry<Link, List<UndervisningsgruppeResource>> subjectTeachingGroupsEntry) {
@@ -149,7 +152,8 @@ public class KulturtankenService {
                 .ifPresent(subject::setFagkode);
 
         List<Undervisningsgruppe> teachingGroups = subjectTeachingGroupsEntry.getValue().stream()
-                .filter(t -> t.getElevforhold().size() > 0).map(this::teachingGroup).collect(Collectors.toList());
+                .map(this::teachingGroup)
+                .collect(Collectors.toList());
 
         subject.setUndervisningsgrupper(teachingGroups);
 
