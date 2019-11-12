@@ -25,6 +25,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -67,6 +68,8 @@ public class KulturtankenService {
         Optional<OrganisasjonselementResource> organizationElementResource = Optional.of(resource);
         organizationElementResource.map(OrganisasjonselementResource::getNavn).ifPresent(schoolOwner::setNavn);
         organizationElementResource.map(OrganisasjonselementResource::getOrganisasjonsnummer).map(Identifikator::getIdentifikatorverdi).ifPresent(schoolOwner::setOrganisasjonsnummer);
+
+        schoolOwner.setSkolear(KulturtankenUtil.getSchoolYear(LocalDate.now()));
 
         return schoolOwner;
     }

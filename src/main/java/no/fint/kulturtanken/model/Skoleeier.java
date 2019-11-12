@@ -8,5 +8,6 @@ import java.util.List;
 public class Skoleeier {
 	private String navn;
 	private String organisasjonsnummer;
+	private String skolear;
 	private List<Skole> skoler;
 }
