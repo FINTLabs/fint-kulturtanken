@@ -1,30 +1,35 @@
 package no.fint.kulturtanken
 
 import com.fasterxml.jackson.databind.ObjectMapper
-
+import no.fint.kulturtanken.model.Besoksadresse
+import no.fint.kulturtanken.model.Enhet
 import no.fint.test.utils.MockMvcSpecification
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
+import org.springframework.web.client.RestTemplate
 
 class KulturtankenServiceSpec extends MockMvcSpecification {
 
     private MockWebServer server
     private KulturtankenService kulturtankenService
+    private NsrService nsrService
     private FintObjectFactory fintObjectFactory
     private ObjectMapper objectMapper
 
     void setup() {
         server = new MockWebServer()
-        kulturtankenService = new KulturtankenService(RestTemplateBuilder.newInstance().rootUri(server.url('/').toString()).build())
+        nsrService = Mock()
+        kulturtankenService = new KulturtankenService(RestTemplateBuilder.newInstance().rootUri(server.url('/').toString()).build(), nsrService)
         fintObjectFactory = new FintObjectFactory()
         objectMapper = new ObjectMapper()
     }
 
     def "Get school owner"() {
         given:
+        def visitingAddress = new Besoksadresse(adresselinje: ['Spannavegen 38'], postnummer: '5531', poststed: 'Haugesund')
         server.enqueue(
                 new MockResponse().setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                         .setBody(objectMapper.writeValueAsString(fintObjectFactory.newOrganizationElementResources())))
@@ -48,6 +53,8 @@ class KulturtankenServiceSpec extends MockMvcSpecification {
         def response = kulturtankenService.getSchoolOwner()
 
         then:
+        1 * nsrService.getVisitingAddress('974624486') >> visitingAddress
+
         response.navn == 'Rogaland fylkeskommune'
         response.organisasjonsnummer == '971045698'
 

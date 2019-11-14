@@ -9,6 +9,10 @@ fint:
     access-token-uri:
   base-uri: "https://beta.felleskomponent.no"
 
+nsr:
+  endpoints:
+    unit: "https://data-nsr.udir.no/enhet/{id}"
+
 server:
   servlet:
     context-path: "/tjenester/kulturtanken"

@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 @Service
 public class KulturtankenService {
     private final RestTemplate restTemplate;
+    private final NsrService nsrService;
 
     private OrganisasjonselementResources organizationElements;
     private SkoleResources schools;
@@ -41,8 +42,9 @@ public class KulturtankenService {
     private UndervisningsgruppeResources teachingGroups;
     private FagResources subjects;
 
-    public KulturtankenService(RestTemplate restTemplate) {
+    public KulturtankenService(RestTemplate restTemplate, NsrService nsrService) {
         this.restTemplate = restTemplate;
+        this.nsrService = nsrService;
     }
 
     @Cacheable("kulturtanken")
@@ -86,7 +88,9 @@ public class KulturtankenService {
         Optional<SkoleResource> schoolResource = Optional.of(resource);
         schoolResource.map(SkoleResource::getNavn).ifPresent(school::setNavn);
         schoolResource.map(SkoleResource::getKontaktinformasjon).map(this::getContactInformation).ifPresent(school::setKontaktinformasjon);
-        schoolResource.map(SkoleResource::getPostadresse).map(this::getVisitingAddress).ifPresent(school::setBesoksadresse);
+        //schoolResource.map(SkoleResource::getPostadresse).map(this::getVisitingAddress).ifPresent(school::setBesoksadresse);
+        schoolResource.map(SkoleResource::getOrganisasjonsnummer).map(Identifikator::getIdentifikatorverdi)
+                .map(nsrService::getVisitingAddress).ifPresent(school::setBesoksadresse);
         schoolResource.map(SkoleResource::getOrganisasjonsnummer).map(Identifikator::getIdentifikatorverdi).ifPresent(school::setOrganisasjonsnummer);
         schoolResource.map(SkoleResource::getSkolenummer).map(Identifikator::getIdentifikatorverdi).ifPresent(school::setSkolenummer);
         schoolResource.ifPresent(s -> school.setTrinn(getLevels(s)));
