@@ -18,6 +18,8 @@ import no.fint.model.resource.utdanning.utdanningsprogram.ArstrinnResource;
 import no.fint.model.resource.utdanning.utdanningsprogram.ArstrinnResources;
 import no.fint.model.resource.utdanning.utdanningsprogram.SkoleResource;
 import no.fint.model.resource.utdanning.utdanningsprogram.SkoleResources;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +37,24 @@ public class KulturtankenService {
     private final RestTemplate restTemplate;
     private final NsrService nsrService;
 
+    @Value("${fint.endpoints.organisation-element}")
+    private String organisationElementEndpoint;
+
+    @Value("${fint.endpoints.school}")
+    private String schoolEndpoint;
+
+    @Value("${fint.endpoints.basis-group}")
+    private String basisGroupEndpoint;
+
+    @Value("${fint.endpoints.level}")
+    private String levelEndpoint;
+
+    @Value("${fint.endpoints.teaching-group}")
+    private String teachingGroupEndpoint;
+
+    @Value("${fint.endpoints.subject}")
+    private String subjectEndpoint;
+
     private OrganisasjonselementResources organizationElements;
     private SkoleResources schools;
     private ArstrinnResources levels;
@@ -42,7 +62,7 @@ public class KulturtankenService {
     private UndervisningsgruppeResources teachingGroups;
     private FagResources subjects;
 
-    public KulturtankenService(RestTemplate restTemplate, NsrService nsrService) {
+    public KulturtankenService(@Qualifier("oauth2RestTemplate") RestTemplate restTemplate, NsrService nsrService) {
         this.restTemplate = restTemplate;
         this.nsrService = nsrService;
     }
@@ -207,8 +227,7 @@ public class KulturtankenService {
     }
 
     private <T> T get(String uri, Class<T> clazz) {
-        ResponseEntity<T> response = restTemplate.getForEntity(uri, clazz);
-        return response.getBody();
+        return restTemplate.getForObject(uri, clazz);
     }
 
     @Scheduled(cron = "${fint.kulturtanken.cache-evict-cron:0 0 4 * * *}")
@@ -219,12 +238,12 @@ public class KulturtankenService {
 
     private void fetchData() {
         log.info("Fetching data from FINT API...");
-        organizationElements = get("/administrasjon/organisasjon/organisasjonselement", OrganisasjonselementResources.class);
-        schools = get("/utdanning/utdanningsprogram/skole", SkoleResources.class);
-        basisGroups = get("/utdanning/elev/basisgruppe", BasisgruppeResources.class);
-        levels = get("/utdanning/utdanningsprogram/arstrinn", ArstrinnResources.class);
-        teachingGroups = get("/utdanning/timeplan/undervisningsgruppe", UndervisningsgruppeResources.class);
-        subjects = get("/utdanning/timeplan/fag", FagResources.class);
+        organizationElements = get(organisationElementEndpoint, OrganisasjonselementResources.class);
+        schools = get(schoolEndpoint, SkoleResources.class);
+        basisGroups = get(basisGroupEndpoint, BasisgruppeResources.class);
+        levels = get(levelEndpoint, ArstrinnResources.class);
+        teachingGroups = get(teachingGroupEndpoint, UndervisningsgruppeResources.class);
+        subjects = get(subjectEndpoint, FagResources.class);
         log.info("Finished fetching data");
     }
 }

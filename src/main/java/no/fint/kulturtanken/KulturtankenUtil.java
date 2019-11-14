@@ -1,11 +1,7 @@
 package no.fint.kulturtanken;
 
-import lombok.extern.slf4j.Slf4j;
-
 import java.time.LocalDate;
 import java.time.Month;
-
-import static java.time.LocalDate.now;
 
 public final class KulturtankenUtil {
 

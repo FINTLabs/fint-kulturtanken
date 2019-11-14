@@ -28,7 +28,7 @@ spec:
     spec:
       containers:
         - name: kulturtanken-beta
-          image: fintlabs.azurecr.io/kulturtanken:resttemplate.14
+          image: fintlabs.azurecr.io/kulturtanken:resttemplate.15
           resources:
             limits:
               memory: "1.5Gi"

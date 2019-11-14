@@ -1,58 +1,38 @@
 package no.fint.kulturtanken
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import no.fint.kulturtanken.model.Besoksadresse
-import no.fint.kulturtanken.model.Enhet
-import no.fint.test.utils.MockMvcSpecification
-import okhttp3.mockwebserver.MockResponse
-import okhttp3.mockwebserver.MockWebServer
-import org.springframework.boot.web.client.RestTemplateBuilder
-import org.springframework.http.HttpHeaders
-import org.springframework.http.MediaType
 import org.springframework.web.client.RestTemplate
+import spock.lang.Specification
 
-class KulturtankenServiceSpec extends MockMvcSpecification {
+class KulturtankenServiceSpec extends Specification {
 
-    private MockWebServer server
     private KulturtankenService kulturtankenService
     private NsrService nsrService
     private FintObjectFactory fintObjectFactory
-    private ObjectMapper objectMapper
+    private RestTemplate restTemplate
 
     void setup() {
-        server = new MockWebServer()
         nsrService = Mock()
-        kulturtankenService = new KulturtankenService(RestTemplateBuilder.newInstance().rootUri(server.url('/').toString()).build(), nsrService)
+        restTemplate = Mock()
+        kulturtankenService = new KulturtankenService(restTemplate, nsrService)
         fintObjectFactory = new FintObjectFactory()
-        objectMapper = new ObjectMapper()
     }
 
     def "Get school owner"() {
         given:
         def visitingAddress = new Besoksadresse(adresselinje: ['Spannavegen 38'], postnummer: '5531', poststed: 'Haugesund')
-        server.enqueue(
-                new MockResponse().setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                        .setBody(objectMapper.writeValueAsString(fintObjectFactory.newOrganizationElementResources())))
-        server.enqueue(
-                new MockResponse().setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                        .setBody(objectMapper.writeValueAsString(fintObjectFactory.newSchoolResources())))
-        server.enqueue(
-                new MockResponse().setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                        .setBody(objectMapper.writeValueAsString(fintObjectFactory.newBasisGroupResources())))
-        server.enqueue(
-                new MockResponse().setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                        .setBody(objectMapper.writeValueAsString(fintObjectFactory.newLevelResources())))
-        server.enqueue(
-                new MockResponse().setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                        .setBody(objectMapper.writeValueAsString(fintObjectFactory.newTeachingGroupResources())))
-        server.enqueue(
-                new MockResponse().setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                        .setBody(objectMapper.writeValueAsString(fintObjectFactory.newSubjectResources())))
+        def organisationElement = fintObjectFactory.newOrganizationElementResources()
+        def school = fintObjectFactory.newSchoolResources()
+        def basisGroup = fintObjectFactory.newBasisGroupResources()
+        def level = fintObjectFactory.newLevelResources()
+        def teachingGroup = fintObjectFactory.newTeachingGroupResources()
+        def subject = fintObjectFactory.newSubjectResources()
 
         when:
         def response = kulturtankenService.getSchoolOwner()
 
         then:
+        6 * restTemplate.getForObject(_, _ as Class) >>> [organisationElement, school, basisGroup, level, teachingGroup, subject]
         1 * nsrService.getVisitingAddress('974624486') >> visitingAddress
 
         response.navn == 'Rogaland fylkeskommune'
