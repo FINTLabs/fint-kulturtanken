@@ -3,7 +3,6 @@ package no.fint.kulturtanken
 import spock.lang.Specification
 
 import java.time.LocalDate
-import java.time.Month
 
 class KulturtankenUtilSpec extends Specification {
 
