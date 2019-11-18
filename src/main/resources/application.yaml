@@ -8,7 +8,6 @@ fint:
     scope:
     access-token-uri:
   endpoints:
-    organisation-element: "https://beta.felleskomponent.no/administrasjon/organisasjon/organisasjonselement"
     school: "https://beta.felleskomponent.no/utdanning/utdanningsprogram/skole"
     basis-group: "https://beta.felleskomponent.no/utdanning/elev/basisgruppe"
     level: "https://beta.felleskomponent.no/utdanning/utdanningsprogram/arstrinn"

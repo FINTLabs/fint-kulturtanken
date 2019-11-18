@@ -1,27 +1,31 @@
 package no.fint.kulturtanken
 
-import no.fint.kulturtanken.model.Besoksadresse
-import org.springframework.web.client.RestTemplate
+
+import no.fint.kulturtanken.model.Enhet
+import no.fint.kulturtanken.service.FintService
+import no.fint.kulturtanken.service.KulturtankenService
+import no.fint.kulturtanken.service.NsrService
 import spock.lang.Specification
 
 class KulturtankenServiceSpec extends Specification {
 
     private KulturtankenService kulturtankenService
     private NsrService nsrService
+    private FintService fintService
     private FintObjectFactory fintObjectFactory
-    private RestTemplate restTemplate
 
     void setup() {
         nsrService = Mock()
-        restTemplate = Mock()
-        kulturtankenService = new KulturtankenService(restTemplate, nsrService)
+        fintService = Mock()
+        kulturtankenService = new KulturtankenService(nsrService, fintService)
         fintObjectFactory = new FintObjectFactory()
     }
 
     def "Get school owner"() {
         given:
-        def visitingAddress = new Besoksadresse(adresselinje: ['Spannavegen 38'], postnummer: '5531', poststed: 'Haugesund')
-        def organisationElement = fintObjectFactory.newOrganizationElementResources()
+        def nsrSchoolOwner = new Enhet(navn: 'Rogaland fylkeskommune', orgNr: '971045698')
+        def nsrSchool = new Enhet(navn: 'Haugaland videregående skole', orgNr: '974624486',
+                besoksadresse: new Enhet.Adresse(adresselinje: 'Spannavegen 38', postnunmmer: '5531', poststed: 'Haugesund' ))
         def school = fintObjectFactory.newSchoolResources()
         def basisGroup = fintObjectFactory.newBasisGroupResources()
         def level = fintObjectFactory.newLevelResources()
@@ -29,11 +33,15 @@ class KulturtankenServiceSpec extends Specification {
         def subject = fintObjectFactory.newSubjectResources()
 
         when:
-        def response = kulturtankenService.getSchoolOwner()
+        def response = kulturtankenService.getSchoolOwner('971045698')
 
         then:
-        6 * restTemplate.getForObject(_, _ as Class) >>> [organisationElement, school, basisGroup, level, teachingGroup, subject]
-        1 * nsrService.getVisitingAddress('974624486') >> visitingAddress
+        2 * nsrService.getUnit(_ as String) >>> [nsrSchoolOwner, nsrSchool]
+        1 * fintService.getSchools(_ as String) >> school
+        1 * fintService.getBasisGroups(_ as String) >> basisGroup
+        1 * fintService.getLevels(_ as String) >> level
+        1 * fintService.getTeachingGroups(_ as String) >> teachingGroup
+        1 * fintService.getSubjects(_ as String) >> subject
 
         response.navn == 'Rogaland fylkeskommune'
         response.organisasjonsnummer == '971045698'

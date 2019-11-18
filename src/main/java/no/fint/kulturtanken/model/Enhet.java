@@ -8,6 +8,12 @@ import lombok.Data;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Enhet {
 
+    @JsonProperty(value = "Navn")
+    private String navn;
+
+    @JsonProperty(value = "OrgNr")
+    private String orgNr;
+
     @JsonProperty(value = "Besoksadresse")
     private Adresse besoksadresse;
 
