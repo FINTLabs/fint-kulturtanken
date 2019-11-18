@@ -1,7 +1,8 @@
-package no.fint.kulturtanken;
+package no.fint.kulturtanken.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import no.fint.kulturtanken.model.Skoleeier;
+import no.fint.kulturtanken.service.KulturtankenService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestClientResponseException;
@@ -17,9 +18,10 @@ public class KulturtankenController {
         this.kulturtankenService = kulturtankenService;
     }
 
-    @GetMapping
-    public Skoleeier getSchoolOwner() {
-        return kulturtankenService.getSchoolOwner();
+    @GetMapping(value = {"", "{orgId}"})
+    public Skoleeier getSchoolOwner(@PathVariable(required = false) String orgId) {
+        return (orgId == null ? kulturtankenService.getSchoolOwner("971045698") :
+                kulturtankenService.getSchoolOwner(orgId));
     }
 
     @ExceptionHandler(RestClientResponseException.class)

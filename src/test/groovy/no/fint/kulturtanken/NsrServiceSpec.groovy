@@ -1,6 +1,7 @@
 package no.fint.kulturtanken
 
 import no.fint.kulturtanken.model.Enhet
+import no.fint.kulturtanken.service.NsrService
 import org.springframework.web.client.RestTemplate
 import spock.lang.Specification
 
@@ -15,15 +16,13 @@ class NsrServiceSpec extends Specification {
 
     def "Given orgId get Unit from NSR"() {
         given:
-        def unit = new Enhet(besoksadresse: new Enhet.Adresse(adresselinje: 'Salhusvegen 68', postnunmmer: '5529', poststed: '5529' ))
+        def unit = new Enhet(navn: 'Haugaland videregående skole', orgNr: '974624486',
+                besoksadresse: new Enhet.Adresse(adresselinje: 'Spannavegen 38', postnunmmer: '5531', poststed: 'Haugesund' ))
 
         when:
-        def visitingAddress = nsrService.getVisitingAddress(_ as String)
+        nsrService.getUnit(_ as String)
 
         then:
         1 * restTemplate.getForObject(_, _ as Class<Enhet>, _ as String) >> unit
-        visitingAddress.adresselinje.get(0) == 'Salhusvegen 68'
-        visitingAddress.postnummer == '5529'
-        visitingAddress.poststed == '5529'
     }
 }

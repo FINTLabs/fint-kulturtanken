@@ -1,12 +1,11 @@
-package no.fint.kulturtanken;
+package no.fint.kulturtanken.service;
 
 import lombok.extern.slf4j.Slf4j;
+import no.fint.kulturtanken.KulturtankenUtil;
 import no.fint.kulturtanken.model.*;
 import no.fint.model.felles.kompleksedatatyper.Identifikator;
 import no.fint.model.felles.kompleksedatatyper.Kontaktinformasjon;
 import no.fint.model.resource.Link;
-import no.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementResource;
-import no.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementResources;
 import no.fint.model.resource.felles.kompleksedatatyper.AdresseResource;
 import no.fint.model.resource.utdanning.elev.BasisgruppeResource;
 import no.fint.model.resource.utdanning.elev.BasisgruppeResources;
@@ -18,14 +17,7 @@ import no.fint.model.resource.utdanning.utdanningsprogram.ArstrinnResource;
 import no.fint.model.resource.utdanning.utdanningsprogram.ArstrinnResources;
 import no.fint.model.resource.utdanning.utdanningsprogram.SkoleResource;
 import no.fint.model.resource.utdanning.utdanningsprogram.SkoleResources;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -34,62 +26,34 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class KulturtankenService {
-    private final RestTemplate restTemplate;
     private final NsrService nsrService;
+    private final FintService fintService;
 
-    @Value("${fint.endpoints.organisation-element}")
-    private String organisationElementEndpoint;
+    private String orgId;
 
-    @Value("${fint.endpoints.school}")
-    private String schoolEndpoint;
-
-    @Value("${fint.endpoints.basis-group}")
-    private String basisGroupEndpoint;
-
-    @Value("${fint.endpoints.level}")
-    private String levelEndpoint;
-
-    @Value("${fint.endpoints.teaching-group}")
-    private String teachingGroupEndpoint;
-
-    @Value("${fint.endpoints.subject}")
-    private String subjectEndpoint;
-
-    private OrganisasjonselementResources organizationElements;
-    private SkoleResources schools;
-    private ArstrinnResources levels;
-    private BasisgruppeResources basisGroups;
-    private UndervisningsgruppeResources teachingGroups;
-    private FagResources subjects;
-
-    public KulturtankenService(@Qualifier("oauth2RestTemplate") RestTemplate restTemplate, NsrService nsrService) {
-        this.restTemplate = restTemplate;
+    public KulturtankenService(NsrService nsrService, FintService fintService) {
         this.nsrService = nsrService;
+        this.fintService = fintService;
     }
 
-    @Cacheable("kulturtanken")
-    public Skoleeier getSchoolOwner() {
-        fetchData();
+    public Skoleeier getSchoolOwner(String orgId) {
+        this.orgId = orgId;
 
-        if (organizationElements == null) return new Skoleeier();
+        Enhet nsrUnit = nsrService.getUnit(orgId);
 
-        Skoleeier schoolOwner = organizationElements.getContent().stream()
-                .filter(o -> o.getSelfLinks().contains(o.getOverordnet().stream().findAny().orElse(null)))
-                .map(this::schoolOwner)
-                .findFirst()
-                .orElse(new Skoleeier());
+        Skoleeier schoolOwner = schoolOwner(nsrUnit);
 
         schoolOwner.setSkoler(getSchools());
 
         return schoolOwner;
     }
 
-    private Skoleeier schoolOwner(OrganisasjonselementResource resource) {
+    private Skoleeier schoolOwner(Enhet nsrUnit) {
         Skoleeier schoolOwner = new Skoleeier();
 
-        Optional<OrganisasjonselementResource> organizationElementResource = Optional.of(resource);
-        organizationElementResource.map(OrganisasjonselementResource::getNavn).ifPresent(schoolOwner::setNavn);
-        organizationElementResource.map(OrganisasjonselementResource::getOrganisasjonsnummer).map(Identifikator::getIdentifikatorverdi).ifPresent(schoolOwner::setOrganisasjonsnummer);
+        Optional<Enhet> unit = Optional.of(nsrUnit);
+        unit.map(Enhet::getNavn).ifPresent(schoolOwner::setNavn);
+        unit.map(Enhet::getOrgNr).ifPresent(schoolOwner::setOrganisasjonsnummer);
 
         schoolOwner.setSkolear(KulturtankenUtil.getSchoolYear(LocalDate.now()));
 
@@ -97,6 +61,8 @@ public class KulturtankenService {
     }
 
     private List<Skole> getSchools() {
+        SkoleResources schools = fintService.getSchools(orgId);
+
         if (schools == null) return Collections.emptyList();
 
         return schools.getContent().stream().map(this::school).collect(Collectors.toList());
@@ -108,9 +74,10 @@ public class KulturtankenService {
         Optional<SkoleResource> schoolResource = Optional.of(resource);
         schoolResource.map(SkoleResource::getNavn).ifPresent(school::setNavn);
         schoolResource.map(SkoleResource::getKontaktinformasjon).map(this::getContactInformation).ifPresent(school::setKontaktinformasjon);
-        //schoolResource.map(SkoleResource::getPostadresse).map(this::getVisitingAddress).ifPresent(school::setBesoksadresse);
-        schoolResource.map(SkoleResource::getOrganisasjonsnummer).map(Identifikator::getIdentifikatorverdi)
-                .map(nsrService::getVisitingAddress).ifPresent(school::setBesoksadresse);
+
+        schoolResource.map(SkoleResource::getOrganisasjonsnummer).map(Identifikator::getIdentifikatorverdi).map(nsrService::getUnit)
+                .map(this::getVisitingAddress).ifPresent(school::setBesoksadresse);
+
         schoolResource.map(SkoleResource::getOrganisasjonsnummer).map(Identifikator::getIdentifikatorverdi).ifPresent(school::setOrganisasjonsnummer);
         schoolResource.map(SkoleResource::getSkolenummer).map(Identifikator::getIdentifikatorverdi).ifPresent(school::setSkolenummer);
         schoolResource.ifPresent(s -> school.setTrinn(getLevels(s)));
@@ -120,7 +87,7 @@ public class KulturtankenService {
     }
 
     private List<Trinn> getLevels(SkoleResource resource) {
-        if (basisGroups == null || levels == null) return Collections.emptyList();
+        BasisgruppeResources basisGroups = fintService.getBasisGroups(orgId);
 
         Map<Link, List<BasisgruppeResource>> levelBasisGroupsMap = basisGroups.getContent().stream()
                 .filter(b -> resource.getSelfLinks().contains(b.getSkole().stream().findAny().orElse(null)))
@@ -132,6 +99,8 @@ public class KulturtankenService {
     }
 
     private Trinn level(Map.Entry<Link, List<BasisgruppeResource>> levelBasisGroupsEntry) {
+        ArstrinnResources levels = fintService.getLevels(orgId);
+
         Trinn level = new Trinn();
 
         levels.getContent().stream()
@@ -159,7 +128,7 @@ public class KulturtankenService {
     }
 
     private List<Fag> getSubjects(SkoleResource resource) {
-        if (teachingGroups == null || subjects == null) return Collections.emptyList();
+        UndervisningsgruppeResources teachingGroups = fintService.getTeachingGroups(orgId);
 
         Map<Link, List<UndervisningsgruppeResource>> subjectTeachingGroupsMap = teachingGroups.getContent().stream()
                 .filter(t -> resource.getSelfLinks().contains(t.getSkole().stream().findAny().orElse(null)))
@@ -171,6 +140,8 @@ public class KulturtankenService {
     }
 
     private Fag subject(Map.Entry<Link, List<UndervisningsgruppeResource>> subjectTeachingGroupsEntry) {
+        FagResources subjects = fintService.getSubjects(orgId);
+
         Fag subject = new Fag();
 
         subjects.getContent().stream()
@@ -218,32 +189,22 @@ public class KulturtankenService {
         return visitingAddress;
     }
 
+    private Besoksadresse getVisitingAddress(Enhet nsrUnit) {
+        Besoksadresse visitingAddress = new Besoksadresse();
+
+        Optional<Enhet.Adresse> address = Optional.ofNullable(nsrUnit).map(Enhet::getBesoksadresse);
+        address.map(Enhet.Adresse::getAdresselinje).map(Collections::singletonList).ifPresent(visitingAddress::setAdresselinje);
+        address.map(Enhet.Adresse::getPostnunmmer).ifPresent(visitingAddress::setPostnummer);
+        address.map(Enhet.Adresse::getPoststed).ifPresent(visitingAddress::setPoststed);
+
+        return visitingAddress;
+    }
+
     private Link getLevelLink(BasisgruppeResource resource) {
         return resource.getTrinn().stream().findAny().orElse(null);
     }
 
     private Link getSubjectLink(UndervisningsgruppeResource resource) {
         return resource.getFag().stream().findAny().orElse(null);
-    }
-
-    private <T> T get(String uri, Class<T> clazz) {
-        return restTemplate.getForObject(uri, clazz);
-    }
-
-    @Scheduled(cron = "${fint.kulturtanken.cache-evict-cron:0 0 4 * * *}")
-    @CacheEvict(cacheNames = "kulturtanken", allEntries = true)
-    public void clearCache() {
-        log.info("\uD83D\uDD53 clearing cache...");
-    }
-
-    private void fetchData() {
-        log.info("Fetching data from FINT API...");
-        organizationElements = get(organisationElementEndpoint, OrganisasjonselementResources.class);
-        schools = get(schoolEndpoint, SkoleResources.class);
-        basisGroups = get(basisGroupEndpoint, BasisgruppeResources.class);
-        levels = get(levelEndpoint, ArstrinnResources.class);
-        teachingGroups = get(teachingGroupEndpoint, UndervisningsgruppeResources.class);
-        subjects = get(subjectEndpoint, FagResources.class);
-        log.info("Finished fetching data");
     }
 }

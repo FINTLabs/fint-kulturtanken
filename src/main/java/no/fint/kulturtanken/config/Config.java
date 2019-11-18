@@ -1,4 +1,4 @@
-package no.fint;
+package no.fint.kulturtanken.config;
 
 import no.fint.oauth.OAuthConfig;
 import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
