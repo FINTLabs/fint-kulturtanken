@@ -1,4 +1,4 @@
-package no.fint.kulturtanken;
+package no.fint.kulturtanken.util;
 
 import java.time.LocalDate;
 import java.time.Month;

@@ -10,6 +10,10 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
 @Slf4j
 @Service
 public class NsrService {
@@ -28,8 +32,22 @@ public class NsrService {
         return restTemplate.getForObject(unitEndpoint, Enhet.class, orgId);
     }
 
+    @Cacheable(value = "childUnits")
+    public List<Enhet> getUnits(String orgId) {
+        return getUnit(orgId).getChildRelasjoner().stream()
+                .map(Enhet.ChildRelasjon::getEnhet)
+                .map(Enhet::getOrgNr).distinct()
+                .map(unitId -> restTemplate.getForObject(unitEndpoint, Enhet.class, unitId))
+                .filter(isValidUnit())
+                .collect(Collectors.toList());
+    }
+
+    private Predicate<Enhet> isValidUnit() {
+        return unit -> unit.getErOffentligSkole() && unit.getErVideregaaendeSkole() && unit.getErAktiv();
+    }
+
     @Scheduled(cron = "${fint.kulturtanken.cache-evict-cron:0 0 4 * * MON-FRI}")
-    @CacheEvict(cacheNames = {"units"}, allEntries = true)
+    @CacheEvict(cacheNames = {"units", "childUnits"}, allEntries = true)
     public void clearCache() {
         log.info("\uD83D\uDD53 clearing cache...");
     }
