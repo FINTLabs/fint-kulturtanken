@@ -17,11 +17,8 @@ import org.springframework.web.client.RestTemplate;
 @Slf4j
 @Service
 public class FintService {
-    private final RestTemplate restTemplate;
 
-    public FintService(@Qualifier("oauth2RestTemplate") RestTemplate restTemplate) {
-        this.restTemplate = restTemplate;
-    }
+    private final RestTemplate restTemplate;
 
     @Value("${fint.endpoints.school}")
     private String schoolEndpoint;
@@ -38,33 +35,33 @@ public class FintService {
     @Value("${fint.endpoints.subject}")
     private String subjectEndpoint;
 
-    private <T> T get(String uri, Class<T> clazz) {
-        return restTemplate.getForObject(uri, clazz);
+    public FintService(@Qualifier("oauth2RestTemplate") RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
     }
 
     @Cacheable(value = "schools")
     public SkoleResources getSchools(String orgId) {
-        return get(schoolEndpoint, SkoleResources.class);
+        return restTemplate.getForObject(schoolEndpoint, SkoleResources.class);
     }
 
     @Cacheable(value = "basisGroups")
     public BasisgruppeResources getBasisGroups(String orgId) {
-        return get(basisGroupEndpoint, BasisgruppeResources.class);
+        return restTemplate.getForObject(basisGroupEndpoint, BasisgruppeResources.class);
     }
 
     @Cacheable(value = "levels")
     public ArstrinnResources getLevels(String orgId) {
-        return get(levelEndpoint, ArstrinnResources.class);
+        return restTemplate.getForObject(levelEndpoint, ArstrinnResources.class);
     }
 
     @Cacheable(value = "teachingGroups")
     public UndervisningsgruppeResources getTeachingGroups(String orgId) {
-        return get(teachingGroupEndpoint, UndervisningsgruppeResources.class);
+        return restTemplate.getForObject(teachingGroupEndpoint, UndervisningsgruppeResources.class);
     }
 
     @Cacheable(value = "subjects")
     public FagResources getSubjects(String orgId) {
-        return get(subjectEndpoint, FagResources.class);
+        return restTemplate.getForObject(subjectEndpoint, FagResources.class);
     }
 
     @Scheduled(cron = "${fint.kulturtanken.cache-evict-cron:0 0 4 * * MON-FRI}")

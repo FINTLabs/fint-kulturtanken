@@ -19,24 +19,6 @@ import no.fint.model.resource.utdanning.utdanningsprogram.SkoleResources
 
 class FintObjectFactory {
 
-    static OrganisasjonselementResources newOrganizationElementResources() {
-        OrganisasjonselementResources resources = new OrganisasjonselementResources()
-        resources.addResource(newSchoolOwner())
-        return resources
-    }
-
-    static OrganisasjonselementResource newSchoolOwner() {
-        OrganisasjonselementResource resource = new OrganisasjonselementResource()
-        resource.setNavn('Rogaland fylkeskommune')
-        resource.setOrganisasjonsId(new Identifikator(identifikatorverdi: '1001961'))
-        resource.setOrganisasjonsKode(new Identifikator(identifikatorverdi: 'R11'))
-        resource.setOrganisasjonsnummer(new Identifikator(identifikatorverdi: '971045698'))
-        resource.setKontaktinformasjon(new Kontaktinformasjon(epostadresse: 'firmapost@rogfk.no', telefonnummer: '51 51 66 00'))
-        resource.addSelf(new Link(verdi: 'https://rogfk'))
-        resource.addOverordnet(new Link(verdi: 'https://rogfk'))
-        return resource
-    }
-
     static SkoleResources newSchoolResources() {
         SkoleResources resources = new SkoleResources()
         resources.addResource(newSchool())
