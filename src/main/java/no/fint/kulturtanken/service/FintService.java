@@ -24,7 +24,6 @@ import org.springframework.web.client.RestTemplate;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -111,7 +110,7 @@ public class FintService {
                 .collect(Collectors.groupingBy(this::getSchoolLink, Collectors.groupingBy(this::getSubjectLink))) : null;
     }
 
-    @Cacheable(value = "subjects")
+    @Cacheable(value = "subjects", unless = "#result == null")
     public Map<Link, FagResource> getSubjects(String orgId) {
         FagResources resources;
 

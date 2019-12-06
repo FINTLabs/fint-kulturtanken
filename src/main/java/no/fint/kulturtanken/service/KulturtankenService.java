@@ -6,17 +6,10 @@ import no.fint.kulturtanken.util.KulturtankenUtil;
 import no.fint.kulturtanken.model.*;
 import no.fint.model.felles.kompleksedatatyper.Identifikator;
 import no.fint.model.felles.kompleksedatatyper.Kontaktinformasjon;
-import no.fint.model.resource.FintLinks;
 import no.fint.model.resource.Link;
 import no.fint.model.resource.felles.kompleksedatatyper.AdresseResource;
 import no.fint.model.resource.utdanning.elev.BasisgruppeResource;
-import no.fint.model.resource.utdanning.elev.BasisgruppeResources;
-import no.fint.model.resource.utdanning.timeplan.FagResource;
-import no.fint.model.resource.utdanning.timeplan.FagResources;
 import no.fint.model.resource.utdanning.timeplan.UndervisningsgruppeResource;
-import no.fint.model.resource.utdanning.timeplan.UndervisningsgruppeResources;
-import no.fint.model.resource.utdanning.utdanningsprogram.ArstrinnResource;
-import no.fint.model.resource.utdanning.utdanningsprogram.ArstrinnResources;
 import no.fint.model.resource.utdanning.utdanningsprogram.SkoleResource;
 import org.springframework.stereotype.Service;
 
@@ -44,8 +37,31 @@ public class KulturtankenService {
     public Skoleeier getSchoolOwner(final String orgId) {
         this.orgId = orgId;
 
-        Skoleeier schoolOwner = schoolOwner(nsrService.getUnit(orgId));
-        schoolOwner.setSkoler(getSchools());
+        Skoleeier schoolOwner;
+
+        if (kulturtankenProperties.getOrganisations().get(orgId).getSource().equals("nsr")) {
+            Enhet unit = nsrService.getUnit(orgId);
+
+            schoolOwner = schoolOwner(unit);
+
+            List<Skole> schools = unit.getChildRelasjoner().stream()
+                    .map(Enhet.ChildRelasjon::getEnhet)
+                    .map(Enhet::getOrgNr).distinct()
+                    .map(nsrService::getUnit)
+                    .filter(isValidUnit())
+                    .map(this::school)
+                    .collect(Collectors.toList());
+
+            schoolOwner.setSkoler(schools);
+        } else {
+            schoolOwner = schoolOwner(nsrService.getUnit(orgId));
+
+            List<Skole> schools = fintService.getSchools(orgId).getContent().stream()
+                    .map(this::school)
+                    .collect(Collectors.toList());
+
+            schoolOwner.setSkoler(schools);
+        }
 
         return schoolOwner;
     }
@@ -58,16 +74,6 @@ public class KulturtankenService {
         schoolOwner.setSkolear(KulturtankenUtil.getSchoolYear(LocalDate.now()));
 
         return schoolOwner;
-    }
-
-    private List<Skole> getSchools() {
-        if (kulturtankenProperties.getOrganisations().get(orgId).getSource().equals("nsr")) {
-            return nsrService.getUnits(orgId).stream()
-                    .map(this::school).collect(Collectors.toList());
-        } else {
-            return fintService.getSchools(orgId).getContent().stream()
-                    .map(this::school).collect(Collectors.toList());
-        }
     }
 
     private Skole school(Enhet unit) {
@@ -208,5 +214,9 @@ public class KulturtankenService {
         address.map(Enhet.Adresse::getPoststed).ifPresent(visitingAddress::setPoststed);
 
         return visitingAddress;
+    }
+
+    private Predicate<Enhet> isValidUnit() {
+        return unit -> unit.getErOffentligSkole() && unit.getErVideregaaendeSkole() && unit.getErAktiv();
     }
 }

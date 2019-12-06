@@ -75,10 +75,12 @@ class KulturtankenServiceSpec extends Specification {
 
     def "Given valid orgId and source equal nsr get school owner and schools"() {
         given:
-        def nsrSchoolOwner = new Enhet(navn: 'Rogaland fylkeskommune', orgNr: '971045698')
         def nsrSchool = new Enhet(navn: 'Haugaland videregående skole', orgNr: '974624486',
                 besoksadresse: new Enhet.Adresse(adress: 'Spannavegen 38', postnr: '5531', poststed: 'Haugesund' ),
-                epost: 'haugaland-vgs@skole.rogfk.no', telefon: '52 86 56 00')
+                epost: 'haugaland-vgs@skole.rogfk.no', telefon: '52 86 56 00', erAktiv: true,
+                erVideregaaendeSkole: true, erOffentligSkole: true)
+        def nsrSchoolOwner = new Enhet(navn: 'Rogaland fylkeskommune', orgNr: '971045698',
+                childRelasjoner: [new Enhet.ChildRelasjon(enhet: nsrSchool)])
 
         when:
         def response = kulturtankenService.getSchoolOwner(_ as String)
@@ -86,7 +88,7 @@ class KulturtankenServiceSpec extends Specification {
         then:
         1 * nsrService.getUnit(_ as String) >> nsrSchoolOwner
         1 * kulturtankenProperties.getOrganisations() >> [(_ as String) : new KulturtankenProperties.Organisation(source: 'nsr')]
-        1 * nsrService.getUnits(_ as String) >> [nsrSchool]
+        1 * nsrService.getUnit(_ as String) >> nsrSchool
 
         response.navn == 'Rogaland fylkeskommune'
         response.organisasjonsnummer == '971045698'

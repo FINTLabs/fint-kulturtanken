@@ -37,12 +37,6 @@ class FintObjectFactory {
         return resource
     }
 
-    static ArstrinnResources newLevelResources() {
-        ArstrinnResources resources = new ArstrinnResources()
-        resources.addResource(newLevel())
-        return resources
-    }
-
     static ArstrinnResource newLevel() {
         ArstrinnResource resource = new ArstrinnResource()
         resource.setSystemId(new Identifikator(identifikatorverdi: 'vg1'))
@@ -51,12 +45,6 @@ class FintObjectFactory {
         resource.setBeskrivelse('Videregående trinn 1')
         resource.addSelf(new Link(verdi: 'https://vg1'))
         return resource
-    }
-
-    static BasisgruppeResources newBasisGroupResources() {
-        BasisgruppeResources resources = new BasisgruppeResources()
-        resources.addResource(newBasisGroup())
-        return resources
     }
 
     static BasisgruppeResource newBasisGroup() {
@@ -71,12 +59,6 @@ class FintObjectFactory {
         return resource
     }
 
-    static FagResources newSubjectResources() {
-        FagResources resources = new FagResources()
-        resources.addResource(newSubject())
-        return resources
-    }
-
     static FagResource newSubject() {
         FagResource resource = new FagResource()
         resource.setSystemId(new Identifikator(identifikatorverdi: 'YFF4106'))
@@ -85,12 +67,6 @@ class FintObjectFactory {
         resource.setBeskrivelse('Yrkesfaglig fordypning Vg1')
         resource.addSelf(new Link(verdi: 'https://yff4106'))
         return resource
-    }
-
-    static UndervisningsgruppeResources newTeachingGroupResources() {
-        UndervisningsgruppeResources resources = new UndervisningsgruppeResources()
-        resources.addResource(newTeachingGroup())
-        return resources
     }
 
     static UndervisningsgruppeResource newTeachingGroup() {
