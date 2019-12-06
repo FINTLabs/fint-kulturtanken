@@ -6,17 +6,10 @@ import no.fint.kulturtanken.util.KulturtankenUtil;
 import no.fint.kulturtanken.model.*;
 import no.fint.model.felles.kompleksedatatyper.Identifikator;
 import no.fint.model.felles.kompleksedatatyper.Kontaktinformasjon;
-import no.fint.model.resource.FintLinks;
 import no.fint.model.resource.Link;
 import no.fint.model.resource.felles.kompleksedatatyper.AdresseResource;
 import no.fint.model.resource.utdanning.elev.BasisgruppeResource;
-import no.fint.model.resource.utdanning.elev.BasisgruppeResources;
-import no.fint.model.resource.utdanning.timeplan.FagResource;
-import no.fint.model.resource.utdanning.timeplan.FagResources;
 import no.fint.model.resource.utdanning.timeplan.UndervisningsgruppeResource;
-import no.fint.model.resource.utdanning.timeplan.UndervisningsgruppeResources;
-import no.fint.model.resource.utdanning.utdanningsprogram.ArstrinnResource;
-import no.fint.model.resource.utdanning.utdanningsprogram.ArstrinnResources;
 import no.fint.model.resource.utdanning.utdanningsprogram.SkoleResource;
 import org.springframework.stereotype.Service;
 
@@ -44,8 +37,31 @@ public class KulturtankenService {
     public Skoleeier getSchoolOwner(final String orgId) {
         this.orgId = orgId;
 
-        Skoleeier schoolOwner = schoolOwner(nsrService.getUnit(orgId));
-        schoolOwner.setSkoler(getSchools());
+        Skoleeier schoolOwner;
+
+        if (kulturtankenProperties.getOrganisations().get(orgId).getSource().equals("nsr")) {
+            Enhet unit = nsrService.getUnit(orgId);
+
+            schoolOwner = schoolOwner(unit);
+
+            List<Skole> schools = unit.getChildRelasjoner().stream()
+                    .map(Enhet.ChildRelasjon::getEnhet)
+                    .map(Enhet::getOrgNr).distinct()
+                    .map(nsrService::getUnit)
+                    .filter(isValidUnit())
+                    .map(this::school)
+                    .collect(Collectors.toList());
+
+            schoolOwner.setSkoler(schools);
+        } else {
+            schoolOwner = schoolOwner(nsrService.getUnit(orgId));
+
+            List<Skole> schools = fintService.getSchools(orgId).getContent().stream()
+                    .map(this::school)
+                    .collect(Collectors.toList());
+
+            schoolOwner.setSkoler(schools);
+        }
 
         return schoolOwner;
     }
@@ -58,16 +74,6 @@ public class KulturtankenService {
         schoolOwner.setSkolear(KulturtankenUtil.getSchoolYear(LocalDate.now()));
 
         return schoolOwner;
-    }
-
-    private List<Skole> getSchools() {
-        if (kulturtankenProperties.getOrganisations().get(orgId).getSource().equals("nsr")) {
-            return nsrService.getUnits(orgId).stream()
-                    .map(this::school).collect(Collectors.toList());
-        } else {
-            return fintService.getSchools(orgId).getContent().stream()
-                    .map(this::school).collect(Collectors.toList());
-        }
     }
 
     private Skole school(Enhet unit) {
@@ -108,31 +114,29 @@ public class KulturtankenService {
         return school;
     }
 
-    private List<Trinn> getLevels(SkoleResource resource) {
-        Map<Link, List<BasisgruppeResource>> basisGroupsByLevel = fintService.getBasisGroups(orgId).getContent().stream()
-                .filter(hasSchoolRelation(resource))
-                .collect(Collectors.groupingBy(this::getLevelLink));
+    private List<Trinn> getLevels(SkoleResource school) {
+        Optional<Link> linkToSchool = school.getSelfLinks().stream().findFirst();
 
-        return basisGroupsByLevel.entrySet().stream()
-                .map(this::level)
-                .collect(Collectors.toList());
-    }
+        List<Trinn> levels = new ArrayList<>();
 
-    private Trinn level(Map.Entry<Link, List<BasisgruppeResource>> basisGroupByLevel) {
-        Trinn level = new Trinn();
+        linkToSchool.ifPresent(link -> {
+            Map<Link, Map<Link, List<BasisgruppeResource>>> basisGroupsByLevelAndSchool = fintService.getBasisGroups(orgId);
+            if (basisGroupsByLevelAndSchool.containsKey(link)) {
+                Map<Link, List<BasisgruppeResource>> basisGroupsByLevel = basisGroupsByLevelAndSchool.get(link);
+                fintService.getLevels(orgId).forEach((key, value) -> {
+                    if (basisGroupsByLevel.containsKey(key)) {
+                        Trinn level = new Trinn();
+                        level.setNiva(value.getNavn());
+                        level.setBasisgrupper(basisGroupsByLevel.get(key).stream()
+                                .map(this::basisGroup)
+                                .collect(Collectors.toList()));
+                        levels.add(level);
+                    }
+                });
+            }
+        });
 
-        fintService.getLevels(orgId).getContent().stream()
-                .filter(l -> l.getSelfLinks().contains(basisGroupByLevel.getKey()))
-                .map(ArstrinnResource::getNavn).findAny()
-                .ifPresent(level::setNiva);
-
-        List<Basisgruppe> basisGroups = basisGroupByLevel.getValue().stream()
-                .map(this::basisGroup)
-                .collect(Collectors.toList());
-
-        level.setBasisgrupper(basisGroups);
-
-        return level;
+        return levels;
     }
 
     private Basisgruppe basisGroup(BasisgruppeResource resource) {
@@ -145,31 +149,29 @@ public class KulturtankenService {
         return basisGroup;
     }
 
-    private List<Fag> getSubjects(SkoleResource resource) {
-        Map<Link, List<UndervisningsgruppeResource>> teachingGroupsBySubject = fintService.getTeachingGroups(orgId).getContent().stream()
-                .filter(hasSchoolRelation(resource))
-                .collect(Collectors.groupingBy(this::getSubjectLink));
+    private List<Fag> getSubjects(SkoleResource school) {
+        Optional<Link> linkToSchool = school.getSelfLinks().stream().findFirst();
 
-        return teachingGroupsBySubject.entrySet().stream()
-                .map(this::subject)
-                .collect(Collectors.toList());
-    }
+        List<Fag> subjects = new ArrayList<>();
 
-    private Fag subject(Map.Entry<Link, List<UndervisningsgruppeResource>> subjectTeachingGroupsEntry) {
-        Fag subject = new Fag();
+        linkToSchool.ifPresent(link -> {
+            Map<Link, Map<Link, List<UndervisningsgruppeResource>>> teachingGroupsByLevelAndSchool = fintService.getTeachingGroups(orgId);
+            if (teachingGroupsByLevelAndSchool.containsKey(link)) {
+                Map<Link, List<UndervisningsgruppeResource>> teachingGroupsByLevel = teachingGroupsByLevelAndSchool.get(link);
+                fintService.getSubjects(orgId).forEach((key, value) -> {
+                    if (teachingGroupsByLevel.containsKey(key)) {
+                        Fag subject = new Fag();
+                        subject.setFagkode(value.getNavn());
+                        subject.setUndervisningsgrupper(teachingGroupsByLevel.get(key).stream()
+                                .map(this::teachingGroup)
+                                .collect(Collectors.toList()));
+                        subjects.add(subject);
+                    }
+                });
+            }
+        });
 
-        fintService.getSubjects(orgId).getContent().stream()
-                .filter(s -> s.getSelfLinks().contains(subjectTeachingGroupsEntry.getKey()))
-                .map(FagResource::getNavn).findAny()
-                .ifPresent(subject::setFagkode);
-
-        List<Undervisningsgruppe> teachingGroups = subjectTeachingGroupsEntry.getValue().stream()
-                .map(this::teachingGroup)
-                .collect(Collectors.toList());
-
-        subject.setUndervisningsgrupper(teachingGroups);
-
-        return subject;
+        return subjects;
     }
 
     private Undervisningsgruppe teachingGroup(UndervisningsgruppeResource resource) {
@@ -214,15 +216,7 @@ public class KulturtankenService {
         return visitingAddress;
     }
 
-    private Link getLevelLink(BasisgruppeResource resource) {
-        return resource.getTrinn().stream().findFirst().orElse(null);
-    }
-
-    private Link getSubjectLink(UndervisningsgruppeResource resource) {
-        return resource.getFag().stream().findFirst().orElse(null);
-    }
-
-    private<T extends FintLinks> Predicate<T> hasSchoolRelation(T school) {
-        return resource -> resource.getLinks().get("skole").contains(school.getSelfLinks().stream().findFirst().orElse(null));
+    private Predicate<Enhet> isValidUnit() {
+        return unit -> unit.getErOffentligSkole() && unit.getErVideregaaendeSkole() && unit.getErAktiv();
     }
 }

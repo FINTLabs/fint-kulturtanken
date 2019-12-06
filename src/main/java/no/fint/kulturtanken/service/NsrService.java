@@ -8,11 +8,8 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
-
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -27,23 +24,18 @@ public class NsrService {
         this.restTemplate = restTemplate;
     }
 
-    @Cacheable(value = "units")
+    @Cacheable(value = "units", unless = "#result == null")
     public Enhet getUnit(String orgId) {
-        return restTemplate.getForObject(unitEndpoint, Enhet.class, orgId);
-    }
+        Enhet unit;
 
-    @Cacheable(value = "childUnits")
-    public List<Enhet> getUnits(String orgId) {
-        return getUnit(orgId).getChildRelasjoner().stream()
-                .map(Enhet.ChildRelasjon::getEnhet)
-                .map(Enhet::getOrgNr).distinct()
-                .map(unitId -> restTemplate.getForObject(unitEndpoint, Enhet.class, unitId))
-                .filter(isValidUnit())
-                .collect(Collectors.toList());
-    }
+        try {
+            unit = restTemplate.getForObject(unitEndpoint, Enhet.class, orgId);
+        } catch (RestClientResponseException ex) {
+            log.error(ex.getResponseBodyAsString());
+            return null;
+        }
 
-    private Predicate<Enhet> isValidUnit() {
-        return unit -> unit.getErOffentligSkole() && unit.getErVideregaaendeSkole() && unit.getErAktiv();
+        return unit;
     }
 
     @Scheduled(cron = "${fint.kulturtanken.cache-evict-cron:0 0 4 * * MON-FRI}")
