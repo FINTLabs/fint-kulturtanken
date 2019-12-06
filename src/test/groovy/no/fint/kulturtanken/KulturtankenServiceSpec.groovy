@@ -5,6 +5,7 @@ import no.fint.kulturtanken.model.Enhet
 import no.fint.kulturtanken.service.FintService
 import no.fint.kulturtanken.service.KulturtankenService
 import no.fint.kulturtanken.service.NsrService
+import no.fint.model.resource.Link
 import spock.lang.Specification
 
 class KulturtankenServiceSpec extends Specification {
@@ -29,10 +30,10 @@ class KulturtankenServiceSpec extends Specification {
         def nsrSchool = new Enhet(navn: 'Haugaland videregående skole', orgNr: '974624486',
                 besoksadresse: new Enhet.Adresse(adress: 'Spannavegen 38', postnr: '5531', poststed: 'Haugesund' ))
         def schools = fintObjectFactory.newSchoolResources()
-        def basisGroups = fintObjectFactory.newBasisGroupResources()
-        def levels = fintObjectFactory.newLevelResources()
-        def teachingGroups = fintObjectFactory.newTeachingGroupResources()
-        def subjects = fintObjectFactory.newSubjectResources()
+        def basisGroup = fintObjectFactory.newBasisGroup()
+        def level = fintObjectFactory.newLevel()
+        def teachingGroup = fintObjectFactory.newTeachingGroup()
+        def subject = fintObjectFactory.newSubject()
 
         when:
         def response = kulturtankenService.getSchoolOwner(_ as String)
@@ -42,10 +43,10 @@ class KulturtankenServiceSpec extends Specification {
         1 * kulturtankenProperties.getOrganisations() >> [(_ as String) : new KulturtankenProperties.Organisation(source: 'fint')]
         1 * nsrService.getUnit(_ as String) >> nsrSchool
         1 * fintService.getSchools(_ as String) >> schools
-        1 * fintService.getBasisGroups(_ as String) >> basisGroups
-        1 * fintService.getLevels(_ as String) >> levels
-        1 * fintService.getTeachingGroups(_ as String) >> teachingGroups
-        1 * fintService.getSubjects(_ as String) >> subjects
+        1 * fintService.getBasisGroups(_ as String) >> [(new Link(verdi: 'https://hvs')): [(new Link(verdi: 'https://vg1')): [basisGroup]]]
+        1 * fintService.getLevels(_ as String) >> [(new Link(verdi: 'https://vg1')): level]
+        1 * fintService.getTeachingGroups(_ as String) >> [(new Link(verdi: 'https://hvs')): [(new Link(verdi: 'https://yff4106')): [teachingGroup]]]
+        1 * fintService.getSubjects(_ as String) >> [(new Link('https://yff4106')): subject]
 
         response.navn == 'Rogaland fylkeskommune'
         response.organisasjonsnummer == '971045698'

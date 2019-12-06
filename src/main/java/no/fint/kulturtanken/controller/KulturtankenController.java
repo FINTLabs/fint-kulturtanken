@@ -38,7 +38,7 @@ public class KulturtankenController {
 
     @GetMapping("/")
     public List<Organisasjon> getOrganisations() {
-        List<Organisasjon> organisations = new  ArrayList<>();
+        List<Organisasjon> organisations = new ArrayList<>();
 
         kulturtankenProperties.getOrganisations().forEach((key, value) -> {
             Organisasjon organisation = new Organisasjon();
