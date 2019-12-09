@@ -1,4 +1,4 @@
-package no.fint.kulturtanken.service;
+package no.fint.kulturtanken.repository;
 
 import lombok.extern.slf4j.Slf4j;
 import no.fint.model.resource.FintLinks;
@@ -17,7 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Repository;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
@@ -27,8 +27,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Slf4j
-@Service
-public class FintService {
+@Repository
+public class FintRepository {
 
     private final RestTemplate restTemplate;
 
@@ -47,7 +47,7 @@ public class FintService {
     @Value("${fint.endpoints.subject}")
     private String subjectEndpoint;
 
-    public FintService(@Qualifier("oauth2RestTemplate") RestTemplate restTemplate) {
+    public FintRepository(@Qualifier("oauth2RestTemplate") RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
 

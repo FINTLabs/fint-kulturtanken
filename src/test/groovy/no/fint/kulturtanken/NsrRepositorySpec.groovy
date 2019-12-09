@@ -1,18 +1,17 @@
 package no.fint.kulturtanken
 
 import no.fint.kulturtanken.model.Enhet
-import no.fint.kulturtanken.service.NsrService
-import org.springframework.boot.web.client.RestTemplateBuilder
+import no.fint.kulturtanken.repository.NsrRepository
 import org.springframework.web.client.RestTemplate
 import spock.lang.Specification
 
-class NsrServiceSpec extends Specification {
-    private NsrService nsrService
+class NsrRepositorySpec extends Specification {
+    private NsrRepository nsrService
     private RestTemplate restTemplate
 
     void setup() {
         restTemplate = Mock()
-        nsrService = new NsrService(restTemplate)
+        nsrService = new NsrRepository(restTemplate)
     }
 
     def "Given valid orgId get Unit from NSR"() {

@@ -2,17 +2,17 @@ package no.fint.kulturtanken
 
 import no.fint.kulturtanken.config.KulturtankenProperties
 import no.fint.kulturtanken.model.Enhet
-import no.fint.kulturtanken.service.FintService
+import no.fint.kulturtanken.repository.FintRepository
 import no.fint.kulturtanken.service.KulturtankenService
-import no.fint.kulturtanken.service.NsrService
+import no.fint.kulturtanken.repository.NsrRepository
 import no.fint.model.resource.Link
 import spock.lang.Specification
 
 class KulturtankenServiceSpec extends Specification {
 
     private KulturtankenService kulturtankenService
-    private NsrService nsrService
-    private FintService fintService
+    private NsrRepository nsrService
+    private FintRepository fintService
     private KulturtankenProperties kulturtankenProperties
     private FintObjectFactory fintObjectFactory
 
