@@ -1,4 +1,4 @@
-package no.fint.kulturtanken.config;
+package no.fint.kulturtanken.configuration;
 
 import no.fint.oauth.OAuthConfig;
 import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
@@ -12,7 +12,7 @@ import org.springframework.web.client.RestTemplate;
 
 @Import(OAuthConfig.class)
 @Configuration
-public class Config extends WebSecurityConfigurerAdapter {
+public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Bean
     public RestTemplate getRestTemplate() {

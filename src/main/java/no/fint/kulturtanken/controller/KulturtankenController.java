@@ -1,9 +1,8 @@
 package no.fint.kulturtanken.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import no.fint.kulturtanken.config.KulturtankenProperties;
+import no.fint.kulturtanken.configuration.KulturtankenProperties;
 import no.fint.kulturtanken.exception.SchoolOwnerNotFoundException;
-import no.fint.kulturtanken.model.Organisasjon;
 import no.fint.kulturtanken.model.Skoleeier;
 import no.fint.kulturtanken.service.KulturtankenService;
 import org.springframework.http.ResponseEntity;
@@ -11,9 +10,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.List;
+import java.util.stream.Stream;
 
 @Slf4j
 @RestController
@@ -37,21 +35,15 @@ public class KulturtankenController {
     }
 
     @GetMapping("/")
-    public List<Organisasjon> getOrganisations() {
-        List<Organisasjon> organisations = new ArrayList<>();
-
-        kulturtankenProperties.getOrganisations().forEach((key, value) -> {
-            Organisasjon organisation = new Organisasjon();
-            organisation.setNavn(value.getName());
-            organisation.setOrganisasjonsnummer(key);
-            organisation.setGrupper(value.getGroups());
-            organisation.setUri(ServletUriComponentsBuilder.fromCurrentContextPath().pathSegment("skoleeier", key).build().toUri());
-            organisations.add(organisation);
-        });
-
-        organisations.sort(Comparator.comparing(Organisasjon::getNavn));
-
-        return organisations;
+    public Stream<KulturtankenProperties.Organisation> getOrganisations() {
+        return kulturtankenProperties.getOrganisations().entrySet().stream()
+                .map(organisation -> {
+                    organisation.getValue().setOrganisationNumber(organisation.getKey());
+                    organisation.getValue().setUri(ServletUriComponentsBuilder.fromCurrentContextPath()
+                            .pathSegment("skoleeier", organisation.getKey()).build().toUri());
+                    return organisation.getValue();
+                })
+                .sorted(Comparator.comparing(KulturtankenProperties.Organisation::getName));
     }
 
     @ExceptionHandler(RestClientResponseException.class)

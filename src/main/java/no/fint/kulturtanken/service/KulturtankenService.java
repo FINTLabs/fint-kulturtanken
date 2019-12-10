@@ -1,13 +1,15 @@
 package no.fint.kulturtanken.service;
 
 import lombok.extern.slf4j.Slf4j;
-import no.fint.kulturtanken.config.KulturtankenProperties;
+import no.fint.kulturtanken.configuration.KulturtankenProperties;
 import no.fint.kulturtanken.repository.FintRepository;
 import no.fint.kulturtanken.repository.NsrRepository;
 import no.fint.kulturtanken.model.*;
 import no.fint.model.resource.Link;
 import no.fint.model.resource.utdanning.elev.BasisgruppeResource;
+import no.fint.model.resource.utdanning.timeplan.FagResource;
 import no.fint.model.resource.utdanning.timeplan.UndervisningsgruppeResource;
+import no.fint.model.resource.utdanning.utdanningsprogram.ArstrinnResource;
 import no.fint.model.resource.utdanning.utdanningsprogram.SkoleResource;
 import org.springframework.stereotype.Service;
 
@@ -23,17 +25,13 @@ public class KulturtankenService {
     private final FintRepository fintRepository;
     private final KulturtankenProperties kulturtankenProperties;
 
-    private String orgId;
-
     public KulturtankenService(NsrRepository nsrRepository, FintRepository fintRepository, KulturtankenProperties kulturtankenProperties) {
         this.nsrRepository = nsrRepository;
         this.fintRepository = fintRepository;
         this.kulturtankenProperties = kulturtankenProperties;
     }
 
-    public Skoleeier getSchoolOwner(final String orgId) {
-        this.orgId = orgId;
-
+    public Skoleeier getSchoolOwner(String orgId) {
         Enhet unit = nsrRepository.getUnit(orgId);
 
         Skoleeier schoolOwner = Skoleeier.fromNsr(unit);
@@ -55,8 +53,8 @@ public class KulturtankenService {
                         Skole school = Skole.fromFint(s);
                         Optional.ofNullable(nsrRepository.getUnit(school.getOrganisasjonsnummer()))
                                 .map(Enhet::getBesoksadresse).map(Besoksadresse::fromNsr).ifPresent(school::setBesoksadresse);
-                        school.setTrinn(getLevels(s));
-                        school.setFag(getSubjects(s));
+                        school.setTrinn(getLevels(s, orgId));
+                        school.setFag(getSubjects(s, orgId));
                         return school;
                     })
                     .collect(Collectors.toList());
@@ -67,16 +65,18 @@ public class KulturtankenService {
         return schoolOwner;
     }
 
-    private List<Trinn> getLevels(SkoleResource school) {
-        Optional<Link> linkToSchool = school.getSelfLinks().stream().findFirst();
+    private List<Trinn> getLevels(SkoleResource school, String orgId) {
+        Map<Link, Map<Link, List<BasisgruppeResource>>> basisGroupsByLevelAndSchool = fintRepository.getBasisGroups(orgId);
+        Map<Link, ArstrinnResource> levelBySelf = fintRepository.getLevels(orgId);
+
+        if (basisGroupsByLevelAndSchool == null || levelBySelf == null) return Collections.emptyList();
 
         List<Trinn> levels = new ArrayList<>();
 
-        linkToSchool.ifPresent(link -> {
-            Map<Link, Map<Link, List<BasisgruppeResource>>> basisGroupsByLevelAndSchool = fintRepository.getBasisGroups(orgId);
+        school.getSelfLinks().stream().findFirst().ifPresent(link -> {
             if (basisGroupsByLevelAndSchool.containsKey(link)) {
                 Map<Link, List<BasisgruppeResource>> basisGroupsByLevel = basisGroupsByLevelAndSchool.get(link);
-                fintRepository.getLevels(orgId).forEach((key, value) -> {
+                levelBySelf.forEach((key, value) -> {
                     if (basisGroupsByLevel.containsKey(key)) {
                         Trinn level = new Trinn();
                         level.setNiva(value.getNavn());
@@ -92,16 +92,18 @@ public class KulturtankenService {
         return levels;
     }
 
-    private List<Fag> getSubjects(SkoleResource school) {
-        Optional<Link> linkToSchool = school.getSelfLinks().stream().findFirst();
+    private List<Fag> getSubjects(SkoleResource school, String orgId) {
+        Map<Link, Map<Link, List<UndervisningsgruppeResource>>> teachingGroupsByLevelAndSchool = fintRepository.getTeachingGroups(orgId);
+        Map<Link, FagResource> subjectsBySelf = fintRepository.getSubjects(orgId);
+
+        if (teachingGroupsByLevelAndSchool == null || subjectsBySelf == null) return Collections.emptyList();
 
         List<Fag> subjects = new ArrayList<>();
 
-        linkToSchool.ifPresent(link -> {
-            Map<Link, Map<Link, List<UndervisningsgruppeResource>>> teachingGroupsByLevelAndSchool = fintRepository.getTeachingGroups(orgId);
+        school.getSelfLinks().stream().findFirst().ifPresent(link -> {
             if (teachingGroupsByLevelAndSchool.containsKey(link)) {
                 Map<Link, List<UndervisningsgruppeResource>> teachingGroupsByLevel = teachingGroupsByLevelAndSchool.get(link);
-                fintRepository.getSubjects(orgId).forEach((key, value) -> {
+                subjectsBySelf.forEach((key, value) -> {
                     if (teachingGroupsByLevel.containsKey(key)) {
                         Fag subject = new Fag();
                         subject.setFagkode(value.getNavn());

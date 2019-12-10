@@ -62,6 +62,8 @@ public class FintRepository {
             return null;
         }
 
+        log.info("Updated schools from {}...", schoolEndpoint);
+
         return resources;
     }
 
@@ -75,6 +77,8 @@ public class FintRepository {
             log.error(ex.getResponseBodyAsString());
             return null;
         }
+
+        log.info("Updated basis groups from {}...", basisGroupEndpoint);
 
         return resources != null ? resources.getContent().stream()
                 .collect(Collectors.groupingBy(this::getSchoolLink, Collectors.groupingBy(this::getLevelLink))) : null;
@@ -91,6 +95,8 @@ public class FintRepository {
             return null;
         }
 
+        log.info("Updated levels from {}...", levelEndpoint);
+
         return resources != null ? resources.getContent().stream()
                 .collect(Collectors.toMap(this::getSelfLink, Function.identity(), (a, b) -> a)) : null;
     }
@@ -106,6 +112,8 @@ public class FintRepository {
             return null;
         }
 
+        log.info("Updated teaching groups from {}...", teachingGroupEndpoint);
+
         return resources != null ? resources.getContent().stream()
                 .collect(Collectors.groupingBy(this::getSchoolLink, Collectors.groupingBy(this::getSubjectLink))) : null;
     }
@@ -120,6 +128,8 @@ public class FintRepository {
             log.error(ex.getResponseBodyAsString());
             return null;
         }
+
+        log.info("Updated subjects from {}...", subjectEndpoint);
 
         return resources != null ? resources.getContent().stream()
                 .collect(Collectors.toMap(this::getSelfLink, Function.identity(), (a, b) -> a)) : null;
