@@ -52,7 +52,9 @@ public class KulturtankenService {
                     .map(s -> {
                         Skole school = Skole.fromFint(s);
                         Optional.ofNullable(nsrRepository.getUnit(school.getOrganisasjonsnummer()))
-                                .map(Enhet::getBesoksadresse).map(Besoksadresse::fromNsr).ifPresent(school::setBesoksadresse);
+                                .map(Enhet::getBesoksadresse)
+                                .map(Besoksadresse::fromNsr)
+                                .ifPresent(school::setBesoksadresse);
                         school.setTrinn(getLevels(s, orgId));
                         school.setFag(getSubjects(s, orgId));
                         return school;

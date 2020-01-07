@@ -21,6 +21,43 @@ nsr:
 
 kulturtanken:
   organisations:
+    921707134:
+      name: Agder
+      source: nsr
+      groups: false
+      username:
+      password:
+    920717152:
+      name: Innlandet
+      source: nsr
+      groups: false
+      username:
+      password:
+    922420866:
+      name: Troms og Finnmark
+      source: nsr
+      groups: false
+      username:
+      password:
+    821227062:
+      name: Vestfold og Telemark
+      source: nsr
+      groups: false
+      username:
+      password:
+    821311632:
+      name: Vestland
+      source: nsr
+      groups: false
+      username:
+      password:
+    921693230:
+      name: Viken
+      source: nsr
+      groups: false
+      username:
+      password:
+
     958381492:
       name: Akershus
       source: nsr
