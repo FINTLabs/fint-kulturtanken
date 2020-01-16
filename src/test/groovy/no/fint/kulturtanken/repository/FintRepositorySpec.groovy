@@ -1,5 +1,6 @@
 package no.fint.kulturtanken.repository
 
+import no.fint.kulturtanken.configuration.KulturtankenProperties
 import no.fint.kulturtanken.util.FintObjectFactory
 import no.fint.model.resource.Link
 import no.fint.model.resource.utdanning.elev.BasisgruppeResources
@@ -7,16 +8,26 @@ import no.fint.model.resource.utdanning.timeplan.FagResources
 import no.fint.model.resource.utdanning.timeplan.UndervisningsgruppeResources
 import no.fint.model.resource.utdanning.utdanningsprogram.ArstrinnResources
 import no.fint.model.resource.utdanning.utdanningsprogram.SkoleResources
+import org.springframework.security.oauth2.client.OAuth2AuthorizeRequest
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClient
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager
+import org.springframework.security.oauth2.client.registration.ClientRegistration
+import org.springframework.security.oauth2.core.OAuth2AccessToken
 import org.springframework.web.client.RestTemplate
 import spock.lang.Specification
 
 class FintRepositorySpec extends Specification {
     private FintRepository fintRepository
-    private RestTemplate restTemplate
+    private RestTemplate restTemplate;
+    private OAuth2AuthorizedClientManager oAuth2AuthorizedClientManager;
+    private KulturtankenProperties kulturtankenProperties;
 
     void setup() {
-        restTemplate = Mock()
-        fintRepository = new FintRepository(restTemplate)
+        restTemplate = Mock();
+        oAuth2AuthorizedClientManager = Mock();
+        kulturtankenProperties = Mock();
+        fintRepository = new FintRepository(restTemplate, oAuth2AuthorizedClientManager, kulturtankenProperties)
+
     }
 
     def "Get schools from Fint"() {
@@ -29,6 +40,7 @@ class FintRepositorySpec extends Specification {
         def resources = fintRepository.getSchools(_ as String)
 
         then:
+        1 * oAuth2AuthorizedClientManager.authorize(_ as OAuth2AuthorizeRequest) >> null
         1 * restTemplate.getForObject(_, _ as Class<SkoleResources>) >> schools
         resources.getTotalItems() == 1
         resources.getContent().get(0).navn == 'School'

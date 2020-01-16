@@ -10,7 +10,6 @@ import no.fint.model.resource.utdanning.elev.BasisgruppeResource;
 import no.fint.model.resource.utdanning.timeplan.FagResource;
 import no.fint.model.resource.utdanning.timeplan.UndervisningsgruppeResource;
 import no.fint.model.resource.utdanning.utdanningsprogram.ArstrinnResource;
-import no.fint.model.resource.utdanning.utdanningsprogram.SkoleResource;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -49,14 +48,48 @@ public class KulturtankenService {
 
         } else {
             List<Skole> schools = fintRepository.getSchools(orgId).getContent().stream()
-                    .map(s -> {
-                        Skole school = Skole.fromFint(s);
+                    .map(schoolResource -> {
+                        Skole school = Skole.fromFint(schoolResource);
+
                         Optional.ofNullable(nsrRepository.getUnit(school.getOrganisasjonsnummer()))
                                 .map(Enhet::getBesoksadresse)
                                 .map(Besoksadresse::fromNsr)
                                 .ifPresent(school::setBesoksadresse);
-                        school.setTrinn(getLevels(s, orgId));
-                        school.setFag(getSubjects(s, orgId));
+
+                        List<Trinn> levels = new ArrayList<>();
+                        schoolResource.getBasisgruppe().stream()
+                                .map(link -> fintRepository.getBasisGroups(orgId).get(link))
+                                .filter(Objects::nonNull)
+                                .collect(Collectors.groupingBy(this::getLevel))
+                                .forEach((key, value) -> Optional.ofNullable(fintRepository.getLevels(orgId).get(key))
+                                        .map(ArstrinnResource::getNavn)
+                                        .ifPresent(name -> {
+                                            Trinn level = new Trinn();
+                                            level.setNiva(name);
+                                            level.setBasisgrupper(value.stream()
+                                                    .map(Basisgruppe::fromFint)
+                                                    .collect(Collectors.toList()));
+                                            levels.add(level);
+                                        }));
+                        school.setTrinn(levels);
+
+                        List<Fag> subjects = new ArrayList<>();
+                        schoolResource.getUndervisningsgruppe().stream()
+                                .map(link -> fintRepository.getTeachingGroups(orgId).get(link))
+                                .filter(Objects::nonNull)
+                                .collect(Collectors.groupingBy(this::getSubject))
+                                .forEach((key, value) -> Optional.ofNullable(fintRepository.getSubjects(orgId).get(key))
+                                        .map(FagResource::getNavn)
+                                        .ifPresent(name -> {
+                                            Fag subject = new Fag();
+                                            subject.setFagkode(name);
+                                            subject.setUndervisningsgrupper(value.stream()
+                                                    .map(Undervisningsgruppe::fromFint)
+                                                    .collect(Collectors.toList()));
+                                            subjects.add(subject);
+                                        }));
+                        school.setFag(subjects);
+
                         return school;
                     })
                     .collect(Collectors.toList());
@@ -67,58 +100,12 @@ public class KulturtankenService {
         return schoolOwner;
     }
 
-    private List<Trinn> getLevels(SkoleResource school, String orgId) {
-        Map<Link, Map<Link, List<BasisgruppeResource>>> basisGroupsByLevelAndSchool = fintRepository.getBasisGroups(orgId);
-        Map<Link, ArstrinnResource> levelBySelf = fintRepository.getLevels(orgId);
-
-        if (basisGroupsByLevelAndSchool == null || levelBySelf == null) return Collections.emptyList();
-
-        List<Trinn> levels = new ArrayList<>();
-
-        school.getSelfLinks().stream().findFirst().ifPresent(link -> {
-            if (basisGroupsByLevelAndSchool.containsKey(link)) {
-                Map<Link, List<BasisgruppeResource>> basisGroupsByLevel = basisGroupsByLevelAndSchool.get(link);
-                levelBySelf.forEach((key, value) -> {
-                    if (basisGroupsByLevel.containsKey(key)) {
-                        Trinn level = new Trinn();
-                        level.setNiva(value.getNavn());
-                        level.setBasisgrupper(basisGroupsByLevel.get(key).stream()
-                                .map(Basisgruppe::fromFint)
-                                .collect(Collectors.toList()));
-                        levels.add(level);
-                    }
-                });
-            }
-        });
-
-        return levels;
+    private Link getLevel(BasisgruppeResource basisGroup) {
+        return basisGroup.getTrinn().stream().findAny().orElseGet(Link::new);
     }
 
-    private List<Fag> getSubjects(SkoleResource school, String orgId) {
-        Map<Link, Map<Link, List<UndervisningsgruppeResource>>> teachingGroupsByLevelAndSchool = fintRepository.getTeachingGroups(orgId);
-        Map<Link, FagResource> subjectsBySelf = fintRepository.getSubjects(orgId);
-
-        if (teachingGroupsByLevelAndSchool == null || subjectsBySelf == null) return Collections.emptyList();
-
-        List<Fag> subjects = new ArrayList<>();
-
-        school.getSelfLinks().stream().findFirst().ifPresent(link -> {
-            if (teachingGroupsByLevelAndSchool.containsKey(link)) {
-                Map<Link, List<UndervisningsgruppeResource>> teachingGroupsByLevel = teachingGroupsByLevelAndSchool.get(link);
-                subjectsBySelf.forEach((key, value) -> {
-                    if (teachingGroupsByLevel.containsKey(key)) {
-                        Fag subject = new Fag();
-                        subject.setFagkode(value.getNavn());
-                        subject.setUndervisningsgrupper(teachingGroupsByLevel.get(key).stream()
-                                .map(Undervisningsgruppe::fromFint)
-                                .collect(Collectors.toList()));
-                        subjects.add(subject);
-                    }
-                });
-            }
-        });
-
-        return subjects;
+    private Link getSubject(UndervisningsgruppeResource teachingGroup) {
+        return teachingGroup.getFag().stream().findAny().orElseGet(Link::new);
     }
 
     private Predicate<Enhet> isValidUnit() {

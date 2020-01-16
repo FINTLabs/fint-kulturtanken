@@ -5,7 +5,9 @@ import no.fint.kulturtanken.configuration.KulturtankenProperties;
 import no.fint.kulturtanken.exception.SchoolOwnerNotFoundException;
 import no.fint.kulturtanken.model.Skoleeier;
 import no.fint.kulturtanken.service.KulturtankenService;
+import no.fint.kulturtanken.util.CurrentRequest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -20,18 +22,23 @@ public class KulturtankenController {
 
     private final KulturtankenService kulturtankenService;
     private final KulturtankenProperties kulturtankenProperties;
+    private final CurrentRequest currentRequest;
 
-    public KulturtankenController(KulturtankenService kulturtankenService, KulturtankenProperties kulturtankenProperties) {
+    public KulturtankenController(KulturtankenService kulturtankenService, KulturtankenProperties kulturtankenProperties, CurrentRequest currentRequest) {
         this.kulturtankenService = kulturtankenService;
         this.kulturtankenProperties = kulturtankenProperties;
+        this.currentRequest = currentRequest;
     }
 
     @GetMapping("/{orgId}")
-    public Skoleeier getSchoolOwner(@PathVariable String orgId) {
-        if (kulturtankenProperties.getOrganisations().containsKey(orgId))
+    public Skoleeier getSchoolOwner(Authentication principal, @PathVariable String orgId) {
+        if (kulturtankenProperties.getOrganisations().containsKey(orgId)) {
+            currentRequest.setOrgId(orgId);
+            currentRequest.setPrincipal(principal);
             return kulturtankenService.getSchoolOwner(orgId);
-        else
+        } else {
             throw new SchoolOwnerNotFoundException(String.format("School owner not found for organisation number: %s", orgId));
+        }
     }
 
     @GetMapping("/")

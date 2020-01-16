@@ -20,7 +20,7 @@ class KulturtankenServiceSpec extends Specification {
         nsrRepository = Mock()
         fintRepository = Mock()
         kulturtankenProperties = Mock()
-        kulturtankenService = new KulturtankenService(nsrRepository, fintRepository, kulturtankenProperties)
+        kulturtankenService = new KulturtankenService(nsrRepository, fintRepository, oAuth2AuthorizedClientManager, oAuth2Properties, kulturtankenProperties)
     }
 
     def "Given valid orgId and source equal fint get school owner, schools and groups"() {

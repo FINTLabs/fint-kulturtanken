@@ -17,17 +17,16 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Slf4j
-@Repository
+@Service
 public class FintRepository {
 
     private final RestTemplate restTemplate;
@@ -47,7 +46,7 @@ public class FintRepository {
     @Value("${fint.endpoints.subject}")
     private String subjectEndpoint;
 
-    public FintRepository(@Qualifier("oauth2RestTemplate") RestTemplate restTemplate) {
+    public FintRepository(@Qualifier("oAuth2RestTemplate") RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
 
@@ -62,13 +61,13 @@ public class FintRepository {
             return null;
         }
 
-        log.info("Updated schools from {}...", schoolEndpoint);
+        log.info("({}) Updated schools from {}...", orgId, schoolEndpoint);
 
         return resources;
     }
 
     @Cacheable(value = "basisGroups", unless = "#result == null")
-    public Map<Link, Map<Link, List<BasisgruppeResource>>> getBasisGroups(String orgId) {
+    public Map<Link, BasisgruppeResource> getBasisGroups(String orgId) {
         BasisgruppeResources resources;
 
         try {
@@ -78,10 +77,10 @@ public class FintRepository {
             return null;
         }
 
-        log.info("Updated basis groups from {}...", basisGroupEndpoint);
+        log.info("({}) Updated basis groups from {}...", orgId, basisGroupEndpoint);
 
         return resources != null ? resources.getContent().stream()
-                .collect(Collectors.groupingBy(this::getSchoolLink, Collectors.groupingBy(this::getLevelLink))) : null;
+                .collect(Collectors.toMap(this::getSelfLink, Function.identity(), (a, b) -> a)) : null;
     }
 
     @Cacheable(value = "levels", unless = "#result == null")
@@ -95,14 +94,14 @@ public class FintRepository {
             return null;
         }
 
-        log.info("Updated levels from {}...", levelEndpoint);
+        log.info("({}) Updated levels from {}...", orgId, levelEndpoint);
 
         return resources != null ? resources.getContent().stream()
                 .collect(Collectors.toMap(this::getSelfLink, Function.identity(), (a, b) -> a)) : null;
     }
 
     @Cacheable(value = "teachingGroups", unless = "#result == null")
-    public Map<Link, Map<Link, List<UndervisningsgruppeResource>>> getTeachingGroups(String orgId) {
+    public Map<Link, UndervisningsgruppeResource> getTeachingGroups(String orgId) {
         UndervisningsgruppeResources resources;
 
         try {
@@ -112,10 +111,10 @@ public class FintRepository {
             return null;
         }
 
-        log.info("Updated teaching groups from {}...", teachingGroupEndpoint);
+        log.info("({}) Updated teaching groups from {}...", orgId, teachingGroupEndpoint);
 
         return resources != null ? resources.getContent().stream()
-                .collect(Collectors.groupingBy(this::getSchoolLink, Collectors.groupingBy(this::getSubjectLink))) : null;
+                .collect(Collectors.toMap(this::getSelfLink, Function.identity(), (a, b) -> a)) : null;
     }
 
     @Cacheable(value = "subjects", unless = "#result == null")
@@ -129,26 +128,14 @@ public class FintRepository {
             return null;
         }
 
-        log.info("Updated subjects from {}...", subjectEndpoint);
+        log.info("({}) Updated subjects from {}...", orgId, subjectEndpoint);
 
         return resources != null ? resources.getContent().stream()
                 .collect(Collectors.toMap(this::getSelfLink, Function.identity(), (a, b) -> a)) : null;
     }
 
     private <T extends FintLinks> Link getSelfLink(T resource) {
-        return resource.getSelfLinks().stream().findFirst().orElse(null);
-    }
-
-    private <T extends FintLinks> Link getSchoolLink(T resource) {
-        return resource.getLinks().get("skole").stream().findFirst().orElse(null);
-    }
-
-    private Link getLevelLink(BasisgruppeResource resource) {
-        return resource.getTrinn().stream().findFirst().orElse(null);
-    }
-
-    private Link getSubjectLink(UndervisningsgruppeResource resource) {
-        return resource.getFag().stream().findFirst().orElse(null);
+        return resource.getSelfLinks().stream().findFirst().orElseGet(Link::new);
     }
 
     @Scheduled(cron = "${fint.kulturtanken.cache-evict-cron:0 0 4 * * MON-FRI}")
