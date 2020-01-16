@@ -1,19 +1,13 @@
 fint:
-  oauth:
-    enabled: true
-    username:
-    password:
-    client-id:
-    client-secret:
-    access-token-uri: https://idp.felleskomponent.no/nidp/oauth/nam/token
-    scope: fint-client
-
   endpoints:
     school: https://beta.felleskomponent.no/utdanning/utdanningsprogram/skole
     basis-group: https://beta.felleskomponent.no/utdanning/elev/basisgruppe
     level: https://beta.felleskomponent.no/utdanning/utdanningsprogram/arstrinn
     teaching-group: https://beta.felleskomponent.no/utdanning/timeplan/undervisningsgruppe
     subject: https://beta.felleskomponent.no/utdanning/timeplan/fag
+  basic:
+    username:
+    password:
 
 nsr:
   endpoints:
@@ -173,6 +167,15 @@ server:
 
 spring:
   security:
-    user:
-      name:
-      password:
+    oauth2:
+      client:
+        registration:
+          971045698:
+            client-id:
+            client-secret:
+            authorization-grant-type: password
+            scope: fint-client
+            provider: fint
+        provider:
+          fint:
+            token-uri: https://idp.felleskomponent.no/nidp/oauth/nam/token

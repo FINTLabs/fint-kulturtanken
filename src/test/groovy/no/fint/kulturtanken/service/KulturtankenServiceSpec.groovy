@@ -44,9 +44,9 @@ class KulturtankenServiceSpec extends Specification {
         1 * kulturtankenProperties.getOrganisations() >> [(_ as String) : new KulturtankenProperties.Organisation(source: 'fint')]
         1 * nsrRepository.getUnit(_ as String) >> nsrSchool
         1 * fintRepository.getSchools(_ as String) >> schools
-        1 * fintRepository.getBasisGroups(_ as String) >> [(Link.with('link.To.School')): [(Link.with('link.To.Level')): [basisGroup]]]
+        1 * fintRepository.getBasisGroups(_ as String) >> [(Link.with('link.To.BasisGroup')): basisGroup]
         1 * fintRepository.getLevels(_ as String) >> [(Link.with('link.To.Level')): level]
-        1 * fintRepository.getTeachingGroups(_ as String) >> [(Link.with('link.To.School')): [(Link.with('link.To.Subject')): [teachingGroup]]]
+        1 * fintRepository.getTeachingGroups(_ as String) >> [(Link.with('link.To.TeachingGroup')): teachingGroup]
         1 * fintRepository.getSubjects(_ as String) >> [(Link.with('link.To.Subject')): subject]
 
         schoolOwner.navn == 'School owner'
@@ -105,48 +105,5 @@ class KulturtankenServiceSpec extends Specification {
 
         schoolOwner.skoler[0].trinn.size() == 0
         schoolOwner.skoler[0].fag.size() == 0
-    }
-
-    def "check if nsr school is valid"() {
-        def nsrSchool = new Enhet(navn: 'School', orgNr: '012345678',
-                besoksadresse: new Enhet.Adresse(adress: 'Address', postnr: '0123', poststed: 'City' ),
-                epost: 'school@schools.no', telefon: '00 11 22 33', erAktiv: true,
-                erVideregaaendeSkole: true, erOffentligSkole: true)
-
-        expect:
-        kulturtankenService.isValidUnit().test(nsrSchool)
-    }
-
-    def "Given school and orgId get all basis groups grouped by level"() {
-        given:
-        def school = FintObjectFactory.newSchool()
-        def basisGroup = FintObjectFactory.newBasisGroup()
-        def level = FintObjectFactory.newLevel()
-
-        when:
-        def basisGroupsByLevel = kulturtankenService.getLevels(school, _ as String)
-
-        then:
-        1 * fintRepository.getBasisGroups(_ as String) >> [(Link.with('link.To.School')): [(Link.with('link.To.Level')): [basisGroup]]]
-        1 * fintRepository.getLevels(_ as String) >> [(Link.with('link.To.Level')): level]
-        basisGroupsByLevel.size() == 1
-        basisGroupsByLevel.get(0).niva == 'Level'
-        basisGroupsByLevel.get(0).basisgrupper.size() == 1
-    }
-
-    def "Given school and orgId get all teaching groups grouped by subject"() {
-        def school = FintObjectFactory.newSchool()
-        def teachingGroup = FintObjectFactory.newTeachingGroup()
-        def subject = FintObjectFactory.newSubject()
-
-        when:
-        def teachingGroupsBySubject = kulturtankenService.getSubjects(school, _ as String)
-
-        then:
-        1 * fintRepository.getTeachingGroups(_ as String) >> [(Link.with('link.To.School')): [(Link.with('link.To.Subject')): [teachingGroup]]]
-        1 * fintRepository.getSubjects(_ as String) >> [(Link.with('link.To.Subject')): subject]
-        teachingGroupsBySubject.size() == 1
-        teachingGroupsBySubject.get(0).fagkode == 'Subject'
-        teachingGroupsBySubject.get(0).undervisningsgrupper.size() == 1
     }
 }

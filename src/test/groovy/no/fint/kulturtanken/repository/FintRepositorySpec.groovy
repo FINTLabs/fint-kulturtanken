@@ -12,10 +12,10 @@ import spock.lang.Specification
 
 class FintRepositorySpec extends Specification {
     private FintRepository fintRepository
-    private RestTemplate restTemplate
+    private RestTemplate restTemplate;
 
     void setup() {
-        restTemplate = Mock()
+        restTemplate = Mock();
         fintRepository = new FintRepository(restTemplate)
     }
 
@@ -45,9 +45,8 @@ class FintRepositorySpec extends Specification {
 
         then:
         1 * restTemplate.getForObject(_, _ as Class<BasisgruppeResources>) >> basisGroups
-        resources.get(Link.with('link.To.School')).size() == 1
-        resources.get(Link.with('link.To.School')).get(Link.with('link.To.Level')).size() == 1
-        resources.get(Link.with('link.To.School')).get(Link.with('link.To.Level')).get(0).navn == 'Basis group'
+        resources.size() == 1
+        resources.get(Link.with('link.To.BasisGroup')).navn == 'Basis group'
     }
 
     def "Get levels from Fint"() {
@@ -76,9 +75,8 @@ class FintRepositorySpec extends Specification {
 
         then:
         1 * restTemplate.getForObject(_, _ as Class<UndervisningsgruppeResources>) >> teachingGroups
-        resources.get(Link.with('link.To.School')).size() == 1
-        resources.get(Link.with('link.To.School')).get(Link.with('link.To.Subject')).size() == 1
-        resources.get(Link.with('link.To.School')).get(Link.with('link.To.Subject')).get(0).navn == 'Teaching group'
+        resources.size() == 1
+        resources.get(Link.with('link.To.TeachingGroup')).navn == 'Teaching group'
     }
 
     def "Get subjects from Fint"() {

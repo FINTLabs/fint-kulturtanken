@@ -12,6 +12,7 @@ import no.fint.kulturtanken.model.Skoleeier
 import no.fint.kulturtanken.model.Trinn
 import no.fint.kulturtanken.model.Undervisningsgruppe
 import no.fint.kulturtanken.service.KulturtankenService
+import no.fint.kulturtanken.util.CurrentRequest
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import spock.lang.Specification
@@ -23,13 +24,15 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 class KulturtankenControllerSpec extends Specification {
     private KulturtankenService kulturtankenService
     private KulturtankenProperties kulturtankenProperties
+    private CurrentRequest currentRequest
     private KulturtankenController kulturtankenController
     private MockMvc mockMvc
 
     void setup() {
         kulturtankenService = Mock()
         kulturtankenProperties = Mock()
-        kulturtankenController = new KulturtankenController(kulturtankenService, kulturtankenProperties)
+        currentRequest = Mock()
+        kulturtankenController = new KulturtankenController(kulturtankenService, kulturtankenProperties, currentRequest)
         mockMvc = MockMvcBuilders.standaloneSetup(kulturtankenController).build()
     }
 
@@ -46,6 +49,7 @@ class KulturtankenControllerSpec extends Specification {
         def response = mockMvc.perform(get("/skoleeier/876543210"))
 
         then:
+        1 * currentRequest.setOrgId('876543210')
         1 * kulturtankenProperties.getOrganisations() >> [('876543210'): new KulturtankenProperties.Organisation()]
         1 * kulturtankenService.getSchoolOwner('876543210') >> schoolOwner
         response.andExpect(status().isOk()).andExpect(content().json(JsonOutput.toJson(schoolOwner)))

@@ -20,7 +20,7 @@ public class NsrRepository {
     @Value("${nsr.endpoints.unit}")
     private String unitEndpoint;
 
-    public NsrRepository(@Qualifier("getRestTemplate") RestTemplate restTemplate) {
+    public NsrRepository(@Qualifier("restTemplate") RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
 

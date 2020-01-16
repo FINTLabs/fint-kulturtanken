@@ -5,7 +5,6 @@ import no.fint.model.resource.felles.kompleksedatatyper.AdresseResource;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 @Data
 public class Besoksadresse {
