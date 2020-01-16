@@ -31,15 +31,9 @@ public class KulturtankenService {
     }
 
     public Skoleeier getSchoolOwner(String orgId) {
-        /*
         Enhet unit = nsrRepository.getUnit(orgId);
 
         Skoleeier schoolOwner = Skoleeier.fromNsr(unit);
-
-         */
-
-        Enhet unit = new Enhet();
-        Skoleeier schoolOwner = new Skoleeier();
 
         if (kulturtankenProperties.getOrganisations().get(orgId).getSource().equals("nsr")) {
             List<Skole> schools = unit.getChildRelasjoner().stream()
