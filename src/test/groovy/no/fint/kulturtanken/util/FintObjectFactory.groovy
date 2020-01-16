@@ -3,19 +3,12 @@ package no.fint.kulturtanken.util
 import no.fint.model.felles.kompleksedatatyper.Identifikator
 import no.fint.model.felles.kompleksedatatyper.Kontaktinformasjon
 import no.fint.model.resource.Link
-import no.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementResource
-import no.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementResources
 import no.fint.model.resource.felles.kompleksedatatyper.AdresseResource
 import no.fint.model.resource.utdanning.elev.BasisgruppeResource
-import no.fint.model.resource.utdanning.elev.BasisgruppeResources
 import no.fint.model.resource.utdanning.timeplan.FagResource
-import no.fint.model.resource.utdanning.timeplan.FagResources
 import no.fint.model.resource.utdanning.timeplan.UndervisningsgruppeResource
-import no.fint.model.resource.utdanning.timeplan.UndervisningsgruppeResources
 import no.fint.model.resource.utdanning.utdanningsprogram.ArstrinnResource
-import no.fint.model.resource.utdanning.utdanningsprogram.ArstrinnResources
 import no.fint.model.resource.utdanning.utdanningsprogram.SkoleResource
-import no.fint.model.resource.utdanning.utdanningsprogram.SkoleResources
 
 class FintObjectFactory {
 

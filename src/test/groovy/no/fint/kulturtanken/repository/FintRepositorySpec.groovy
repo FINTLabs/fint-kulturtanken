@@ -1,6 +1,5 @@
 package no.fint.kulturtanken.repository
 
-import no.fint.kulturtanken.configuration.KulturtankenProperties
 import no.fint.kulturtanken.util.FintObjectFactory
 import no.fint.model.resource.Link
 import no.fint.model.resource.utdanning.elev.BasisgruppeResources
@@ -8,26 +7,16 @@ import no.fint.model.resource.utdanning.timeplan.FagResources
 import no.fint.model.resource.utdanning.timeplan.UndervisningsgruppeResources
 import no.fint.model.resource.utdanning.utdanningsprogram.ArstrinnResources
 import no.fint.model.resource.utdanning.utdanningsprogram.SkoleResources
-import org.springframework.security.oauth2.client.OAuth2AuthorizeRequest
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClient
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager
-import org.springframework.security.oauth2.client.registration.ClientRegistration
-import org.springframework.security.oauth2.core.OAuth2AccessToken
 import org.springframework.web.client.RestTemplate
 import spock.lang.Specification
 
 class FintRepositorySpec extends Specification {
     private FintRepository fintRepository
     private RestTemplate restTemplate;
-    private OAuth2AuthorizedClientManager oAuth2AuthorizedClientManager;
-    private KulturtankenProperties kulturtankenProperties;
 
     void setup() {
         restTemplate = Mock();
-        oAuth2AuthorizedClientManager = Mock();
-        kulturtankenProperties = Mock();
-        fintRepository = new FintRepository(restTemplate, oAuth2AuthorizedClientManager, kulturtankenProperties)
-
+        fintRepository = new FintRepository(restTemplate)
     }
 
     def "Get schools from Fint"() {
@@ -40,7 +29,6 @@ class FintRepositorySpec extends Specification {
         def resources = fintRepository.getSchools(_ as String)
 
         then:
-        1 * oAuth2AuthorizedClientManager.authorize(_ as OAuth2AuthorizeRequest) >> null
         1 * restTemplate.getForObject(_, _ as Class<SkoleResources>) >> schools
         resources.getTotalItems() == 1
         resources.getContent().get(0).navn == 'School'
@@ -57,9 +45,8 @@ class FintRepositorySpec extends Specification {
 
         then:
         1 * restTemplate.getForObject(_, _ as Class<BasisgruppeResources>) >> basisGroups
-        resources.get(Link.with('link.To.School')).size() == 1
-        resources.get(Link.with('link.To.School')).get(Link.with('link.To.Level')).size() == 1
-        resources.get(Link.with('link.To.School')).get(Link.with('link.To.Level')).get(0).navn == 'Basis group'
+        resources.size() == 1
+        resources.get(Link.with('link.To.BasisGroup')).navn == 'Basis group'
     }
 
     def "Get levels from Fint"() {
@@ -88,9 +75,8 @@ class FintRepositorySpec extends Specification {
 
         then:
         1 * restTemplate.getForObject(_, _ as Class<UndervisningsgruppeResources>) >> teachingGroups
-        resources.get(Link.with('link.To.School')).size() == 1
-        resources.get(Link.with('link.To.School')).get(Link.with('link.To.Subject')).size() == 1
-        resources.get(Link.with('link.To.School')).get(Link.with('link.To.Subject')).get(0).navn == 'Teaching group'
+        resources.size() == 1
+        resources.get(Link.with('link.To.TeachingGroup')).navn == 'Teaching group'
     }
 
     def "Get subjects from Fint"() {

@@ -1,7 +1,6 @@
 package no.fint.kulturtanken.repository
 
 import no.fint.kulturtanken.model.Enhet
-import no.fint.kulturtanken.repository.NsrRepository
 import org.springframework.web.client.RestTemplate
 import spock.lang.Specification
 
