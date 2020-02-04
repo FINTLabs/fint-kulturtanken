@@ -28,7 +28,7 @@ spec:
     spec:
       containers:
         - name: kulturtanken-beta
-          image: fintlabs.azurecr.io/kulturtanken:build.9
+          image: fintlabs.azurecr.io/kulturtanken:build.10
           resources:
             limits:
               memory: "1.5Gi"
@@ -66,6 +66,26 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: kulturtanken-rogaland
+                  key: password
+            - name: spring.security.oauth2.client.registration.921693230.client-id
+              valueFrom:
+                secretKeyRef:
+                  key: client-id
+                  name: kulturtanken-viken
+            - name: spring.security.oauth2.client.registration.921693230.client-secret
+              valueFrom:
+                secretKeyRef:
+                  key: client-secret
+                  name: kulturtanken-viken
+            - name: kulturtanken.organisations.921693230.username
+              valueFrom:
+                secretKeyRef:
+                  name: kulturtanken-viken
+                  key: username
+            - name: kulturtanken.organisations.921693230.password
+              valueFrom:
+                secretKeyRef:
+                  name: kulturtanken-viken
                   key: password
             - name: fint.basic.username
               valueFrom:

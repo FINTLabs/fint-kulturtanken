@@ -47,8 +47,8 @@ kulturtanken:
       password:
     921693230:
       name: Viken
-      source: nsr
-      groups: false
+      source: fint
+      groups: true
       username:
       password:
 
@@ -171,6 +171,12 @@ spring:
       client:
         registration:
           971045698:
+            client-id:
+            client-secret:
+            authorization-grant-type: password
+            scope: fint-client
+            provider: fint
+          921693230:
             client-id:
             client-secret:
             authorization-grant-type: password

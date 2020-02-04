@@ -5,7 +5,7 @@ build/
 !**/src/main/**
 !**/src/test/**
 application-*.yaml
-k8s-secret.yaml
+k8s-secret-*.yaml
 
 ### STS ###
 .apt_generated
