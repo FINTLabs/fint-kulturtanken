@@ -5,11 +5,10 @@ import no.fint.kulturtanken.configuration.KulturtankenProperties;
 import no.fint.kulturtanken.repository.FintRepository;
 import no.fint.kulturtanken.repository.NsrRepository;
 import no.fint.kulturtanken.model.*;
+import no.fint.model.resource.FintLinks;
 import no.fint.model.resource.Link;
 import no.fint.model.resource.utdanning.elev.BasisgruppeResource;
-import no.fint.model.resource.utdanning.timeplan.FagResource;
 import no.fint.model.resource.utdanning.timeplan.UndervisningsgruppeResource;
-import no.fint.model.resource.utdanning.utdanningsprogram.ArstrinnResource;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -63,7 +62,7 @@ public class KulturtankenService {
                                 .filter(Objects::nonNull)
                                 .collect(Collectors.groupingBy(this::getLevel))
                                 .forEach((key, value) -> Optional.ofNullable(fintRepository.getLevels(orgId).get(key))
-                                        .map(ArstrinnResource::getNavn)
+                                        .map(this::getGrepCode)
                                         .ifPresent(name -> {
                                             Trinn level = new Trinn();
                                             level.setNiva(name);
@@ -80,7 +79,7 @@ public class KulturtankenService {
                                 .filter(Objects::nonNull)
                                 .collect(Collectors.groupingBy(this::getSubject))
                                 .forEach((key, value) -> Optional.ofNullable(fintRepository.getSubjects(orgId).get(key))
-                                        .map(this::getGrep)
+                                        .map(this::getGrepCode)
                                         .ifPresent(name -> {
                                             Fag subject = new Fag();
                                             subject.setFagkode(name);
@@ -109,8 +108,8 @@ public class KulturtankenService {
         return teachingGroup.getFag().stream().findAny().orElseGet(Link::new);
     }
 
-    private String getGrep(FagResource subject) {
-        return subject.getGrepreferanse().stream()
+    private<T extends FintLinks> String getGrepCode(T resource) {
+        return resource.getLinks().get("grepreferanse").stream()
                 .map(Link::getHref)
                 .map(href -> StringUtils.substringAfterLast(href,"/"))
                 .findAny()

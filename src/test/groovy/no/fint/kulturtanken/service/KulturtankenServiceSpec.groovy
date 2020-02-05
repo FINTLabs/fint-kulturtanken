@@ -62,7 +62,7 @@ class KulturtankenServiceSpec extends Specification {
         schoolOwner.skoler[0].besoksadresse.poststed == 'City'
 
         schoolOwner.skoler[0].trinn.size() == 1
-        schoolOwner.skoler[0].trinn[0].niva == 'Level'
+        schoolOwner.skoler[0].trinn[0].niva == 'Grep'
         schoolOwner.skoler[0].trinn[0].basisgrupper.size() == 1
         schoolOwner.skoler[0].trinn[0].basisgrupper[0].navn == 'Basis group'
         schoolOwner.skoler[0].trinn[0].basisgrupper[0].antall == 1

@@ -33,6 +33,7 @@ class FintObjectFactory {
         resource.setPeriode(Collections.emptyList())
         resource.setNavn('Level')
         resource.setBeskrivelse('A level')
+        resource.addGrepreferanse(new Link(verdi: 'link.To/Grep'))
         resource.addSelf(new Link(verdi: 'link.To.Level'))
         return resource
     }
