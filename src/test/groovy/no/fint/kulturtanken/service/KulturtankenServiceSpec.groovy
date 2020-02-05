@@ -68,7 +68,7 @@ class KulturtankenServiceSpec extends Specification {
         schoolOwner.skoler[0].trinn[0].basisgrupper[0].antall == 1
 
         schoolOwner.skoler[0].fag.size() == 1
-        schoolOwner.skoler[0].fag[0].fagkode == 'Subject'
+        schoolOwner.skoler[0].fag[0].fagkode == 'Grep'
         schoolOwner.skoler[0].fag[0].undervisningsgrupper.size() == 1
         schoolOwner.skoler[0].fag[0].undervisningsgrupper[0].navn == 'Teaching group'
         schoolOwner.skoler[0].fag[0].undervisningsgrupper[0].antall == 1

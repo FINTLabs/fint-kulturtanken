@@ -10,6 +10,7 @@ import no.fint.model.resource.utdanning.elev.BasisgruppeResource;
 import no.fint.model.resource.utdanning.timeplan.FagResource;
 import no.fint.model.resource.utdanning.timeplan.UndervisningsgruppeResource;
 import no.fint.model.resource.utdanning.utdanningsprogram.ArstrinnResource;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -79,7 +80,7 @@ public class KulturtankenService {
                                 .filter(Objects::nonNull)
                                 .collect(Collectors.groupingBy(this::getSubject))
                                 .forEach((key, value) -> Optional.ofNullable(fintRepository.getSubjects(orgId).get(key))
-                                        .map(FagResource::getNavn)
+                                        .map(this::getGrep)
                                         .ifPresent(name -> {
                                             Fag subject = new Fag();
                                             subject.setFagkode(name);
@@ -106,6 +107,14 @@ public class KulturtankenService {
 
     private Link getSubject(UndervisningsgruppeResource teachingGroup) {
         return teachingGroup.getFag().stream().findAny().orElseGet(Link::new);
+    }
+
+    private String getGrep(FagResource subject) {
+        return subject.getGrepreferanse().stream()
+                .map(Link::getHref)
+                .map(href -> StringUtils.substringAfterLast(href,"/"))
+                .findAny()
+                .orElse(null);
     }
 
     private Predicate<Enhet> isValidUnit() {

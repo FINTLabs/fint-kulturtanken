@@ -56,6 +56,7 @@ class FintObjectFactory {
         resource.setPeriode(Collections.emptyList())
         resource.setNavn('Subject')
         resource.setBeskrivelse('A subject')
+        resource.addGrepreferanse(new Link(verdi: 'link.To/Grep'))
         resource.addSelf(new Link(verdi: 'link.To.Subject'))
         return resource
     }
