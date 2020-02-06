@@ -1,5 +1,6 @@
 package no.fint.kulturtanken.repository
 
+import no.fint.kulturtanken.configuration.KulturtankenProperties
 import no.fint.kulturtanken.util.FintObjectFactory
 import no.fint.model.resource.Link
 import no.fint.model.resource.utdanning.elev.BasisgruppeResources
@@ -10,12 +11,16 @@ import no.fint.model.resource.utdanning.utdanningsprogram.SkoleResources
 import org.springframework.web.client.RestTemplate
 import spock.lang.Specification
 
+import java.util.stream.Stream
+
 class FintRepositorySpec extends Specification {
     private FintRepository fintRepository
+    private KulturtankenProperties kulturtankenProperties
     private RestTemplate restTemplate;
 
     void setup() {
         restTemplate = Mock();
+        kulturtankenProperties = Mock()
         fintRepository = new FintRepository(restTemplate, kulturtankenProperties)
     }
 
@@ -29,6 +34,7 @@ class FintRepositorySpec extends Specification {
         def resources = fintRepository.getSchools(_ as String)
 
         then:
+        1 * kulturtankenProperties.getOrganisations() >> [(_ as String) : new KulturtankenProperties.Organisation(environment: _ as String)]
         1 * restTemplate.getForObject(_, _ as Class<SkoleResources>) >> schools
         resources.getTotalItems() == 1
         resources.getContent().get(0).navn == 'School'
@@ -44,6 +50,7 @@ class FintRepositorySpec extends Specification {
         def resources = fintRepository.getBasisGroups(_ as String)
 
         then:
+        1 * kulturtankenProperties.getOrganisations() >> [(_ as String) : new KulturtankenProperties.Organisation(environment: _ as String)]
         1 * restTemplate.getForObject(_, _ as Class<BasisgruppeResources>) >> basisGroups
         resources.size() == 1
         resources.get(Link.with('link.To.BasisGroup')).navn == 'Basis group'
@@ -59,6 +66,7 @@ class FintRepositorySpec extends Specification {
         def resources = fintRepository.getLevels(_ as String)
 
         then:
+        1 * kulturtankenProperties.getOrganisations() >> [(_ as String) : new KulturtankenProperties.Organisation(environment: _ as String)]
         1 * restTemplate.getForObject(_, _ as Class<ArstrinnResources>) >> levels
         resources.size() == 1
         resources.get(Link.with('link.To.Level')).navn == 'Level'
@@ -74,6 +82,7 @@ class FintRepositorySpec extends Specification {
         def resources = fintRepository.getTeachingGroups(_ as String)
 
         then:
+        1 * kulturtankenProperties.getOrganisations() >> [(_ as String) : new KulturtankenProperties.Organisation(environment: _ as String)]
         1 * restTemplate.getForObject(_, _ as Class<UndervisningsgruppeResources>) >> teachingGroups
         resources.size() == 1
         resources.get(Link.with('link.To.TeachingGroup')).navn == 'Teaching group'
@@ -89,6 +98,7 @@ class FintRepositorySpec extends Specification {
         def resources = fintRepository.getSubjects(_ as String)
 
         then:
+        1 * kulturtankenProperties.getOrganisations() >> [(_ as String) : new KulturtankenProperties.Organisation(environment: _ as String)]
         1 * restTemplate.getForObject(_, _ as Class<FagResources>) >> subjects
         resources.size() == 1
         resources.get(Link.with('link.To.Subject')).navn == 'Subject'
