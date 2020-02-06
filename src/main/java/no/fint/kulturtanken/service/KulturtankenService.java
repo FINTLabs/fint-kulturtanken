@@ -5,11 +5,11 @@ import no.fint.kulturtanken.configuration.KulturtankenProperties;
 import no.fint.kulturtanken.repository.FintRepository;
 import no.fint.kulturtanken.repository.NsrRepository;
 import no.fint.kulturtanken.model.*;
+import no.fint.model.resource.FintLinks;
 import no.fint.model.resource.Link;
 import no.fint.model.resource.utdanning.elev.BasisgruppeResource;
-import no.fint.model.resource.utdanning.timeplan.FagResource;
 import no.fint.model.resource.utdanning.timeplan.UndervisningsgruppeResource;
-import no.fint.model.resource.utdanning.utdanningsprogram.ArstrinnResource;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -62,10 +62,10 @@ public class KulturtankenService {
                                 .filter(Objects::nonNull)
                                 .collect(Collectors.groupingBy(this::getLevel))
                                 .forEach((key, value) -> Optional.ofNullable(fintRepository.getLevels(orgId).get(key))
-                                        .map(ArstrinnResource::getNavn)
-                                        .ifPresent(name -> {
+                                        .map(this::getGrepCode)
+                                        .ifPresent(code -> {
                                             Trinn level = new Trinn();
-                                            level.setNiva(name);
+                                            level.setNiva(code);
                                             level.setBasisgrupper(value.stream()
                                                     .map(Basisgruppe::fromFint)
                                                     .collect(Collectors.toList()));
@@ -79,10 +79,10 @@ public class KulturtankenService {
                                 .filter(Objects::nonNull)
                                 .collect(Collectors.groupingBy(this::getSubject))
                                 .forEach((key, value) -> Optional.ofNullable(fintRepository.getSubjects(orgId).get(key))
-                                        .map(FagResource::getNavn)
-                                        .ifPresent(name -> {
+                                        .map(this::getGrepCode)
+                                        .ifPresent(code -> {
                                             Fag subject = new Fag();
-                                            subject.setFagkode(name);
+                                            subject.setFagkode(code);
                                             subject.setUndervisningsgrupper(value.stream()
                                                     .map(Undervisningsgruppe::fromFint)
                                                     .collect(Collectors.toList()));
@@ -106,6 +106,14 @@ public class KulturtankenService {
 
     private Link getSubject(UndervisningsgruppeResource teachingGroup) {
         return teachingGroup.getFag().stream().findAny().orElseGet(Link::new);
+    }
+
+    private<T extends FintLinks> String getGrepCode(T resource) {
+        return resource.getLinks().getOrDefault("grepreferanse", Collections.emptyList()).stream()
+                .map(Link::getHref)
+                .map(href -> StringUtils.substringAfterLast(href,"/"))
+                .findAny()
+                .orElse(null);
     }
 
     private Predicate<Enhet> isValidUnit() {

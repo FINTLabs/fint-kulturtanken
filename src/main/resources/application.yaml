@@ -1,10 +1,4 @@
 fint:
-  endpoints:
-    school: https://beta.felleskomponent.no/utdanning/utdanningsprogram/skole
-    basis-group: https://beta.felleskomponent.no/utdanning/elev/basisgruppe
-    level: https://beta.felleskomponent.no/utdanning/utdanningsprogram/arstrinn
-    teaching-group: https://beta.felleskomponent.no/utdanning/timeplan/undervisningsgruppe
-    subject: https://beta.felleskomponent.no/utdanning/timeplan/fag
   basic:
     username:
     password:
@@ -21,145 +15,77 @@ kulturtanken:
       groups: false
       username:
       password:
+      environment:
     920717152:
       name: Innlandet
       source: nsr
       groups: false
       username:
       password:
-    922420866:
-      name: Troms og Finnmark
-      source: nsr
-      groups: false
-      username:
-      password:
-    821227062:
-      name: Vestfold og Telemark
-      source: nsr
-      groups: false
-      username:
-      password:
-    821311632:
-      name: Vestland
-      source: nsr
-      groups: false
-      username:
-      password:
-    921693230:
-      name: Viken
-      source: fint
-      groups: true
-      username:
-      password:
-
-    958381492:
-      name: Akershus
-      source: nsr
-      groups: false
-      username:
-      password:
-    943039046:
-      name: Aust-Agder
-      source: nsr
-      groups: false
-      username:
-      password:
-    964951373:
-      name: Buskerud
-      source: nsr
-      groups: false
-      username:
-      password:
-    964994218:
-      name: Finnmark
-      source: nsr
-      groups: false
-      username:
-      password:
-    942116217:
-      name: Hedmark
-      source: nsr
-      groups: false
-      username:
-      password:
-    938626367:
-      name: Hordaland
-      source: nsr
-      groups: false
-      username:
-      password:
+      environment:
     944183779:
       name: Møre og Romsdal
       source: nsr
       groups: false
       username:
       password:
+      environment:
     964982953:
       name: Nordland
       source: nsr
       groups: false
       username:
       password:
-    961382335:
-      name: Oppland
-      source: nsr
-      groups: false
-      username:
-      password:
+      environment:
     958935420:
       name: Oslo
       source: nsr
       groups: false
       username:
       password:
+      environment:
     971045698:
       name: Rogaland
       source: fint
       groups: true
       username:
       password:
-    941388841:
-      name: Sogn og Fjordane
+      environment: https://beta.felleskomponent.no
+    922420866:
+      name: Troms og Finnmark
       source: nsr
       groups: false
       username:
       password:
-    940192226:
-      name: Telemark
-      source: nsr
-      groups: false
-      username:
-      password:
-    864870732:
-      name: Troms
-      source: nsr
-      groups: false
-      username:
-      password:
+      environment:
     817920632:
       name: Trøndelag
       source: nsr
       groups: false
       username:
       password:
-    960895827:
-      name: Vest-Agder
+      environment:
+    821227062:
+      name: Vestfold og Telemark
       source: nsr
       groups: false
       username:
       password:
-    944025391:
-      name: Vestfold
+      environment:
+    821311632:
+      name: Vestland
       source: nsr
       groups: false
       username:
       password:
-    842952972:
-      name: Østfold
-      source: nsr
-      groups: false
+      environment:
+    921693230:
+      name: Viken
+      source: fint
+      groups: true
       username:
       password:
+      environment: https://api.felleskomponent.no
 
 server:
   servlet:

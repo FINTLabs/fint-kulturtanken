@@ -31,7 +31,7 @@ public class NsrRepository {
         try {
             unit = restTemplate.getForObject(unitEndpoint, Enhet.class, orgId);
         } catch (RestClientResponseException ex) {
-            log.error(ex.getResponseBodyAsString());
+            log.error("({}) - {}", orgId, ex.getRawStatusCode());
             return null;
         }
 
