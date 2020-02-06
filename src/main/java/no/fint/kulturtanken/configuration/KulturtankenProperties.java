@@ -25,12 +25,14 @@ public class KulturtankenProperties {
         private String organisationNumber;
 
         @JsonIgnore
-        private String source, username, password;
+        private String source, username, password, environment;
 
         @JsonProperty("grupper")
         private Boolean groups;
 
         @JsonProperty("uri")
         private URI uri;
+
+
     }
 }

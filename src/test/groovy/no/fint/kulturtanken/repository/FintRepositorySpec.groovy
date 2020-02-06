@@ -16,7 +16,7 @@ class FintRepositorySpec extends Specification {
 
     void setup() {
         restTemplate = Mock();
-        fintRepository = new FintRepository(restTemplate)
+        fintRepository = new FintRepository(restTemplate, kulturtankenProperties)
     }
 
     def "Get schools from Fint"() {

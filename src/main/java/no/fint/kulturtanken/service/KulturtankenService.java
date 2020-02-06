@@ -63,9 +63,9 @@ public class KulturtankenService {
                                 .collect(Collectors.groupingBy(this::getLevel))
                                 .forEach((key, value) -> Optional.ofNullable(fintRepository.getLevels(orgId).get(key))
                                         .map(this::getGrepCode)
-                                        .ifPresent(name -> {
+                                        .ifPresent(code -> {
                                             Trinn level = new Trinn();
-                                            level.setNiva(name);
+                                            level.setNiva(code);
                                             level.setBasisgrupper(value.stream()
                                                     .map(Basisgruppe::fromFint)
                                                     .collect(Collectors.toList()));
@@ -80,9 +80,9 @@ public class KulturtankenService {
                                 .collect(Collectors.groupingBy(this::getSubject))
                                 .forEach((key, value) -> Optional.ofNullable(fintRepository.getSubjects(orgId).get(key))
                                         .map(this::getGrepCode)
-                                        .ifPresent(name -> {
+                                        .ifPresent(code -> {
                                             Fag subject = new Fag();
-                                            subject.setFagkode(name);
+                                            subject.setFagkode(code);
                                             subject.setUndervisningsgrupper(value.stream()
                                                     .map(Undervisningsgruppe::fromFint)
                                                     .collect(Collectors.toList()));
@@ -109,7 +109,7 @@ public class KulturtankenService {
     }
 
     private<T extends FintLinks> String getGrepCode(T resource) {
-        return resource.getLinks().get("grepreferanse").stream()
+        return resource.getLinks().getOrDefault("grepreferanse", Collections.emptyList()).stream()
                 .map(Link::getHref)
                 .map(href -> StringUtils.substringAfterLast(href,"/"))
                 .findAny()

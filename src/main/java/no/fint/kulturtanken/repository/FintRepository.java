@@ -1,6 +1,7 @@
 package no.fint.kulturtanken.repository;
 
 import lombok.extern.slf4j.Slf4j;
+import no.fint.kulturtanken.configuration.KulturtankenProperties;
 import no.fint.model.resource.FintLinks;
 import no.fint.model.resource.Link;
 import no.fint.model.resource.utdanning.elev.BasisgruppeResource;
@@ -30,38 +31,27 @@ import java.util.stream.Collectors;
 public class FintRepository {
 
     private final RestTemplate restTemplate;
+    private final KulturtankenProperties kulturtankenProperties;
 
-    @Value("${fint.endpoints.school}")
-    private String schoolEndpoint;
-
-    @Value("${fint.endpoints.basis-group}")
-    private String basisGroupEndpoint;
-
-    @Value("${fint.endpoints.level}")
-    private String levelEndpoint;
-
-    @Value("${fint.endpoints.teaching-group}")
-    private String teachingGroupEndpoint;
-
-    @Value("${fint.endpoints.subject}")
-    private String subjectEndpoint;
-
-    public FintRepository(@Qualifier("oAuth2RestTemplate") RestTemplate restTemplate) {
+    public FintRepository(@Qualifier("oAuth2RestTemplate") RestTemplate restTemplate, KulturtankenProperties kulturtankenProperties) {
         this.restTemplate = restTemplate;
+        this.kulturtankenProperties = kulturtankenProperties;
     }
 
     @Cacheable(value = "schools", unless = "#result == null")
     public SkoleResources getSchools(String orgId) {
         SkoleResources resources;
 
+        String uri = kulturtankenProperties.getOrganisations().get(orgId).getEnvironment().concat("/utdanning/utdanningsprogram/skole");
+
         try {
-            resources = restTemplate.getForObject(schoolEndpoint, SkoleResources.class);
+            resources = restTemplate.getForObject(uri, SkoleResources.class);
         } catch (RestClientResponseException ex) {
             log.error(ex.getResponseBodyAsString());
             return null;
         }
 
-        log.info("({}) Updated schools from {}...", orgId, schoolEndpoint);
+        log.info("({}) Updated schools from {}...", orgId, uri);
 
         return resources;
     }
@@ -70,14 +60,16 @@ public class FintRepository {
     public Map<Link, BasisgruppeResource> getBasisGroups(String orgId) {
         BasisgruppeResources resources;
 
+        String uri = kulturtankenProperties.getOrganisations().get(orgId).getEnvironment().concat("/utdanning/elev/basisgruppe");
+
         try {
-            resources = restTemplate.getForObject(basisGroupEndpoint, BasisgruppeResources.class);
+            resources = restTemplate.getForObject(uri, BasisgruppeResources.class);
         } catch (RestClientResponseException ex) {
             log.error(ex.getResponseBodyAsString());
             return null;
         }
 
-        log.info("({}) Updated basis groups from {}...", orgId, basisGroupEndpoint);
+        log.info("({}) Updated basis groups from {}...", orgId, uri);
 
         return resources != null ? resources.getContent().stream()
                 .collect(Collectors.toMap(this::getSelfLink, Function.identity(), (a, b) -> a)) : null;
@@ -87,14 +79,16 @@ public class FintRepository {
     public Map<Link, ArstrinnResource> getLevels(String orgId) {
         ArstrinnResources resources;
 
+        String uri = kulturtankenProperties.getOrganisations().get(orgId).getEnvironment().concat("/utdanning/utdanningsprogram/arstrinn");
+
         try {
-            resources = restTemplate.getForObject(levelEndpoint, ArstrinnResources.class);
+            resources = restTemplate.getForObject(uri, ArstrinnResources.class);
         } catch (RestClientResponseException ex) {
             log.error(ex.getResponseBodyAsString());
             return null;
         }
 
-        log.info("({}) Updated levels from {}...", orgId, levelEndpoint);
+        log.info("({}) Updated levels from {}...", orgId, uri);
 
         return resources != null ? resources.getContent().stream()
                 .collect(Collectors.toMap(this::getSelfLink, Function.identity(), (a, b) -> a)) : null;
@@ -104,14 +98,16 @@ public class FintRepository {
     public Map<Link, UndervisningsgruppeResource> getTeachingGroups(String orgId) {
         UndervisningsgruppeResources resources;
 
+        String uri = kulturtankenProperties.getOrganisations().get(orgId).getEnvironment().concat("/utdanning/timeplan/undervisningsgruppe");
+
         try {
-            resources = restTemplate.getForObject(teachingGroupEndpoint, UndervisningsgruppeResources.class);
+            resources = restTemplate.getForObject(uri, UndervisningsgruppeResources.class);
         } catch (RestClientResponseException ex) {
             log.error(ex.getResponseBodyAsString());
             return null;
         }
 
-        log.info("({}) Updated teaching groups from {}...", orgId, teachingGroupEndpoint);
+        log.info("({}) Updated teaching groups from {}...", orgId, uri);
 
         return resources != null ? resources.getContent().stream()
                 .collect(Collectors.toMap(this::getSelfLink, Function.identity(), (a, b) -> a)) : null;
@@ -121,14 +117,16 @@ public class FintRepository {
     public Map<Link, FagResource> getSubjects(String orgId) {
         FagResources resources;
 
+        String uri = kulturtankenProperties.getOrganisations().get(orgId).getEnvironment().concat("/utdanning/timeplan/fag");
+
         try {
-            resources = restTemplate.getForObject(subjectEndpoint, FagResources.class);
+            resources = restTemplate.getForObject(uri, FagResources.class);
         } catch (RestClientResponseException ex) {
             log.error(ex.getResponseBodyAsString());
             return null;
         }
 
-        log.info("({}) Updated subjects from {}...", orgId, subjectEndpoint);
+        log.info("({}) Updated subjects from {}...", orgId, uri);
 
         return resources != null ? resources.getContent().stream()
                 .collect(Collectors.toMap(this::getSelfLink, Function.identity(), (a, b) -> a)) : null;
