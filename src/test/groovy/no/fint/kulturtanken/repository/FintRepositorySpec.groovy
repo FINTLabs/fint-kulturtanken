@@ -45,15 +45,14 @@ class FintRepositorySpec extends Specification {
         mockWebServer.enqueue(new MockResponse()
                 .setBody(new ObjectMapper().writeValueAsString(schools))
                 .setHeader('content-type', 'application/json')
-                .setResponseCode(400))
+                .setResponseCode(200))
 
         when:
         def resources = fintRepository.getSchools(_ as String)
 
         then:
-        thrown(WebClientResponseException)
-        //resources.getTotalItems() == 1
-        //resources.getContent().get(0).navn == 'School'
+        resources.getTotalItems() == 1
+        resources.getContent().get(0).navn == 'School'
     }
 
     def "Get basis groups from Fint"() {
