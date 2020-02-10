@@ -30,7 +30,7 @@ public class KulturtankenController {
     }
 
     @GetMapping("/{orgId}")
-    public Skoleeier getSchoolOwner(Authentication principal, @PathVariable String orgId) {
+    public Skoleeier getSchoolOwner(@PathVariable String orgId) {
         if (kulturtankenProperties.getOrganisations().containsKey(orgId)) {
             return kulturtankenService.getSchoolOwner(orgId);
         } else {
@@ -42,7 +42,6 @@ public class KulturtankenController {
     public Stream<KulturtankenProperties.Organisation> getOrganisations() {
         return kulturtankenProperties.getOrganisations().entrySet().stream()
                 .map(organisation -> {
-                    organisation.getValue().setOrganisationNumber(organisation.getKey());
                     organisation.getValue().setUri(ServletUriComponentsBuilder.fromCurrentContextPath()
                             .pathSegment("skoleeier", organisation.getKey()).build().toUri());
                     return organisation.getValue();
