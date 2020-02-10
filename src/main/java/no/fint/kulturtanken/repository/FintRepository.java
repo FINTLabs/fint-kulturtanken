@@ -23,7 +23,6 @@ import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
 import org.springframework.security.oauth2.client.web.reactive.function.client.ServerOAuth2AuthorizedClientExchangeFilterFunction;
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
@@ -51,12 +50,16 @@ public class FintRepository {
     public SkoleResources getSchools(String orgId) {
         SkoleResources resources;
 
-        String uri = kulturtankenProperties.getOrganisations().get(orgId).getEnvironment().concat("/utdanning/utdanningsprogram/skole");
+        KulturtankenProperties.Organisation organisation = kulturtankenProperties.getOrganisations().get(orgId);
+
+        String uri = organisation.getEnvironment().concat("/utdanning/utdanningsprogram/skole");
+
+        OAuth2AuthorizedClient authorizedClient = getAuthorizedClient(organisation);
 
         try {
             resources = webClient.get()
                     .uri(uri)
-                    .attributes(ServerOAuth2AuthorizedClientExchangeFilterFunction.oauth2AuthorizedClient(getAuthorizedClient(orgId)))
+                    .attributes(ServerOAuth2AuthorizedClientExchangeFilterFunction.oauth2AuthorizedClient(authorizedClient))
                     .retrieve()
                     .bodyToMono(SkoleResources.class)
                     .block();
@@ -74,12 +77,16 @@ public class FintRepository {
     public Map<Link, BasisgruppeResource> getBasisGroups(String orgId) {
         BasisgruppeResources resources;
 
-        String uri = kulturtankenProperties.getOrganisations().get(orgId).getEnvironment().concat("/utdanning/elev/basisgruppe");
+        KulturtankenProperties.Organisation organisation = kulturtankenProperties.getOrganisations().get(orgId);
+
+        String uri = organisation.getEnvironment().concat("/utdanning/elev/basisgruppe");
+
+        OAuth2AuthorizedClient authorizedClient = getAuthorizedClient(organisation);
 
         try {
             resources = webClient.get()
                     .uri(uri)
-                    .attributes(ServerOAuth2AuthorizedClientExchangeFilterFunction.oauth2AuthorizedClient(getAuthorizedClient(orgId)))
+                    .attributes(ServerOAuth2AuthorizedClientExchangeFilterFunction.oauth2AuthorizedClient(authorizedClient))
                     .retrieve()
                     .bodyToMono(BasisgruppeResources.class)
                     .block();
@@ -98,12 +105,16 @@ public class FintRepository {
     public Map<Link, ArstrinnResource> getLevels(String orgId) {
         ArstrinnResources resources;
 
-        String uri = kulturtankenProperties.getOrganisations().get(orgId).getEnvironment().concat("/utdanning/utdanningsprogram/arstrinn");
+        KulturtankenProperties.Organisation organisation = kulturtankenProperties.getOrganisations().get(orgId);
+
+        String uri = organisation.getEnvironment().concat("/utdanning/utdanningsprogram/arstrinn");
+
+        OAuth2AuthorizedClient authorizedClient = getAuthorizedClient(organisation);
 
         try {
             resources = webClient.get()
                     .uri(uri)
-                    .attributes(ServerOAuth2AuthorizedClientExchangeFilterFunction.oauth2AuthorizedClient(getAuthorizedClient(orgId)))
+                    .attributes(ServerOAuth2AuthorizedClientExchangeFilterFunction.oauth2AuthorizedClient(authorizedClient))
                     .retrieve()
                     .bodyToMono(ArstrinnResources.class)
                     .block();
@@ -122,12 +133,16 @@ public class FintRepository {
     public Map<Link, UndervisningsgruppeResource> getTeachingGroups(String orgId) {
         UndervisningsgruppeResources resources;
 
-        String uri = kulturtankenProperties.getOrganisations().get(orgId).getEnvironment().concat("/utdanning/timeplan/undervisningsgruppe");
+        KulturtankenProperties.Organisation organisation = kulturtankenProperties.getOrganisations().get(orgId);
+
+        String uri = organisation.getEnvironment().concat("/utdanning/timeplan/undervisningsgruppe");
+
+        OAuth2AuthorizedClient authorizedClient = getAuthorizedClient(organisation);
 
         try {
             resources = webClient.get()
                     .uri(uri)
-                    .attributes(ServerOAuth2AuthorizedClientExchangeFilterFunction.oauth2AuthorizedClient(getAuthorizedClient(orgId)))
+                    .attributes(ServerOAuth2AuthorizedClientExchangeFilterFunction.oauth2AuthorizedClient(authorizedClient))
                     .retrieve()
                     .bodyToMono(UndervisningsgruppeResources.class)
                     .block();
@@ -146,12 +161,16 @@ public class FintRepository {
     public Map<Link, FagResource> getSubjects(String orgId) {
         FagResources resources;
 
-        String uri = kulturtankenProperties.getOrganisations().get(orgId).getEnvironment().concat("/utdanning/timeplan/fag");
+        KulturtankenProperties.Organisation organisation = kulturtankenProperties.getOrganisations().get(orgId);
+
+        String uri = organisation.getEnvironment().concat("/utdanning/timeplan/fag");
+
+        OAuth2AuthorizedClient authorizedClient = getAuthorizedClient(organisation);
 
         try {
             resources = webClient.get()
                     .uri(uri)
-                    .attributes(ServerOAuth2AuthorizedClientExchangeFilterFunction.oauth2AuthorizedClient(getAuthorizedClient(orgId)))
+                    .attributes(ServerOAuth2AuthorizedClientExchangeFilterFunction.oauth2AuthorizedClient(authorizedClient))
                     .retrieve()
                     .bodyToMono(FagResources.class)
                     .block();
@@ -166,12 +185,12 @@ public class FintRepository {
                 .collect(Collectors.toMap(this::getSelfLink, Function.identity(), (a, b) -> a)) : null;
     }
 
-    private OAuth2AuthorizedClient getAuthorizedClient(String orgId) {
-        OAuth2AuthorizeRequest authorizeRequest = OAuth2AuthorizeRequest.withClientRegistrationId(orgId)
+    private OAuth2AuthorizedClient getAuthorizedClient(KulturtankenProperties.Organisation organisation) {
+        OAuth2AuthorizeRequest authorizeRequest = OAuth2AuthorizeRequest.withClientRegistrationId(organisation.getOrganisationNumber())
                 .principal(principal)
                 .attributes(attrs -> {
-                    attrs.put(OAuth2ParameterNames.USERNAME, kulturtankenProperties.getOrganisations().get(orgId).getUsername());
-                    attrs.put(OAuth2ParameterNames.PASSWORD, kulturtankenProperties.getOrganisations().get(orgId).getPassword());
+                    attrs.put(OAuth2ParameterNames.USERNAME, organisation.getUsername());
+                    attrs.put(OAuth2ParameterNames.PASSWORD, organisation.getPassword());
                 }).build();
 
         return authorizedClientManager.authorize(authorizeRequest);

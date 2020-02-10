@@ -39,8 +39,10 @@ dependencies {
 
     annotationProcessor 'org.projectlombok:lombok'
 
-    testImplementation('no.fint:fint-test-utils:0.0.4')
+    //testImplementation 'no.fint:fint-test-utils:0.0.4'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation('org.spockframework:spock-spring:1.2-groovy-2.5')
-    testImplementation('com.squareup.okhttp3:mockwebserver:3.14.0')
+    testImplementation 'org.spockframework:spock-spring:1.2-groovy-2.5'
+    testImplementation 'com.squareup.okhttp3:mockwebserver:4.3.1'
+    testImplementation 'com.squareup.okhttp3:okhttp:4.3.1'
+
 }

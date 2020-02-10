@@ -22,17 +22,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 class KulturtankenControllerSpec extends Specification {
-    private KulturtankenService kulturtankenService
-    private KulturtankenProperties kulturtankenProperties
-    private CurrentRequest currentRequest
-    private KulturtankenController kulturtankenController
-    private MockMvc mockMvc
+    KulturtankenService kulturtankenService
+    KulturtankenProperties kulturtankenProperties
+    KulturtankenController kulturtankenController
+    MockMvc mockMvc
 
     void setup() {
         kulturtankenService = Mock()
         kulturtankenProperties = Mock()
-        currentRequest = Mock()
-        kulturtankenController = new KulturtankenController(kulturtankenService, kulturtankenProperties, currentRequest)
+        kulturtankenController = new KulturtankenController(kulturtankenService, kulturtankenProperties)
         mockMvc = MockMvcBuilders.standaloneSetup(kulturtankenController).build()
     }
 
@@ -49,7 +47,6 @@ class KulturtankenControllerSpec extends Specification {
         def response = mockMvc.perform(get("/skoleeier/876543210"))
 
         then:
-        1 * currentRequest.setOrgId('876543210')
         1 * kulturtankenProperties.getOrganisations() >> [('876543210'): new KulturtankenProperties.Organisation()]
         1 * kulturtankenService.getSchoolOwner('876543210') >> schoolOwner
         response.andExpect(status().isOk()).andExpect(content().json(JsonOutput.toJson(schoolOwner)))
