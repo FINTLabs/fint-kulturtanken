@@ -1,8 +1,3 @@
-fint:
-  basic:
-    username:
-    password:
-
 nsr:
   endpoints:
     unit: https://data-nsr.udir.no/enhet/{id}
@@ -11,6 +6,7 @@ kulturtanken:
   organisations:
     921707134:
       name: Agder
+      organisationnumber: 921707134
       source: nsr
       groups: false
       username:
@@ -18,6 +14,7 @@ kulturtanken:
       environment:
     920717152:
       name: Innlandet
+      organisationnumber: 920717152
       source: nsr
       groups: false
       username:
@@ -25,6 +22,7 @@ kulturtanken:
       environment:
     944183779:
       name: Møre og Romsdal
+      organisationnumber: 944183779
       source: nsr
       groups: false
       username:
@@ -32,6 +30,7 @@ kulturtanken:
       environment:
     964982953:
       name: Nordland
+      organisationnumber: 964982953
       source: nsr
       groups: false
       username:
@@ -39,6 +38,7 @@ kulturtanken:
       environment:
     958935420:
       name: Oslo
+      organisationnumber: 958935420
       source: nsr
       groups: false
       username:
@@ -46,6 +46,7 @@ kulturtanken:
       environment:
     971045698:
       name: Rogaland
+      organisationnumber: 971045698
       source: fint
       groups: true
       username:
@@ -53,6 +54,7 @@ kulturtanken:
       environment: https://beta.felleskomponent.no
     922420866:
       name: Troms og Finnmark
+      organisationnumber: 922420866
       source: nsr
       groups: false
       username:
@@ -60,6 +62,7 @@ kulturtanken:
       environment:
     817920632:
       name: Trøndelag
+      organisationnumber: 817920632
       source: nsr
       groups: false
       username:
@@ -67,6 +70,7 @@ kulturtanken:
       environment:
     821227062:
       name: Vestfold og Telemark
+      organisationnumber: 821227062
       source: nsr
       groups: false
       username:
@@ -74,6 +78,7 @@ kulturtanken:
       environment:
     821311632:
       name: Vestland
+      organisationnumber: 821311632
       source: nsr
       groups: false
       username:
@@ -81,6 +86,7 @@ kulturtanken:
       environment:
     921693230:
       name: Viken
+      organisationnumber: 921693230
       source: fint
       groups: true
       username:
@@ -96,13 +102,13 @@ spring:
     oauth2:
       client:
         registration:
-          971045698:
+          921693230:
             client-id:
             client-secret:
             authorization-grant-type: password
             scope: fint-client
             provider: fint
-          921693230:
+          971045698:
             client-id:
             client-secret:
             authorization-grant-type: password

@@ -13,14 +13,18 @@ import no.fint.model.resource.utdanning.timeplan.UndervisningsgruppeResources;
 import no.fint.model.resource.utdanning.utdanningsprogram.ArstrinnResource;
 import no.fint.model.resource.utdanning.utdanningsprogram.ArstrinnResources;
 import no.fint.model.resource.utdanning.utdanningsprogram.SkoleResources;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.client.OAuth2AuthorizeRequest;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
+import org.springframework.security.oauth2.client.web.reactive.function.client.ServerOAuth2AuthorizedClientExchangeFilterFunction;
+import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClientResponseException;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.util.Map;
 import java.util.function.Function;
@@ -30,11 +34,15 @@ import java.util.stream.Collectors;
 @Service
 public class FintRepository {
 
-    private final RestTemplate restTemplate;
+    private final WebClient webClient;
+    private final Authentication principal;
+    private final OAuth2AuthorizedClientManager authorizedClientManager;
     private final KulturtankenProperties kulturtankenProperties;
 
-    public FintRepository(@Qualifier("oAuth2RestTemplate") RestTemplate restTemplate, KulturtankenProperties kulturtankenProperties) {
-        this.restTemplate = restTemplate;
+    public FintRepository(WebClient webClient, Authentication principal, OAuth2AuthorizedClientManager authorizedClientManager, KulturtankenProperties kulturtankenProperties) {
+        this.webClient = webClient;
+        this.principal = principal;
+        this.authorizedClientManager = authorizedClientManager;
         this.kulturtankenProperties = kulturtankenProperties;
     }
 
@@ -42,11 +50,20 @@ public class FintRepository {
     public SkoleResources getSchools(String orgId) {
         SkoleResources resources;
 
-        String uri = kulturtankenProperties.getOrganisations().get(orgId).getEnvironment().concat("/utdanning/utdanningsprogram/skole");
+        KulturtankenProperties.Organisation organisation = kulturtankenProperties.getOrganisations().get(orgId);
+
+        String uri = organisation.getEnvironment().concat("/utdanning/utdanningsprogram/skole");
+
+        OAuth2AuthorizedClient authorizedClient = getAuthorizedClient(organisation);
 
         try {
-            resources = restTemplate.getForObject(uri, SkoleResources.class);
-        } catch (RestClientResponseException ex) {
+            resources = webClient.get()
+                    .uri(uri)
+                    .attributes(ServerOAuth2AuthorizedClientExchangeFilterFunction.oauth2AuthorizedClient(authorizedClient))
+                    .retrieve()
+                    .bodyToMono(SkoleResources.class)
+                    .block();
+        } catch (WebClientResponseException ex) {
             log.error(ex.getResponseBodyAsString());
             return null;
         }
@@ -60,11 +77,20 @@ public class FintRepository {
     public Map<Link, BasisgruppeResource> getBasisGroups(String orgId) {
         BasisgruppeResources resources;
 
-        String uri = kulturtankenProperties.getOrganisations().get(orgId).getEnvironment().concat("/utdanning/elev/basisgruppe");
+        KulturtankenProperties.Organisation organisation = kulturtankenProperties.getOrganisations().get(orgId);
+
+        String uri = organisation.getEnvironment().concat("/utdanning/elev/basisgruppe");
+
+        OAuth2AuthorizedClient authorizedClient = getAuthorizedClient(organisation);
 
         try {
-            resources = restTemplate.getForObject(uri, BasisgruppeResources.class);
-        } catch (RestClientResponseException ex) {
+            resources = webClient.get()
+                    .uri(uri)
+                    .attributes(ServerOAuth2AuthorizedClientExchangeFilterFunction.oauth2AuthorizedClient(authorizedClient))
+                    .retrieve()
+                    .bodyToMono(BasisgruppeResources.class)
+                    .block();
+        } catch (WebClientResponseException ex) {
             log.error(ex.getResponseBodyAsString());
             return null;
         }
@@ -79,11 +105,20 @@ public class FintRepository {
     public Map<Link, ArstrinnResource> getLevels(String orgId) {
         ArstrinnResources resources;
 
-        String uri = kulturtankenProperties.getOrganisations().get(orgId).getEnvironment().concat("/utdanning/utdanningsprogram/arstrinn");
+        KulturtankenProperties.Organisation organisation = kulturtankenProperties.getOrganisations().get(orgId);
+
+        String uri = organisation.getEnvironment().concat("/utdanning/utdanningsprogram/arstrinn");
+
+        OAuth2AuthorizedClient authorizedClient = getAuthorizedClient(organisation);
 
         try {
-            resources = restTemplate.getForObject(uri, ArstrinnResources.class);
-        } catch (RestClientResponseException ex) {
+            resources = webClient.get()
+                    .uri(uri)
+                    .attributes(ServerOAuth2AuthorizedClientExchangeFilterFunction.oauth2AuthorizedClient(authorizedClient))
+                    .retrieve()
+                    .bodyToMono(ArstrinnResources.class)
+                    .block();
+        } catch (WebClientResponseException ex) {
             log.error(ex.getResponseBodyAsString());
             return null;
         }
@@ -98,11 +133,20 @@ public class FintRepository {
     public Map<Link, UndervisningsgruppeResource> getTeachingGroups(String orgId) {
         UndervisningsgruppeResources resources;
 
-        String uri = kulturtankenProperties.getOrganisations().get(orgId).getEnvironment().concat("/utdanning/timeplan/undervisningsgruppe");
+        KulturtankenProperties.Organisation organisation = kulturtankenProperties.getOrganisations().get(orgId);
+
+        String uri = organisation.getEnvironment().concat("/utdanning/timeplan/undervisningsgruppe");
+
+        OAuth2AuthorizedClient authorizedClient = getAuthorizedClient(organisation);
 
         try {
-            resources = restTemplate.getForObject(uri, UndervisningsgruppeResources.class);
-        } catch (RestClientResponseException ex) {
+            resources = webClient.get()
+                    .uri(uri)
+                    .attributes(ServerOAuth2AuthorizedClientExchangeFilterFunction.oauth2AuthorizedClient(authorizedClient))
+                    .retrieve()
+                    .bodyToMono(UndervisningsgruppeResources.class)
+                    .block();
+        } catch (WebClientResponseException ex) {
             log.error(ex.getResponseBodyAsString());
             return null;
         }
@@ -117,11 +161,20 @@ public class FintRepository {
     public Map<Link, FagResource> getSubjects(String orgId) {
         FagResources resources;
 
-        String uri = kulturtankenProperties.getOrganisations().get(orgId).getEnvironment().concat("/utdanning/timeplan/fag");
+        KulturtankenProperties.Organisation organisation = kulturtankenProperties.getOrganisations().get(orgId);
+
+        String uri = organisation.getEnvironment().concat("/utdanning/timeplan/fag");
+
+        OAuth2AuthorizedClient authorizedClient = getAuthorizedClient(organisation);
 
         try {
-            resources = restTemplate.getForObject(uri, FagResources.class);
-        } catch (RestClientResponseException ex) {
+            resources = webClient.get()
+                    .uri(uri)
+                    .attributes(ServerOAuth2AuthorizedClientExchangeFilterFunction.oauth2AuthorizedClient(authorizedClient))
+                    .retrieve()
+                    .bodyToMono(FagResources.class)
+                    .block();
+        } catch (WebClientResponseException ex) {
             log.error(ex.getResponseBodyAsString());
             return null;
         }
@@ -130,6 +183,17 @@ public class FintRepository {
 
         return resources != null ? resources.getContent().stream()
                 .collect(Collectors.toMap(this::getSelfLink, Function.identity(), (a, b) -> a)) : null;
+    }
+
+    private OAuth2AuthorizedClient getAuthorizedClient(KulturtankenProperties.Organisation organisation) {
+        OAuth2AuthorizeRequest authorizeRequest = OAuth2AuthorizeRequest.withClientRegistrationId(organisation.getOrganisationNumber())
+                .principal(principal)
+                .attributes(attrs -> {
+                    attrs.put(OAuth2ParameterNames.USERNAME, organisation.getUsername());
+                    attrs.put(OAuth2ParameterNames.PASSWORD, organisation.getPassword());
+                }).build();
+
+        return authorizedClientManager.authorize(authorizeRequest);
     }
 
     private <T extends FintLinks> Link getSelfLink(T resource) {
