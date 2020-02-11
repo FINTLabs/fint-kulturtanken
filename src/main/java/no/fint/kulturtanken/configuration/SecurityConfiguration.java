@@ -29,7 +29,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         http.authorizeRequests(authorizeRequests ->
                 authorizeRequests
                         .requestMatchers(EndpointRequest.to("health")).permitAll()
-                        .antMatchers("/tjenester/kulturtanken/skoleeier/**").permitAll()
+                        .antMatchers("/skoleeier/**").permitAll()
                         .anyRequest().denyAll()
         );
     }
