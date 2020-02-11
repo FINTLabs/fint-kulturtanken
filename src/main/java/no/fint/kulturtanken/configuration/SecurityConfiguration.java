@@ -1,6 +1,7 @@
 package no.fint.kulturtanken.configuration;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,23 +25,18 @@ import java.util.function.Function;
 @Configuration
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-    @Value("${fint.basic.username}")
-    private String username;
-
-    @Value("${fint.basic.password}")
-    private String password;
-
     protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests(
-                authorizeRequests ->
-                        authorizeRequests
-                                .anyRequest().permitAll()
+        http.authorizeRequests(authorizeRequests ->
+                authorizeRequests
+                        .requestMatchers(EndpointRequest.to("health")).permitAll()
+                        .antMatchers("/tjenester/kulturtanken/skoleeier/**").permitAll()
+                        .anyRequest().denyAll()
         );
     }
 
     @Bean
     public Authentication authentication() {
-        return new UsernamePasswordAuthenticationToken(username, password, Collections.emptyList());
+        return new UsernamePasswordAuthenticationToken("dummy", "authentication", Collections.emptyList());
     }
 
     @Bean

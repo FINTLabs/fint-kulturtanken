@@ -28,7 +28,7 @@ spec:
     spec:
       containers:
         - name: kulturtanken-beta
-          image: fintlabs.azurecr.io/kulturtanken:build.10
+          image: fintlabs.azurecr.io/kulturtanken:build.12
           resources:
             limits:
               cpu: '500m'
@@ -89,13 +89,3 @@ spec:
                 secretKeyRef:
                   name: kulturtanken-viken
                   key: password
-            - name: fint.basic.username
-              valueFrom:
-                secretKeyRef:
-                  name: kulturtanken-rogaland
-                  key: basic-username
-            - name: fint.basic.password
-              valueFrom:
-                secretKeyRef:
-                  name: kulturtanken-rogaland
-                  key: basic-password
