@@ -15,7 +15,6 @@ import org.springframework.security.core.Authentication
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager
 import org.springframework.web.reactive.function.client.WebClient
-import org.springframework.web.reactive.function.client.WebClientResponseException
 import spock.lang.Specification
 
 class FintRepositorySpec extends Specification {
@@ -51,8 +50,8 @@ class FintRepositorySpec extends Specification {
         def resources = fintRepository.getSchools(_ as String)
 
         then:
-        resources.getTotalItems() == 1
-        resources.getContent().get(0).navn == 'School'
+        resources.size() == 1
+        resources.get(Link.with('link.To.School')).navn == 'School'
     }
 
     def "Get basis groups from Fint"() {

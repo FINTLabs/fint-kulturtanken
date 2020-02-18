@@ -29,6 +29,7 @@ public class KulturtankenController {
 
     @GetMapping("/{orgId}")
     public Skoleeier getSchoolOwner(@PathVariable String orgId) {
+        log.info(orgId);
         if (kulturtankenProperties.getOrganisations().containsKey(orgId)) {
             return kulturtankenService.getSchoolOwner(orgId);
         } else {

@@ -12,10 +12,8 @@ import no.fint.model.resource.utdanning.timeplan.UndervisningsgruppeResource;
 import no.fint.model.resource.utdanning.timeplan.UndervisningsgruppeResources;
 import no.fint.model.resource.utdanning.utdanningsprogram.ArstrinnResource;
 import no.fint.model.resource.utdanning.utdanningsprogram.ArstrinnResources;
+import no.fint.model.resource.utdanning.utdanningsprogram.SkoleResource;
 import no.fint.model.resource.utdanning.utdanningsprogram.SkoleResources;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.OAuth2AuthorizeRequest;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
@@ -24,11 +22,8 @@ import org.springframework.security.oauth2.client.web.reactive.function.client.S
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -46,143 +41,89 @@ public class FintRepository {
         this.kulturtankenProperties = kulturtankenProperties;
     }
 
-    @Cacheable(value = "schools", unless = "#result == null")
-    public SkoleResources getSchools(String orgId) {
-        SkoleResources resources;
-
+    public Map<Link, SkoleResource> getSchools(String orgId) {
         KulturtankenProperties.Organisation organisation = kulturtankenProperties.getOrganisations().get(orgId);
 
         String uri = organisation.getEnvironment().concat("/utdanning/utdanningsprogram/skole");
 
         OAuth2AuthorizedClient authorizedClient = getAuthorizedClient(organisation);
 
-        try {
-            resources = webClient.get()
-                    .uri(uri)
-                    .attributes(ServerOAuth2AuthorizedClientExchangeFilterFunction.oauth2AuthorizedClient(authorizedClient))
-                    .retrieve()
-                    .bodyToMono(SkoleResources.class)
-                    .block();
-        } catch (WebClientResponseException ex) {
-            log.error(ex.getResponseBodyAsString());
-            return null;
-        }
-
-        log.info("({}) Updated schools from {}...", orgId, uri);
-
-        return resources;
+        return webClient.get()
+                .uri(uri)
+                .attributes(ServerOAuth2AuthorizedClientExchangeFilterFunction.oauth2AuthorizedClient(authorizedClient))
+                .retrieve()
+                .bodyToMono(SkoleResources.class)
+                .flatMapIterable(SkoleResources::getContent)
+                .collectMap(this::getSelfLink)
+                .block();
     }
 
-    @Cacheable(value = "basisGroups", unless = "#result == null")
     public Map<Link, BasisgruppeResource> getBasisGroups(String orgId) {
-        BasisgruppeResources resources;
-
         KulturtankenProperties.Organisation organisation = kulturtankenProperties.getOrganisations().get(orgId);
 
         String uri = organisation.getEnvironment().concat("/utdanning/elev/basisgruppe");
 
         OAuth2AuthorizedClient authorizedClient = getAuthorizedClient(organisation);
 
-        try {
-            resources = webClient.get()
-                    .uri(uri)
-                    .attributes(ServerOAuth2AuthorizedClientExchangeFilterFunction.oauth2AuthorizedClient(authorizedClient))
-                    .retrieve()
-                    .bodyToMono(BasisgruppeResources.class)
-                    .block();
-        } catch (WebClientResponseException ex) {
-            log.error(ex.getResponseBodyAsString());
-            return null;
-        }
-
-        log.info("({}) Updated basis groups from {}...", orgId, uri);
-
-        return resources != null ? resources.getContent().stream()
-                .collect(Collectors.toMap(this::getSelfLink, Function.identity(), (a, b) -> a)) : null;
+        return webClient.get()
+                .uri(uri)
+                .attributes(ServerOAuth2AuthorizedClientExchangeFilterFunction.oauth2AuthorizedClient(authorizedClient))
+                .retrieve()
+                .bodyToMono(BasisgruppeResources.class)
+                .flatMapIterable(BasisgruppeResources::getContent)
+                .collectMap(this::getSelfLink)
+                .block();
     }
 
-    @Cacheable(value = "levels", unless = "#result == null")
     public Map<Link, ArstrinnResource> getLevels(String orgId) {
-        ArstrinnResources resources;
-
         KulturtankenProperties.Organisation organisation = kulturtankenProperties.getOrganisations().get(orgId);
 
         String uri = organisation.getEnvironment().concat("/utdanning/utdanningsprogram/arstrinn");
 
         OAuth2AuthorizedClient authorizedClient = getAuthorizedClient(organisation);
 
-        try {
-            resources = webClient.get()
-                    .uri(uri)
-                    .attributes(ServerOAuth2AuthorizedClientExchangeFilterFunction.oauth2AuthorizedClient(authorizedClient))
-                    .retrieve()
-                    .bodyToMono(ArstrinnResources.class)
-                    .block();
-        } catch (WebClientResponseException ex) {
-            log.error(ex.getResponseBodyAsString());
-            return null;
-        }
-
-        log.info("({}) Updated levels from {}...", orgId, uri);
-
-        return resources != null ? resources.getContent().stream()
-                .collect(Collectors.toMap(this::getSelfLink, Function.identity(), (a, b) -> a)) : null;
+        return webClient.get()
+                .uri(uri)
+                .attributes(ServerOAuth2AuthorizedClientExchangeFilterFunction.oauth2AuthorizedClient(authorizedClient))
+                .retrieve()
+                .bodyToMono(ArstrinnResources.class)
+                .flatMapIterable(ArstrinnResources::getContent)
+                .collectMap(this::getSelfLink)
+                .block();
     }
 
-    @Cacheable(value = "teachingGroups", unless = "#result == null")
     public Map<Link, UndervisningsgruppeResource> getTeachingGroups(String orgId) {
-        UndervisningsgruppeResources resources;
-
         KulturtankenProperties.Organisation organisation = kulturtankenProperties.getOrganisations().get(orgId);
 
         String uri = organisation.getEnvironment().concat("/utdanning/timeplan/undervisningsgruppe");
 
         OAuth2AuthorizedClient authorizedClient = getAuthorizedClient(organisation);
 
-        try {
-            resources = webClient.get()
-                    .uri(uri)
-                    .attributes(ServerOAuth2AuthorizedClientExchangeFilterFunction.oauth2AuthorizedClient(authorizedClient))
-                    .retrieve()
-                    .bodyToMono(UndervisningsgruppeResources.class)
-                    .block();
-        } catch (WebClientResponseException ex) {
-            log.error(ex.getResponseBodyAsString());
-            return null;
-        }
-
-        log.info("({}) Updated teaching groups from {}...", orgId, uri);
-
-        return resources != null ? resources.getContent().stream()
-                .collect(Collectors.toMap(this::getSelfLink, Function.identity(), (a, b) -> a)) : null;
+        return webClient.get()
+                .uri(uri)
+                .attributes(ServerOAuth2AuthorizedClientExchangeFilterFunction.oauth2AuthorizedClient(authorizedClient))
+                .retrieve()
+                .bodyToMono(UndervisningsgruppeResources.class)
+                .flatMapIterable(UndervisningsgruppeResources::getContent)
+                .collectMap(this::getSelfLink)
+                .block();
     }
 
-    @Cacheable(value = "subjects", unless = "#result == null")
     public Map<Link, FagResource> getSubjects(String orgId) {
-        FagResources resources;
-
         KulturtankenProperties.Organisation organisation = kulturtankenProperties.getOrganisations().get(orgId);
 
         String uri = organisation.getEnvironment().concat("/utdanning/timeplan/fag");
 
         OAuth2AuthorizedClient authorizedClient = getAuthorizedClient(organisation);
 
-        try {
-            resources = webClient.get()
-                    .uri(uri)
-                    .attributes(ServerOAuth2AuthorizedClientExchangeFilterFunction.oauth2AuthorizedClient(authorizedClient))
-                    .retrieve()
-                    .bodyToMono(FagResources.class)
-                    .block();
-        } catch (WebClientResponseException ex) {
-            log.error(ex.getResponseBodyAsString());
-            return null;
-        }
-
-        log.info("({}) Updated subjects from {}...", orgId, uri);
-
-        return resources != null ? resources.getContent().stream()
-                .collect(Collectors.toMap(this::getSelfLink, Function.identity(), (a, b) -> a)) : null;
+        return webClient.get()
+                .uri(uri)
+                .attributes(ServerOAuth2AuthorizedClientExchangeFilterFunction.oauth2AuthorizedClient(authorizedClient))
+                .retrieve()
+                .bodyToMono(FagResources.class)
+                .flatMapIterable(FagResources::getContent)
+                .collectMap(this::getSelfLink)
+                .block();
     }
 
     private OAuth2AuthorizedClient getAuthorizedClient(KulturtankenProperties.Organisation organisation) {
@@ -198,11 +139,5 @@ public class FintRepository {
 
     private <T extends FintLinks> Link getSelfLink(T resource) {
         return resource.getSelfLinks().stream().findFirst().orElseGet(Link::new);
-    }
-
-    @Scheduled(cron = "${fint.kulturtanken.cache-evict-cron:0 0 4 * * MON-FRI}")
-    @CacheEvict(cacheNames = {"schools", "basisGroups", "levels", "teachingGroups", "subjects"}, allEntries = true)
-    public void clearCache() {
-        log.info("\uD83D\uDD53 clearing cache...");
     }
 }

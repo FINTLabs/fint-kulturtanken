@@ -8,8 +8,12 @@ import no.fint.kulturtanken.model.*;
 import no.fint.model.resource.FintLinks;
 import no.fint.model.resource.Link;
 import no.fint.model.resource.utdanning.elev.BasisgruppeResource;
+import no.fint.model.resource.utdanning.timeplan.FagResource;
 import no.fint.model.resource.utdanning.timeplan.UndervisningsgruppeResource;
+import no.fint.model.resource.utdanning.utdanningsprogram.ArstrinnResource;
+import no.fint.model.resource.utdanning.utdanningsprogram.SkoleResource;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -30,6 +34,7 @@ public class KulturtankenService {
         this.kulturtankenProperties = kulturtankenProperties;
     }
 
+    @Cacheable(value = "schoolOwner")
     public Skoleeier getSchoolOwner(String orgId) {
         Enhet unit = nsrRepository.getUnit(orgId);
 
@@ -47,21 +52,28 @@ public class KulturtankenService {
             schoolOwner.setSkoler(schools);
 
         } else {
-            List<Skole> schools = fintRepository.getSchools(orgId).getContent().stream()
+            Map<Link, SkoleResource> schoolMap = fintRepository.getSchools(orgId);
+            Map<Link, BasisgruppeResource> basisGroupMap = fintRepository.getBasisGroups(orgId);
+            Map<Link, ArstrinnResource> levelMap = fintRepository.getLevels(orgId);
+            Map<Link, UndervisningsgruppeResource> teachingGroupMap = fintRepository.getTeachingGroups(orgId);
+            Map<Link, FagResource> subjectMap = fintRepository.getSubjects(orgId);
+
+            List<Skole> schools = schoolMap.values().stream()
                     .map(schoolResource -> {
                         Skole school = Skole.fromFint(schoolResource);
 
-                        Optional.ofNullable(nsrRepository.getUnit(school.getOrganisasjonsnummer()))
+                        Optional.ofNullable(school.getOrganisasjonsnummer())
+                                .map(nsrRepository::getUnit)
                                 .map(Enhet::getBesoksadresse)
                                 .map(Besoksadresse::fromNsr)
                                 .ifPresent(school::setBesoksadresse);
 
                         List<Trinn> levels = new ArrayList<>();
                         schoolResource.getBasisgruppe().stream()
-                                .map(link -> fintRepository.getBasisGroups(orgId).get(link))
+                                .map(basisGroupMap::get)
                                 .filter(Objects::nonNull)
                                 .collect(Collectors.groupingBy(this::getLevel))
-                                .forEach((key, value) -> Optional.ofNullable(fintRepository.getLevels(orgId).get(key))
+                                .forEach((key, value) -> Optional.ofNullable(levelMap.get(key))
                                         .map(this::getGrepCode)
                                         .ifPresent(code -> {
                                             Trinn level = new Trinn();
@@ -75,10 +87,10 @@ public class KulturtankenService {
 
                         List<Fag> subjects = new ArrayList<>();
                         schoolResource.getUndervisningsgruppe().stream()
-                                .map(link -> fintRepository.getTeachingGroups(orgId).get(link))
+                                .map(teachingGroupMap::get)
                                 .filter(Objects::nonNull)
                                 .collect(Collectors.groupingBy(this::getSubject))
-                                .forEach((key, value) -> Optional.ofNullable(fintRepository.getSubjects(orgId).get(key))
+                                .forEach((key, value) -> Optional.ofNullable(subjectMap.get(key))
                                         .map(this::getGrepCode)
                                         .ifPresent(code -> {
                                             Fag subject = new Fag();
