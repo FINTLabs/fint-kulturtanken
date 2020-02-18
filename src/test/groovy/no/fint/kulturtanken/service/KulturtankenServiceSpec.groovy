@@ -29,8 +29,6 @@ class KulturtankenServiceSpec extends Specification {
         def nsrSchool = new Enhet(navn: 'School', orgNr: '012345678',
                 besoksadresse: new Enhet.Adresse(adress: 'Address', postnr: '0123', poststed: 'City' ))
         def school = FintObjectFactory.newSchool()
-        def schools = new SkoleResources()
-        schools.addResource(school)
         def basisGroup = FintObjectFactory.newBasisGroup()
         def level = FintObjectFactory.newLevel()
         def teachingGroup = FintObjectFactory.newTeachingGroup()
@@ -43,7 +41,7 @@ class KulturtankenServiceSpec extends Specification {
         1 * nsrRepository.getUnit(_ as String) >> nsrSchoolOwner
         1 * kulturtankenProperties.getOrganisations() >> [(_ as String) : new KulturtankenProperties.Organisation(source: 'fint')]
         1 * nsrRepository.getUnit(_ as String) >> nsrSchool
-        1 * fintRepository.getSchools(_ as String) >> schools
+        1 * fintRepository.getSchools(_ as String) >> [(Link.with('link.To.School')): school]
         1 * fintRepository.getBasisGroups(_ as String) >> [(Link.with('link.To.BasisGroup')): basisGroup]
         1 * fintRepository.getLevels(_ as String) >> [(Link.with('link.To.Level')): level]
         1 * fintRepository.getTeachingGroups(_ as String) >> [(Link.with('link.To.TeachingGroup')): teachingGroup]

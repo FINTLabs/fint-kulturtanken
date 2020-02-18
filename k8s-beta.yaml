@@ -28,7 +28,7 @@ spec:
     spec:
       containers:
         - name: kulturtanken-beta
-          image: fintlabs.azurecr.io/kulturtanken:build.13
+          image: fintlabs.azurecr.io/kulturtanken:build.14
           resources:
             limits:
               cpu: '500m'
