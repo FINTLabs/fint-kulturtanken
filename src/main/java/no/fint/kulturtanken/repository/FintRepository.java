@@ -2,6 +2,7 @@ package no.fint.kulturtanken.repository;
 
 import lombok.extern.slf4j.Slf4j;
 import no.fint.kulturtanken.configuration.KulturtankenProperties;
+import no.fint.model.resource.AbstractCollectionResources;
 import no.fint.model.resource.FintLinks;
 import no.fint.model.resource.Link;
 import no.fint.model.resource.utdanning.elev.BasisgruppeResource;
@@ -22,8 +23,12 @@ import org.springframework.security.oauth2.client.web.reactive.function.client.S
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
+import java.util.AbstractMap;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -42,91 +47,45 @@ public class FintRepository {
     }
 
     public Map<Link, SkoleResource> getSchools(String orgId) {
-        KulturtankenProperties.Organisation organisation = kulturtankenProperties.getOrganisations().get(orgId);
-
-        String uri = organisation.getEnvironment().concat("/utdanning/utdanningsprogram/skole");
-
-        OAuth2AuthorizedClient authorizedClient = getAuthorizedClient(organisation);
-
-        return webClient.get()
-                .uri(uri)
-                .attributes(ServerOAuth2AuthorizedClientExchangeFilterFunction.oauth2AuthorizedClient(authorizedClient))
-                .retrieve()
-                .bodyToMono(SkoleResources.class)
+        return getResources(orgId, SkoleResources.class)
                 .flatMapIterable(SkoleResources::getContent)
                 .collectMap(this::getSelfLink)
                 .block();
     }
 
     public Map<Link, BasisgruppeResource> getBasisGroups(String orgId) {
-        KulturtankenProperties.Organisation organisation = kulturtankenProperties.getOrganisations().get(orgId);
-
-        String uri = organisation.getEnvironment().concat("/utdanning/elev/basisgruppe");
-
-        OAuth2AuthorizedClient authorizedClient = getAuthorizedClient(organisation);
-
-        return webClient.get()
-                .uri(uri)
-                .attributes(ServerOAuth2AuthorizedClientExchangeFilterFunction.oauth2AuthorizedClient(authorizedClient))
-                .retrieve()
-                .bodyToMono(BasisgruppeResources.class)
+        return getResources(orgId, BasisgruppeResources.class)
                 .flatMapIterable(BasisgruppeResources::getContent)
                 .collectMap(this::getSelfLink)
                 .block();
     }
 
     public Map<Link, ArstrinnResource> getLevels(String orgId) {
-        KulturtankenProperties.Organisation organisation = kulturtankenProperties.getOrganisations().get(orgId);
-
-        String uri = organisation.getEnvironment().concat("/utdanning/utdanningsprogram/arstrinn");
-
-        OAuth2AuthorizedClient authorizedClient = getAuthorizedClient(organisation);
-
-        return webClient.get()
-                .uri(uri)
-                .attributes(ServerOAuth2AuthorizedClientExchangeFilterFunction.oauth2AuthorizedClient(authorizedClient))
-                .retrieve()
-                .bodyToMono(ArstrinnResources.class)
+        return getResources(orgId, ArstrinnResources.class)
                 .flatMapIterable(ArstrinnResources::getContent)
                 .collectMap(this::getSelfLink)
                 .block();
     }
 
     public Map<Link, UndervisningsgruppeResource> getTeachingGroups(String orgId) {
-        KulturtankenProperties.Organisation organisation = kulturtankenProperties.getOrganisations().get(orgId);
-
-        String uri = organisation.getEnvironment().concat("/utdanning/timeplan/undervisningsgruppe");
-
-        OAuth2AuthorizedClient authorizedClient = getAuthorizedClient(organisation);
-
-        return webClient.get()
-                .uri(uri)
-                .attributes(ServerOAuth2AuthorizedClientExchangeFilterFunction.oauth2AuthorizedClient(authorizedClient))
-                .retrieve()
-                .bodyToMono(UndervisningsgruppeResources.class)
+        return getResources(orgId, UndervisningsgruppeResources.class)
                 .flatMapIterable(UndervisningsgruppeResources::getContent)
                 .collectMap(this::getSelfLink)
                 .block();
     }
 
     public Map<Link, FagResource> getSubjects(String orgId) {
-        KulturtankenProperties.Organisation organisation = kulturtankenProperties.getOrganisations().get(orgId);
-
-        String uri = organisation.getEnvironment().concat("/utdanning/timeplan/fag");
-
-        OAuth2AuthorizedClient authorizedClient = getAuthorizedClient(organisation);
-
-        return webClient.get()
-                .uri(uri)
-                .attributes(ServerOAuth2AuthorizedClientExchangeFilterFunction.oauth2AuthorizedClient(authorizedClient))
-                .retrieve()
-                .bodyToMono(FagResources.class)
+        return getResources(orgId, FagResources.class)
                 .flatMapIterable(FagResources::getContent)
                 .collectMap(this::getSelfLink)
                 .block();
     }
 
-    private OAuth2AuthorizedClient getAuthorizedClient(KulturtankenProperties.Organisation organisation) {
+    public<T extends AbstractCollectionResources<?>> Mono<T> getResources(String orgId, Class<T> clazz) {
+        KulturtankenProperties.Organisation organisation = kulturtankenProperties.getOrganisations().get(orgId);
+
+        String uri = organisation.getEnvironment().concat(paths.get(clazz));
+
         OAuth2AuthorizeRequest authorizeRequest = OAuth2AuthorizeRequest.withClientRegistrationId(organisation.getOrganisationNumber())
                 .principal(principal)
                 .attributes(attrs -> {
@@ -134,10 +93,24 @@ public class FintRepository {
                     attrs.put(OAuth2ParameterNames.PASSWORD, organisation.getPassword());
                 }).build();
 
-        return authorizedClientManager.authorize(authorizeRequest);
+        OAuth2AuthorizedClient authorizedClient = authorizedClientManager.authorize(authorizeRequest);
+
+        return webClient.get()
+                .uri(uri)
+                .attributes(ServerOAuth2AuthorizedClientExchangeFilterFunction.oauth2AuthorizedClient(authorizedClient))
+                .retrieve()
+                .bodyToMono(clazz);
     }
 
     private <T extends FintLinks> Link getSelfLink(T resource) {
         return resource.getSelfLinks().stream().findFirst().orElseGet(Link::new);
     }
+
+    private static final Map<Class<?>, String> paths = Stream.of(
+            new AbstractMap.SimpleImmutableEntry<>(SkoleResources.class, "/utdanning/utdanningsprogram/skole"),
+            new AbstractMap.SimpleImmutableEntry<>(BasisgruppeResources.class, "/utdanning/elev/basisgruppe"),
+            new AbstractMap.SimpleImmutableEntry<>(ArstrinnResources.class, "/utdanning/utdanningsprogram/arstrinn"),
+            new AbstractMap.SimpleImmutableEntry<>(UndervisningsgruppeResources.class, "/utdanning/timeplan/undervisningsgruppe"),
+            new AbstractMap.SimpleImmutableEntry<>(FagResources.class, "/utdanning/timeplan/fag"))
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 }
