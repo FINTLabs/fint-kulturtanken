@@ -15,6 +15,7 @@ import no.fint.model.resource.utdanning.utdanningsprogram.ArstrinnResource;
 import no.fint.model.resource.utdanning.utdanningsprogram.ArstrinnResources;
 import no.fint.model.resource.utdanning.utdanningsprogram.SkoleResource;
 import no.fint.model.resource.utdanning.utdanningsprogram.SkoleResources;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.OAuth2AuthorizeRequest;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
@@ -26,6 +27,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.util.AbstractMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -81,7 +83,23 @@ public class FintRepository {
                 .block();
     }
 
-    public<T extends AbstractCollectionResources<?>> Mono<T> getResources(String orgId, Class<T> clazz) {
+    public <T extends AbstractCollectionResources> Mono<T> getResources(String orgId, Class<T> clazz) {
+        KulturtankenProperties.Organisation organisation = kulturtankenProperties.getOrganisations().get(orgId);
+
+        if (organisation.getMerger().isEmpty()) {
+            return get(orgId, clazz);
+        } else {
+            return Mono.zip(
+                    get(organisation.getMerger().get(0), clazz),
+                    get(organisation.getMerger().get(1), clazz),
+                    (org1, org2) -> {
+                        org1.getContent().stream().forEach(org2::addResource);
+                        return org2;
+                    });
+        }
+    }
+
+    public <T> Mono<T> get(String orgId, Class<T> clazz) {
         KulturtankenProperties.Organisation organisation = kulturtankenProperties.getOrganisations().get(orgId);
 
         String uri = organisation.getEnvironment().concat(paths.get(clazz));

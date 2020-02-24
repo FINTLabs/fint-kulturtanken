@@ -6,7 +6,9 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Data
@@ -26,6 +28,12 @@ public class KulturtankenProperties {
 
         @JsonIgnore
         private String source, username, password, environment;
+
+        @JsonIgnore
+        private boolean active;
+
+        @JsonIgnore
+        private List<String> merger = new ArrayList<>();
 
         @JsonProperty("grupper")
         private Boolean groups;

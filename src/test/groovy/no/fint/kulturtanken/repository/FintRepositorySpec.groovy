@@ -26,7 +26,7 @@ class FintRepositorySpec extends Specification {
     }
 
     KulturtankenProperties kulturtankenProperties = Mock {
-        1 * getOrganisations() >> [(_ as String): new KulturtankenProperties.Organisation(organisationNumber: _ as String, environment: _ as String, username: _ as String, password: _ as String)]
+        2 * getOrganisations() >> [(_ as String): new KulturtankenProperties.Organisation(organisationNumber: _ as String, environment: _ as String, username: _ as String, password: _ as String)]
     }
 
     FintRepository fintRepository

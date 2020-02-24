@@ -7,6 +7,7 @@ kulturtanken:
     921707134:
       name: Agder
       organisationnumber: 921707134
+      active: true
       source: nsr
       groups: false
       username:
@@ -15,6 +16,7 @@ kulturtanken:
     920717152:
       name: Innlandet
       organisationnumber: 920717152
+      active: true
       source: nsr
       groups: false
       username:
@@ -23,6 +25,7 @@ kulturtanken:
     944183779:
       name: Møre og Romsdal
       organisationnumber: 944183779
+      active: true
       source: nsr
       groups: false
       username:
@@ -31,6 +34,7 @@ kulturtanken:
     964982953:
       name: Nordland
       organisationnumber: 964982953
+      active: true
       source: nsr
       groups: false
       username:
@@ -39,6 +43,7 @@ kulturtanken:
     958935420:
       name: Oslo
       organisationnumber: 958935420
+      active: true
       source: nsr
       groups: false
       username:
@@ -47,6 +52,7 @@ kulturtanken:
     971045698:
       name: Rogaland
       organisationnumber: 971045698
+      active: true
       source: fint
       groups: true
       username:
@@ -55,6 +61,7 @@ kulturtanken:
     922420866:
       name: Troms og Finnmark
       organisationnumber: 922420866
+      active: true
       source: nsr
       groups: false
       username:
@@ -63,6 +70,7 @@ kulturtanken:
     817920632:
       name: Trøndelag
       organisationnumber: 817920632
+      active: true
       source: nsr
       groups: false
       username:
@@ -71,14 +79,19 @@ kulturtanken:
     821227062:
       name: Vestfold og Telemark
       organisationnumber: 821227062
-      source: nsr
-      groups: false
+      active: true
+      source: fint
+      groups: true
       username:
       password:
       environment:
+      merger:
+        - 944025391
+        - 940192226
     821311632:
       name: Vestland
       organisationnumber: 821311632
+      active: true
       source: nsr
       groups: false
       username:
@@ -87,15 +100,37 @@ kulturtanken:
     921693230:
       name: Viken
       organisationnumber: 921693230
+      active: true
       source: fint
       groups: true
       username:
       password:
       environment: https://api.felleskomponent.no
 
+    #Old/merged counties
+    944025391:
+      name: Vestfold
+      organisationnumber: 944025391
+      active: false
+      source: fint
+      groups: true
+      username:
+      password:
+      environment: https://beta.felleskomponent.no
+    940192226:
+      name: Telemark
+      organisationnumber: 940192226
+      active: false
+      source: fint
+      groups: true
+      username:
+      password:
+      environment: https://beta.felleskomponent.no
+
 server:
   servlet:
     context-path: /tjenester/kulturtanken
+  port: 8081
 
 spring:
   security:
@@ -109,6 +144,18 @@ spring:
             scope: fint-client
             provider: fint
           971045698:
+            client-id:
+            client-secret:
+            authorization-grant-type: password
+            scope: fint-client
+            provider: fint
+          944025391:
+            client-id:
+            client-secret:
+            authorization-grant-type: password
+            scope: fint-client
+            provider: fint
+          940192226:
             client-id:
             client-secret:
             authorization-grant-type: password
