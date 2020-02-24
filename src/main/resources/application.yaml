@@ -130,7 +130,7 @@ kulturtanken:
 server:
   servlet:
     context-path: /tjenester/kulturtanken
-  port: 8081
+  port: 8080
 
 spring:
   security:
