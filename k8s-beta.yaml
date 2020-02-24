@@ -89,3 +89,43 @@ spec:
                 secretKeyRef:
                   name: kulturtanken-viken
                   key: password
+            - name: spring.security.oauth2.client.registration.944025391.client-id
+              valueFrom:
+                secretKeyRef:
+                  key: client-id
+                  name: kulturtanken-vestfold
+            - name: spring.security.oauth2.client.registration.944025391.client-secret
+              valueFrom:
+                secretKeyRef:
+                  key: client-secret
+                  name: kulturtanken-vestfold
+            - name: kulturtanken.organisations.944025391.username
+              valueFrom:
+                secretKeyRef:
+                  name: kulturtanken-vestfold
+                  key: username
+            - name: kulturtanken.organisations.944025391.password
+              valueFrom:
+                secretKeyRef:
+                  name: kulturtanken-vestfold
+                  key: password
+            - name: spring.security.oauth2.client.registration.940192226.client-id
+              valueFrom:
+                secretKeyRef:
+                  key: client-id
+                  name: kulturtanken-telemark
+            - name: spring.security.oauth2.client.registration.940192226.client-secret
+              valueFrom:
+                secretKeyRef:
+                  key: client-secret
+                  name: kulturtanken-telemark
+            - name: kulturtanken.organisations.940192226.username
+              valueFrom:
+                secretKeyRef:
+                  name: kulturtanken-telemark
+                  key: username
+            - name: kulturtanken.organisations.940192226.password
+              valueFrom:
+                secretKeyRef:
+                  name: kulturtanken-telemark
+                  key: password
