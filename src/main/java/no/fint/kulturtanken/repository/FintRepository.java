@@ -83,7 +83,7 @@ public class FintRepository {
                 .block();
     }
 
-    public <T extends AbstractCollectionResources> Mono<T> getResources(String orgId, Class<T> clazz) {
+    public <S, T extends AbstractCollectionResources<S>> Mono<T> getResources(String orgId, Class<T> clazz) {
         KulturtankenProperties.Organisation organisation = kulturtankenProperties.getOrganisations().get(orgId);
 
         if (organisation.getMerger().isEmpty()) {
@@ -93,7 +93,7 @@ public class FintRepository {
                     get(organisation.getMerger().get(0), clazz),
                     get(organisation.getMerger().get(1), clazz),
                     (org1, org2) -> {
-                        org1.getContent().stream().forEach(org2::addResource);
+                        org1.getContent().forEach(org2::addResource);
                         return org2;
                     });
         }
