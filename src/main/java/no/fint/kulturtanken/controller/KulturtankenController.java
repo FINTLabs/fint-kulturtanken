@@ -45,6 +45,7 @@ public class KulturtankenController {
                             .pathSegment("skoleeier", organisation.getKey()).build().toUri());
                     return organisation.getValue();
                 })
+                .filter(KulturtankenProperties.Organisation::isActive)
                 .sorted(Comparator.comparing(KulturtankenProperties.Organisation::getName));
     }
 
