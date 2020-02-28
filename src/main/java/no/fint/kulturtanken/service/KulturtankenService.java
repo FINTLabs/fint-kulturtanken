@@ -81,6 +81,7 @@ public class KulturtankenService {
                                             level.setNiva(code);
                                             level.setBasisgrupper(value.stream()
                                                     .map(Basisgruppe::fromFint)
+                                                    .filter(basisGroup -> basisGroup.getAntall() > 0)
                                                     .collect(Collectors.toList()));
                                             levels.add(level);
                                         }));
@@ -98,6 +99,7 @@ public class KulturtankenService {
                                             subject.setFagkode(code);
                                             subject.setUndervisningsgrupper(value.stream()
                                                     .map(Undervisningsgruppe::fromFint)
+                                                    .filter(teachingGroup -> teachingGroup.getAntall() > 0)
                                                     .collect(Collectors.toList()));
                                             subjects.add(subject);
                                         }));
