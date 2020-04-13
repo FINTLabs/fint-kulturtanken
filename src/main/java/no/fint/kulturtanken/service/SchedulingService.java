@@ -22,9 +22,9 @@ public class SchedulingService {
     @CacheEvict(value = "schoolOwner", allEntries = true, beforeInvocation = true)
     public void updateCache() {
         log.info("Updating cache...");
-        kulturtankenProperties.getOrganisations().entrySet().parallelStream().forEach(organisation -> {
-            kulturtankenService.getSchoolOwner(organisation.getKey());
-            log.info("({}) {}", organisation.getValue().getSource(), organisation.getValue().getName());
+        kulturtankenProperties.getOrganisations().forEach((key, value) -> {
+            kulturtankenService.getSchoolOwner(key);
+            log.info("({}) {}", value.getSource(), value.getName());
         });
         log.info("Finished updating cache...");
     }
