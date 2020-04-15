@@ -41,7 +41,7 @@ class KulturtankenServiceSpec extends Specification {
         1 * nsrRepository.getUnit(_ as String) >> nsrSchoolOwner
         1 * kulturtankenProperties.getOrganisations() >> [(_ as String) : new KulturtankenProperties.Organisation(source: 'fint')]
         1 * nsrRepository.getUnit(_ as String) >> nsrSchool
-        1 * fintRepository.getSchools(_ as String) >> [(Link.with('link.To.School')): school]
+        1 * fintRepository.getSchools(_ as String) >> [school]
         1 * fintRepository.getBasisGroups(_ as String) >> [(Link.with('link.To.BasisGroup')): basisGroup]
         1 * fintRepository.getLevels(_ as String) >> [(Link.with('link.To.Level')): level]
         1 * fintRepository.getTeachingGroups(_ as String) >> [(Link.with('link.To.TeachingGroup')): teachingGroup]

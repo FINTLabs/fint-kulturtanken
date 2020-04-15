@@ -23,9 +23,11 @@ import org.springframework.security.oauth2.client.web.reactive.function.client.S
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.AbstractMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -46,54 +48,46 @@ public class FintRepository {
         this.kulturtankenProperties = kulturtankenProperties;
     }
 
-    public Map<Link, SkoleResource> getSchools(String orgId) {
+    public List<SkoleResource> getSchools(String orgId) {
         return getResources(orgId, SkoleResources.class)
-                .flatMapIterable(SkoleResources::getContent)
-                .collectMap(this::getSelfLink)
+                .collectList()
                 .block();
     }
 
     public Map<Link, BasisgruppeResource> getBasisGroups(String orgId) {
         return getResources(orgId, BasisgruppeResources.class)
-                .flatMapIterable(BasisgruppeResources::getContent)
                 .collectMap(this::getSelfLink)
                 .block();
     }
 
     public Map<Link, ArstrinnResource> getLevels(String orgId) {
         return getResources(orgId, ArstrinnResources.class)
-                .flatMapIterable(ArstrinnResources::getContent)
                 .collectMap(this::getSelfLink)
                 .block();
     }
 
     public Map<Link, UndervisningsgruppeResource> getTeachingGroups(String orgId) {
         return getResources(orgId, UndervisningsgruppeResources.class)
-                .flatMapIterable(UndervisningsgruppeResources::getContent)
                 .collectMap(this::getSelfLink)
                 .block();
     }
 
     public Map<Link, FagResource> getSubjects(String orgId) {
         return getResources(orgId, FagResources.class)
-                .flatMapIterable(FagResources::getContent)
                 .collectMap(this::getSelfLink)
                 .block();
     }
 
-    public <S, T extends AbstractCollectionResources<S>> Mono<T> getResources(String orgId, Class<T> clazz) {
+    public <S, T extends AbstractCollectionResources<S>> Flux<S> getResources(String orgId, Class<T> clazz) {
         KulturtankenProperties.Organisation organisation = kulturtankenProperties.getOrganisations().get(orgId);
 
         if (organisation.getMerger().isEmpty()) {
-            return get(orgId, clazz);
+            return get(orgId, clazz).flatMapIterable(T::getContent);
         } else {
-            return Mono.zip(
-                    get(organisation.getMerger().get(0), clazz),
-                    get(organisation.getMerger().get(1), clazz),
-                    (org1, org2) -> {
-                        org1.getContent().forEach(org2::addResource);
-                        return org2;
-                    });
+            return Flux.merge(
+                    get(organisation.getMerger().get(0), clazz).flatMapIterable(T::getContent),
+                    get(organisation.getMerger().get(1), clazz).flatMapIterable(T::getContent)
+            );
         }
     }
 

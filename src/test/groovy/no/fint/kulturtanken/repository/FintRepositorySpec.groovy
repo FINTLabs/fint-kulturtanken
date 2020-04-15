@@ -51,7 +51,7 @@ class FintRepositorySpec extends Specification {
 
         then:
         resources.size() == 1
-        resources.get(Link.with('link.To.School')).navn == 'School'
+        resources.first().navn == 'School'
     }
 
     def "Get basis groups from Fint"() {

@@ -11,7 +11,6 @@ import no.fint.model.resource.utdanning.elev.BasisgruppeResource;
 import no.fint.model.resource.utdanning.timeplan.FagResource;
 import no.fint.model.resource.utdanning.timeplan.UndervisningsgruppeResource;
 import no.fint.model.resource.utdanning.utdanningsprogram.ArstrinnResource;
-import no.fint.model.resource.utdanning.utdanningsprogram.SkoleResource;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -52,13 +51,12 @@ public class KulturtankenService {
             schoolOwner.setSkoler(schools);
 
         } else {
-            Map<Link, SkoleResource> schoolMap = fintRepository.getSchools(orgId);
             Map<Link, BasisgruppeResource> basisGroupMap = fintRepository.getBasisGroups(orgId);
             Map<Link, ArstrinnResource> levelMap = fintRepository.getLevels(orgId);
             Map<Link, UndervisningsgruppeResource> teachingGroupMap = fintRepository.getTeachingGroups(orgId);
             Map<Link, FagResource> subjectMap = fintRepository.getSubjects(orgId);
 
-            List<Skole> schools = schoolMap.values().stream()
+            List<Skole> schools = fintRepository.getSchools(orgId).stream()
                     .map(schoolResource -> {
                         Skole school = Skole.fromFint(schoolResource);
 
