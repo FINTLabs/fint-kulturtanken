@@ -21,8 +21,7 @@ public class SchedulingService {
         this.nsrRepository = nsrRepository;
     }
 
-    //@Scheduled(cron = "0 0 6 * * MON-FRI")
-    @Scheduled(initialDelay = 3000, fixedDelay = 1000000)
+    @Scheduled(cron = "0 0 6 * * MON-FRI")
     @CacheEvict(value = {"schoolOwner"}, allEntries = true)
     public void updateCache() {
         kulturtankenProperties.getOrganisations().forEach((key, organisation) -> {

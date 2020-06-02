@@ -115,7 +115,9 @@ public class KulturtankenService {
     }
 
     private<T extends FintLinks> String getGrepCode(T resource) {
-        return resource.getLinks().getOrDefault("grepreferanse", Collections.emptyList()).stream()
+        return resource.getLinks()
+                .getOrDefault("grepreferanse", Collections.emptyList())
+                .stream()
                 .map(Link::getHref)
                 .map(href -> StringUtils.substringAfterLast(href,"/"))
                 .findAny()

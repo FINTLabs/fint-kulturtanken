@@ -23,15 +23,16 @@ public class KulturtankenProperties {
         @JsonProperty("organisasjonsnummer")
         private String organisationNumber;
 
-        @JsonIgnore
-        private String source, username, password;
-
         @JsonProperty("grupper")
         private Boolean groups;
 
         @JsonProperty("uri")
         private URI uri;
 
+        @JsonIgnore
+        private String source;
+
+        @JsonIgnore
         private Map<String, Registration> registration;
     }
 
