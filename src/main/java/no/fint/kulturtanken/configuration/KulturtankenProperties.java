@@ -6,15 +6,12 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Data
 @ConfigurationProperties("kulturtanken")
 public class KulturtankenProperties {
-
     private Map<String, Organisation> organisations = new HashMap<>();
 
     @Data
@@ -27,13 +24,7 @@ public class KulturtankenProperties {
         private String organisationNumber;
 
         @JsonIgnore
-        private String source, username, password, environment;
-
-        @JsonIgnore
-        private boolean active;
-
-        @JsonIgnore
-        private List<String> merger = new ArrayList<>();
+        private String source, username, password;
 
         @JsonProperty("grupper")
         private Boolean groups;
@@ -41,6 +32,14 @@ public class KulturtankenProperties {
         @JsonProperty("uri")
         private URI uri;
 
+        private Map<String, Registration> registration;
+    }
 
+    @Data
+    public static class Registration {
+        private String id;
+        private String username;
+        private String password;
+        private String environment;
     }
 }

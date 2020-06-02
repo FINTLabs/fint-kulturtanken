@@ -2,6 +2,8 @@ package no.fint.kulturtanken.service
 
 import no.fint.kulturtanken.configuration.KulturtankenProperties
 import no.fint.kulturtanken.model.Enhet
+import no.fint.kulturtanken.model.Skole
+import no.fint.kulturtanken.model.Skoleeier
 import no.fint.kulturtanken.repository.FintRepository
 import no.fint.kulturtanken.repository.NsrRepository
 import no.fint.kulturtanken.util.FintObjectFactory
@@ -10,7 +12,6 @@ import no.fint.model.resource.utdanning.utdanningsprogram.SkoleResources
 import spock.lang.Specification
 
 class KulturtankenServiceSpec extends Specification {
-
     private KulturtankenService kulturtankenService
     private NsrRepository nsrRepository
     private FintRepository fintRepository
@@ -25,9 +26,12 @@ class KulturtankenServiceSpec extends Specification {
 
     def "Given valid orgId and source equal fint get school owner, schools and groups"() {
         given:
-        def nsrSchoolOwner = new Enhet(navn: 'School owner', orgNr: '876543210')
         def nsrSchool = new Enhet(navn: 'School', orgNr: '012345678',
-                besoksadresse: new Enhet.Adresse(adress: 'Address', postnr: '0123', poststed: 'City' ))
+                besoksadresse: new Enhet.Adresse(adress: 'Address', postnr: '0123', poststed: 'City'),
+                epost: 'school@schools.no', telefon: '00 11 22 33', erAktiv: true,
+                erVideregaaendeSkole: true, erOffentligSkole: true)
+        def nsrSchoolOwner = new Enhet(navn: 'School owner', orgNr: '876543210',
+                childRelasjoner: [new Enhet.ChildRelasjon(enhet: nsrSchool)])
         def school = FintObjectFactory.newSchool()
         def basisGroup = FintObjectFactory.newBasisGroup()
         def level = FintObjectFactory.newLevel()
@@ -38,14 +42,14 @@ class KulturtankenServiceSpec extends Specification {
         def schoolOwner = kulturtankenService.getSchoolOwner(_ as String)
 
         then:
-        1 * nsrRepository.getUnit(_ as String) >> nsrSchoolOwner
-        1 * kulturtankenProperties.getOrganisations() >> [(_ as String) : new KulturtankenProperties.Organisation(source: 'fint')]
-        1 * nsrRepository.getUnit(_ as String) >> nsrSchool
-        1 * fintRepository.getSchools(_ as String) >> [school]
-        1 * fintRepository.getBasisGroups(_ as String) >> [(Link.with('link.To.BasisGroup')): basisGroup]
-        1 * fintRepository.getLevels(_ as String) >> [(Link.with('link.To.Level')): level]
-        1 * fintRepository.getTeachingGroups(_ as String) >> [(Link.with('link.To.TeachingGroup')): teachingGroup]
-        1 * fintRepository.getSubjects(_ as String) >> [(Link.with('link.To.Subject')): subject]
+        1 * nsrRepository.getSchoolOwner(_ as String) >> Skoleeier.fromNsr(nsrSchoolOwner)
+        1 * kulturtankenProperties.getOrganisations() >> [(_ as String): new KulturtankenProperties.Organisation(source: 'fint')]
+        1 * nsrRepository.getSchools(_ as String) >> [Skole.fromNsr(nsrSchool)]
+        1 * fintRepository.getSchools(_ as String) >> [('012345678'): school]
+        1 * fintRepository.getBasisGroups(_ as String) >> [('link.to.basisgroup'): basisGroup]
+        1 * fintRepository.getLevels(_ as String) >> [('link.to.level'): level]
+        1 * fintRepository.getTeachingGroups(_ as String) >> [('link.to.teachinggroup'): teachingGroup]
+        1 * fintRepository.getSubjects(_ as String) >> [('link.to.subject'): subject]
 
         schoolOwner.navn == 'School owner'
         schoolOwner.organisasjonsnummer == '876543210'
@@ -75,7 +79,7 @@ class KulturtankenServiceSpec extends Specification {
     def "Given valid orgId and source equal nsr get school owner and schools"() {
         given:
         def nsrSchool = new Enhet(navn: 'School', orgNr: '012345678',
-                besoksadresse: new Enhet.Adresse(adress: 'Address', postnr: '0123', poststed: 'City' ),
+                besoksadresse: new Enhet.Adresse(adress: 'Address', postnr: '0123', poststed: 'City'),
                 epost: 'school@schools.no', telefon: '00 11 22 33', erAktiv: true,
                 erVideregaaendeSkole: true, erOffentligSkole: true)
         def nsrSchoolOwner = new Enhet(navn: 'School owner', orgNr: '876543210',
@@ -85,9 +89,9 @@ class KulturtankenServiceSpec extends Specification {
         def schoolOwner = kulturtankenService.getSchoolOwner(_ as String)
 
         then:
-        1 * nsrRepository.getUnit(_ as String) >> nsrSchoolOwner
-        1 * kulturtankenProperties.getOrganisations() >> [(_ as String) : new KulturtankenProperties.Organisation(source: 'nsr')]
-        1 * nsrRepository.getUnit(_ as String) >> nsrSchool
+        1 * nsrRepository.getSchoolOwner(_ as String) >> Skoleeier.fromNsr(nsrSchoolOwner)
+        1 * kulturtankenProperties.getOrganisations() >> [(_ as String): new KulturtankenProperties.Organisation(source: 'nsr')]
+        1 * nsrRepository.getSchools(_ as String) >> [Skole.fromNsr(nsrSchool)]
 
         schoolOwner.navn == 'School owner'
         schoolOwner.organisasjonsnummer == '876543210'

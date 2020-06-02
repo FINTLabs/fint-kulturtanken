@@ -26,7 +26,9 @@ class FintRepositorySpec extends Specification {
     }
 
     KulturtankenProperties kulturtankenProperties = Mock {
-        2 * getOrganisations() >> [(_ as String): new KulturtankenProperties.Organisation(organisationNumber: _ as String, environment: _ as String, username: _ as String, password: _ as String)]
+        1 * getOrganisations() >> [(_ as String): new KulturtankenProperties.Organisation(organisationNumber: _ as String,
+                registration: [(_ as String): new KulturtankenProperties.Registration(id: _ as String, environment: _ as String,
+                        username: _ as String, password: _ as String)])]
     }
 
     FintRepository fintRepository
@@ -51,7 +53,7 @@ class FintRepositorySpec extends Specification {
 
         then:
         resources.size() == 1
-        resources.first().navn == 'School'
+        resources.get('012345678').navn == 'School'
     }
 
     def "Get basis groups from Fint"() {
@@ -69,7 +71,7 @@ class FintRepositorySpec extends Specification {
 
         then:
         resources.size() == 1
-        resources.get(Link.with('link.To.BasisGroup')).navn == 'Basis group'
+        resources.get('link.to.basisgroup').navn == 'Basis group'
     }
 
     def "Get levels from Fint"() {
@@ -87,7 +89,7 @@ class FintRepositorySpec extends Specification {
 
         then:
         resources.size() == 1
-        resources.get(Link.with('link.To.Level')).navn == 'Level'
+        resources.get('link.to.level').navn == 'Level'
     }
 
     def "Get teaching groups from Fint"() {
@@ -105,7 +107,7 @@ class FintRepositorySpec extends Specification {
 
         then:
         resources.size() == 1
-        resources.get(Link.with('link.To.TeachingGroup')).navn == 'Teaching group'
+        resources.get('link.to.teachinggroup').navn == 'Teaching group'
     }
 
     def "Get subjects from Fint"() {
@@ -123,6 +125,6 @@ class FintRepositorySpec extends Specification {
 
         then:
         resources.size() == 1
-        resources.get(Link.with('link.To.Subject')).navn == 'Subject'
+        resources.get('link.to.subject').navn == 'Subject'
     }
 }

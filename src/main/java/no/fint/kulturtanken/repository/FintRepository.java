@@ -2,6 +2,7 @@ package no.fint.kulturtanken.repository;
 
 import lombok.extern.slf4j.Slf4j;
 import no.fint.kulturtanken.configuration.KulturtankenProperties;
+import no.fint.model.felles.kompleksedatatyper.Identifikator;
 import no.fint.model.resource.AbstractCollectionResources;
 import no.fint.model.resource.FintLinks;
 import no.fint.model.resource.Link;
@@ -19,27 +20,30 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.OAuth2AuthorizeRequest;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
-import org.springframework.security.oauth2.client.web.reactive.function.client.ServerOAuth2AuthorizedClientExchangeFilterFunction;
+import org.springframework.security.oauth2.client.web.reactive.function.client.ServletOAuth2AuthorizedClientExchangeFilterFunction;
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.AbstractMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Slf4j
 @Service
 public class FintRepository {
-
     private final WebClient webClient;
     private final Authentication principal;
     private final OAuth2AuthorizedClientManager authorizedClientManager;
     private final KulturtankenProperties kulturtankenProperties;
+
+    private final Map<String, Map<String, SkoleResource>> schools = new HashMap<>();
+    private final Map<String, Map<String, BasisgruppeResource>> basisGroups = new HashMap<>();
+    private final Map<String, Map<String, ArstrinnResource>> levels = new HashMap<>();
+    private final Map<String, Map<String, UndervisningsgruppeResource>> teachingGroups = new HashMap<>();
+    private final Map<String, Map<String, FagResource>> subjects = new HashMap<>();
 
     public FintRepository(WebClient webClient, Authentication principal, OAuth2AuthorizedClientManager authorizedClientManager, KulturtankenProperties kulturtankenProperties) {
         this.webClient = webClient;
@@ -48,72 +52,136 @@ public class FintRepository {
         this.kulturtankenProperties = kulturtankenProperties;
     }
 
-    public List<SkoleResource> getSchools(String orgId) {
-        return getResources(orgId, SkoleResources.class)
-                .collectList()
-                .block();
+    public Map<String, SkoleResource> getSchools(String orgId) {
+        Map<String, SkoleResource> resources = schools.get(orgId);
+
+        if (resources == null || resources.size() == 0) {
+            updateSchools(orgId);
+        }
+
+        return schools.get(orgId);
     }
 
-    public Map<Link, BasisgruppeResource> getBasisGroups(String orgId) {
-        return getResources(orgId, BasisgruppeResources.class)
-                .collectMap(this::getSelfLink)
+    public void updateSchools(String orgId) {
+        Map<String, SkoleResource> resources = getResources(orgId, SkoleResources.class)
+                .filter(skoleResource -> Optional.ofNullable(skoleResource.getOrganisasjonsnummer())
+                        .map(Identifikator::getIdentifikatorverdi)
+                        .isPresent())
+                .collectMap(skoleResource -> skoleResource.getOrganisasjonsnummer().getIdentifikatorverdi())
                 .block();
+
+        schools.put(orgId, resources);
     }
 
-    public Map<Link, ArstrinnResource> getLevels(String orgId) {
-        return getResources(orgId, ArstrinnResources.class)
-                .collectMap(this::getSelfLink)
-                .block();
+    public Map<String, BasisgruppeResource> getBasisGroups(String orgId) {
+        Map<String, BasisgruppeResource> resources = basisGroups.get(orgId);
+
+        if (resources == null || resources.size() == 0) {
+            updateBasisGroups(orgId);
+        }
+
+        return basisGroups.get(orgId);
     }
 
-    public Map<Link, UndervisningsgruppeResource> getTeachingGroups(String orgId) {
-        return getResources(orgId, UndervisningsgruppeResources.class)
+    public void updateBasisGroups(String orgId) {
+        Map<String, BasisgruppeResource> resources = getResources(orgId, BasisgruppeResources.class)
                 .collectMap(this::getSelfLink)
                 .block();
+
+        basisGroups.put(orgId, resources);
     }
 
-    public Map<Link, FagResource> getSubjects(String orgId) {
-        return getResources(orgId, FagResources.class)
+
+    public Map<String, ArstrinnResource> getLevels(String orgId) {
+        Map<String, ArstrinnResource> resources = levels.get(orgId);
+
+        if (resources == null || resources.size() == 0) {
+            updateLevels(orgId);
+        }
+
+        return levels.get(orgId);
+    }
+
+    public void updateLevels(String orgId) {
+        Map<String, ArstrinnResource> resources = getResources(orgId, ArstrinnResources.class)
                 .collectMap(this::getSelfLink)
                 .block();
+
+        levels.put(orgId, resources);
+    }
+
+    public Map<String, UndervisningsgruppeResource> getTeachingGroups(String orgId) {
+        Map<String, UndervisningsgruppeResource> resources = teachingGroups.get(orgId);
+
+        if (resources == null || resources.size() == 0) {
+            updateTeachingGroups(orgId);
+        }
+
+        return teachingGroups.get(orgId);
+    }
+
+    public void updateTeachingGroups(String orgId) {
+        Map<String, UndervisningsgruppeResource> resources = getResources(orgId, UndervisningsgruppeResources.class)
+                .collectMap(this::getSelfLink)
+                .block();
+
+        teachingGroups.put(orgId, resources);
+    }
+
+    public Map<String, FagResource> getSubjects(String orgId) {
+        Map<String, FagResource> resources = subjects.get(orgId);
+
+        if (resources == null || resources.size() == 0) {
+            updateSubjects(orgId);
+        }
+
+        return subjects.get(orgId);
+    }
+
+    public void updateSubjects(String orgId) {
+        Map<String, FagResource> resources = getResources(orgId, FagResources.class)
+                .collectMap(this::getSelfLink)
+                .block();
+
+        subjects.put(orgId, resources);
     }
 
     public <S, T extends AbstractCollectionResources<S>> Flux<S> getResources(String orgId, Class<T> clazz) {
         KulturtankenProperties.Organisation organisation = kulturtankenProperties.getOrganisations().get(orgId);
 
-        if (organisation.getMerger().isEmpty()) {
-            return get(orgId, clazz).flatMapIterable(T::getContent);
-        } else {
-            return Flux.merge(
-                    get(organisation.getMerger().get(0), clazz).flatMapIterable(T::getContent),
-                    get(organisation.getMerger().get(1), clazz).flatMapIterable(T::getContent)
-            );
-        }
+        return Flux.merge(organisation.getRegistration().values()
+                .stream()
+                .map(registration -> get(registration, clazz)
+                        .flatMapIterable(T::getContent))
+                .collect(Collectors.toList()));
     }
 
-    public <T> Mono<T> get(String orgId, Class<T> clazz) {
-        KulturtankenProperties.Organisation organisation = kulturtankenProperties.getOrganisations().get(orgId);
-
-        String uri = organisation.getEnvironment().concat(paths.get(clazz));
-
-        OAuth2AuthorizeRequest authorizeRequest = OAuth2AuthorizeRequest.withClientRegistrationId(organisation.getOrganisationNumber())
+    public <T> Mono<T> get(KulturtankenProperties.Registration registration, Class<T> clazz) {
+        OAuth2AuthorizeRequest authorizeRequest = OAuth2AuthorizeRequest.withClientRegistrationId(registration.getId())
                 .principal(principal)
                 .attributes(attrs -> {
-                    attrs.put(OAuth2ParameterNames.USERNAME, organisation.getUsername());
-                    attrs.put(OAuth2ParameterNames.PASSWORD, organisation.getPassword());
+                    attrs.put(OAuth2ParameterNames.USERNAME, registration.getUsername());
+                    attrs.put(OAuth2ParameterNames.PASSWORD, registration.getPassword());
                 }).build();
 
         OAuth2AuthorizedClient authorizedClient = authorizedClientManager.authorize(authorizeRequest);
 
+        String uri = registration.getEnvironment().concat(paths.get(clazz));
+
         return webClient.get()
                 .uri(uri)
-                .attributes(ServerOAuth2AuthorizedClientExchangeFilterFunction.oauth2AuthorizedClient(authorizedClient))
+                .attributes(ServletOAuth2AuthorizedClientExchangeFilterFunction.oauth2AuthorizedClient(authorizedClient))
                 .retrieve()
                 .bodyToMono(clazz);
     }
 
-    private <T extends FintLinks> Link getSelfLink(T resource) {
-        return resource.getSelfLinks().stream().findFirst().orElseGet(Link::new);
+    private <T extends FintLinks> String getSelfLink(T resource) {
+        return resource.getSelfLinks()
+                .stream()
+                .map(Link::getHref)
+                .map(String::toLowerCase)
+                .findFirst()
+                .orElse(null);
     }
 
     private static final Map<Class<?>, String> paths = Stream.of(
