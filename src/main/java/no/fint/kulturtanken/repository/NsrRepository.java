@@ -5,8 +5,6 @@ import no.fint.kulturtanken.model.Enhet;
 import no.fint.kulturtanken.model.Skole;
 import no.fint.kulturtanken.model.Skoleeier;
 import org.springframework.stereotype.Repository;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
@@ -20,7 +18,7 @@ import java.util.function.Predicate;
 public class NsrRepository {
     private final WebClient webClient;
 
-    private final MultiValueMap<String, Skole> schools = new LinkedMultiValueMap<>();
+    private final Map<String, List<Skole>> schools = new HashMap<>();
     private final Map<String, Skoleeier> schoolOwners = new HashMap<>();
 
     public NsrRepository(WebClient.Builder webClientBuilder) {
@@ -48,7 +46,7 @@ public class NsrRepository {
     }
 
     public void updateSchools(String orgId) {
-        getUnit(orgId)
+        List<Skole> resources = getUnit(orgId)
                 .flatMapIterable(Enhet::getChildRelasjoner)
                 .map(Enhet.ChildRelasjon::getEnhet)
                 .map(Enhet::getOrgNr)
@@ -56,8 +54,10 @@ public class NsrRepository {
                 .flatMap(this::getUnit)
                 .filter(isValidUnit())
                 .map(Skole::fromNsr)
-                .toStream()
-                .forEach(school -> schools.add(orgId, school));
+                .collectList()
+                .block();
+
+        schools.put(orgId, resources);
     }
 
     public Skoleeier getSchoolOwner(String orgId) {
