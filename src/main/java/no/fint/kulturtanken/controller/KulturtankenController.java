@@ -36,7 +36,7 @@ public class KulturtankenController {
         }
     }
 
-    @GetMapping("/")
+    @GetMapping
     public Stream<KulturtankenProperties.Organisation> getOrganisations() {
         return kulturtankenProperties.getOrganisations().entrySet()
                 .stream()
@@ -44,8 +44,7 @@ public class KulturtankenController {
                     organisation.getValue().setUri(ServletUriComponentsBuilder.fromCurrentContextPath()
                             .pathSegment("skoleeier", organisation.getKey()).build().toUri());
                     return organisation.getValue();
-                })
-                .sorted(Comparator.comparing(KulturtankenProperties.Organisation::getName));
+                }).sorted(Comparator.comparing(KulturtankenProperties.Organisation::getName));
     }
 
     @ExceptionHandler(RestClientResponseException.class)
