@@ -11,11 +11,6 @@ kulturtanken:
           username:
           password:
           environment:
-        2:
-          id:
-          username:
-          password:
-          environment:
     920717152:
       name: Innlandet
       organisationnumber:
@@ -100,11 +95,6 @@ kulturtanken:
       groups:
       registration:
         1:
-          id:
-          username:
-          password:
-          environment:
-        2:
           id:
           username:
           password:
