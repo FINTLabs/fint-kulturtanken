@@ -126,8 +126,3 @@ kulturtanken:
           username:
           password:
           environment:
-
-server:
-  servlet:
-    context-path: /tjenester/kulturtanken
-  port: 8080
