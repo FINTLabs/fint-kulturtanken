@@ -25,15 +25,15 @@ public class SchedulingService {
     @CacheEvict(value = {"schoolOwner"}, allEntries = true)
     public void updateCache() {
         kulturtankenProperties.getOrganisations().forEach((key, organisation) -> {
-            nsrRepository.getSchoolOwner(key);
-            nsrRepository.getSchools(key);
+            nsrRepository.updateSchoolOwner(key);
+            nsrRepository.updateSchools(key);
 
             if (organisation.getSource().equals("fint")) {
-                fintRepository.getSchools(key);
-                fintRepository.getBasisGroups(key);
-                fintRepository.getLevels(key);
-                fintRepository.getTeachingGroups(key);
-                fintRepository.getSubjects(key);
+                fintRepository.updateSchools(key);
+                fintRepository.updateBasisGroups(key);
+                fintRepository.updateLevels(key);
+                fintRepository.updateTeachingGroups(key);
+                fintRepository.updateSubjects(key);
             }
 
             log.info(organisation.getName());
