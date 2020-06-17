@@ -63,6 +63,8 @@ public class FintRepository {
     }
 
     public void updateSchools(String orgId) {
+        schools.clear();
+
         Map<String, SkoleResource> resources = getResources(orgId, SkoleResources.class)
                 .filter(skoleResource -> Optional.ofNullable(skoleResource.getOrganisasjonsnummer())
                         .map(Identifikator::getIdentifikatorverdi)
@@ -84,6 +86,8 @@ public class FintRepository {
     }
 
     public void updateBasisGroups(String orgId) {
+        basisGroups.clear();
+
         Map<String, BasisgruppeResource> resources = getResources(orgId, BasisgruppeResources.class)
                 .collectMap(this::getSelfLink)
                 .block();
@@ -103,6 +107,8 @@ public class FintRepository {
     }
 
     public void updateLevels(String orgId) {
+        levels.clear();
+
         Map<String, ArstrinnResource> resources = getResources(orgId, ArstrinnResources.class)
                 .collectMap(this::getSelfLink)
                 .block();
@@ -121,6 +127,8 @@ public class FintRepository {
     }
 
     public void updateTeachingGroups(String orgId) {
+        teachingGroups.clear();
+
         Map<String, UndervisningsgruppeResource> resources = getResources(orgId, UndervisningsgruppeResources.class)
                 .collectMap(this::getSelfLink)
                 .block();
@@ -139,6 +147,8 @@ public class FintRepository {
     }
 
     public void updateSubjects(String orgId) {
+        subjects.clear();
+
         Map<String, FagResource> resources = getResources(orgId, FagResources.class)
                 .collectMap(this::getSelfLink)
                 .block();

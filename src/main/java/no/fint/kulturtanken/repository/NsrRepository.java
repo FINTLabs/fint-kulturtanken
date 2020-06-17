@@ -46,6 +46,8 @@ public class NsrRepository {
     }
 
     public void updateSchools(String orgId) {
+        schools.clear();
+
         List<Skole> resources = getUnit(orgId)
                 .flatMapIterable(Enhet::getChildRelasjoner)
                 .map(Enhet.ChildRelasjon::getEnhet)
@@ -71,6 +73,8 @@ public class NsrRepository {
     }
 
     public void updateSchoolOwner(String orgId) {
+        schoolOwners.clear();
+
         Skoleeier resource = getUnit(orgId)
                 .map(Skoleeier::fromNsr)
                 .block();
