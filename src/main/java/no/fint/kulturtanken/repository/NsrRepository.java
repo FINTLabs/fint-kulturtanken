@@ -46,8 +46,6 @@ public class NsrRepository {
     }
 
     public void updateSchools(String orgId) {
-        schools.clear();
-
         List<Skole> resources = getUnit(orgId)
                 .flatMapIterable(Enhet::getChildRelasjoner)
                 .map(Enhet.ChildRelasjon::getEnhet)
@@ -59,7 +57,9 @@ public class NsrRepository {
                 .collectList()
                 .block();
 
-        schools.put(orgId, resources);
+        if (resources != null && resources.size() > 0) {
+            schools.put(orgId, resources);
+        }
     }
 
     public Skoleeier getSchoolOwner(String orgId) {
@@ -73,13 +73,13 @@ public class NsrRepository {
     }
 
     public void updateSchoolOwner(String orgId) {
-        schoolOwners.clear();
-
         Skoleeier resource = getUnit(orgId)
                 .map(Skoleeier::fromNsr)
                 .block();
 
-        schoolOwners.put(orgId, resource);
+        if (resource != null) {
+            schoolOwners.put(orgId, resource);
+        }
     }
 
     private Predicate<Enhet> isValidUnit() {

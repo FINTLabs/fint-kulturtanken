@@ -63,8 +63,6 @@ public class FintRepository {
     }
 
     public void updateSchools(String orgId) {
-        schools.clear();
-
         Map<String, SkoleResource> resources = getResources(orgId, SkoleResources.class)
                 .filter(skoleResource -> Optional.ofNullable(skoleResource.getOrganisasjonsnummer())
                         .map(Identifikator::getIdentifikatorverdi)
@@ -72,7 +70,9 @@ public class FintRepository {
                 .collectMap(skoleResource -> skoleResource.getOrganisasjonsnummer().getIdentifikatorverdi())
                 .block();
 
-        schools.put(orgId, resources);
+        if (resources != null && resources.size() > 0) {
+            schools.put(orgId, resources);
+        }
     }
 
     public Map<String, BasisgruppeResource> getBasisGroups(String orgId) {
@@ -86,13 +86,13 @@ public class FintRepository {
     }
 
     public void updateBasisGroups(String orgId) {
-        basisGroups.clear();
-
         Map<String, BasisgruppeResource> resources = getResources(orgId, BasisgruppeResources.class)
                 .collectMap(this::getSelfLink)
                 .block();
 
-        basisGroups.put(orgId, resources);
+        if (resources != null && resources.size() > 0) {
+            basisGroups.put(orgId, resources);
+        }
     }
 
 
@@ -107,13 +107,13 @@ public class FintRepository {
     }
 
     public void updateLevels(String orgId) {
-        levels.clear();
-
         Map<String, ArstrinnResource> resources = getResources(orgId, ArstrinnResources.class)
                 .collectMap(this::getSelfLink)
                 .block();
 
-        levels.put(orgId, resources);
+        if (resources != null && resources.size() > 0) {
+            levels.put(orgId, resources);
+        }
     }
 
     public Map<String, UndervisningsgruppeResource> getTeachingGroups(String orgId) {
@@ -127,13 +127,13 @@ public class FintRepository {
     }
 
     public void updateTeachingGroups(String orgId) {
-        teachingGroups.clear();
-
         Map<String, UndervisningsgruppeResource> resources = getResources(orgId, UndervisningsgruppeResources.class)
                 .collectMap(this::getSelfLink)
                 .block();
 
-        teachingGroups.put(orgId, resources);
+        if (resources != null && resources.size() > 0) {
+            teachingGroups.put(orgId, resources);
+        }
     }
 
     public Map<String, FagResource> getSubjects(String orgId) {
@@ -147,13 +147,13 @@ public class FintRepository {
     }
 
     public void updateSubjects(String orgId) {
-        subjects.clear();
-
         Map<String, FagResource> resources = getResources(orgId, FagResources.class)
                 .collectMap(this::getSelfLink)
                 .block();
 
-        subjects.put(orgId, resources);
+        if (resources != null && resources.size() > 0) {
+            subjects.put(orgId, resources);
+        }
     }
 
     public <S, T extends AbstractCollectionResources<S>> Flux<S> getResources(String orgId, Class<T> clazz) {
