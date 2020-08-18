@@ -7,8 +7,6 @@ import no.fint.kulturtanken.model.Skoleeier
 import no.fint.kulturtanken.repository.FintRepository
 import no.fint.kulturtanken.repository.NsrRepository
 import no.fint.kulturtanken.util.FintObjectFactory
-import no.fint.model.resource.Link
-import no.fint.model.resource.utdanning.utdanningsprogram.SkoleResources
 import spock.lang.Specification
 
 class KulturtankenServiceSpec extends Specification {
@@ -42,14 +40,14 @@ class KulturtankenServiceSpec extends Specification {
         def schoolOwner = kulturtankenService.getSchoolOwner(_ as String)
 
         then:
-        1 * nsrRepository.getSchoolOwner(_ as String) >> Skoleeier.fromNsr(nsrSchoolOwner)
+        1 * nsrRepository.getSchoolOwnerById(_ as String) >> Skoleeier.fromNsr(nsrSchoolOwner)
         1 * kulturtankenProperties.getOrganisations() >> [(_ as String): new KulturtankenProperties.Organisation(source: 'fint')]
         1 * nsrRepository.getSchools(_ as String) >> [Skole.fromNsr(nsrSchool)]
-        1 * fintRepository.getSchools(_ as String) >> [('012345678'): school]
-        1 * fintRepository.getBasisGroups(_ as String) >> [('link.to.basisgroup'): basisGroup]
-        1 * fintRepository.getLevels(_ as String) >> [('link.to.level'): level]
-        1 * fintRepository.getTeachingGroups(_ as String) >> [('link.to.teachinggroup'): teachingGroup]
-        1 * fintRepository.getSubjects(_ as String) >> [('link.to.subject'): subject]
+        1 * fintRepository.getSchools(_ as String) >> [school]
+        1 * fintRepository.getBasisGroupById(_ as String, _ as String) >> basisGroup
+        1 * fintRepository.getLevelById(_ as String, _ as String) >> level
+        1 * fintRepository.getTeachingGroupById(_ as String, _ as String) >> teachingGroup
+        1 * fintRepository.getSubjectById(_ as String, _ as String) >> subject
 
         schoolOwner.navn == 'School owner'
         schoolOwner.organisasjonsnummer == '876543210'
@@ -89,7 +87,7 @@ class KulturtankenServiceSpec extends Specification {
         def schoolOwner = kulturtankenService.getSchoolOwner(_ as String)
 
         then:
-        1 * nsrRepository.getSchoolOwner(_ as String) >> Skoleeier.fromNsr(nsrSchoolOwner)
+        1 * nsrRepository.getSchoolOwnerById(_ as String) >> Skoleeier.fromNsr(nsrSchoolOwner)
         1 * kulturtankenProperties.getOrganisations() >> [(_ as String): new KulturtankenProperties.Organisation(source: 'nsr')]
         1 * nsrRepository.getSchools(_ as String) >> [Skole.fromNsr(nsrSchool)]
 

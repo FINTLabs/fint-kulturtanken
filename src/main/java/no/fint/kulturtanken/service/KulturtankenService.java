@@ -5,16 +5,20 @@ import no.fint.kulturtanken.configuration.KulturtankenProperties;
 import no.fint.kulturtanken.repository.FintRepository;
 import no.fint.kulturtanken.repository.NsrRepository;
 import no.fint.kulturtanken.model.*;
+import no.fint.model.felles.kompleksedatatyper.Identifikator;
+import no.fint.model.felles.kompleksedatatyper.Periode;
 import no.fint.model.resource.FintLinks;
 import no.fint.model.resource.Link;
 import no.fint.model.resource.utdanning.elev.BasisgruppeResource;
 import no.fint.model.resource.utdanning.timeplan.UndervisningsgruppeResource;
-import no.fint.model.resource.utdanning.utdanningsprogram.SkoleResource;
+import no.fint.model.utdanning.basisklasser.Gruppe;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import java.time.ZonedDateTime;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -30,32 +34,40 @@ public class KulturtankenService {
         this.kulturtankenProperties = kulturtankenProperties;
     }
 
-    @Cacheable(value = "schoolOwner")
+    @Cacheable(value = "schoolOwner", unless = "#result == null")
     public Skoleeier getSchoolOwner(String orgId) {
-        Skoleeier schoolOwner = nsrRepository.getSchoolOwner(orgId);
+        Skoleeier schoolOwner = nsrRepository.getSchoolOwnerById(orgId);
 
-        List<Skole> schools = nsrRepository.getSchools(orgId)
+        if (schoolOwner == null) return null;
+
+        if (kulturtankenProperties.getOrganisations().get(orgId).getSource().equals("nsr")) {
+            List<Skole> schools = nsrRepository.getSchools(orgId);
+            schoolOwner.setSkoler(schools);
+            return schoolOwner;
+        }
+
+        List<Skole> schools = fintRepository.getSchools(orgId)
                 .stream()
-                .peek(school -> {
-                    if (kulturtankenProperties.getOrganisations().get(orgId).getSource().equals("nsr")) {
-                        return;
-                    }
-
-                    SkoleResource skoleResource = fintRepository.getSchools(orgId).get(school.getOrganisasjonsnummer());
-
-                    if (skoleResource == null) {
-                        return;
-                    }
+                .map(skoleResource -> {
+                    Skole school = nsrRepository.getSchools(orgId)
+                            .stream()
+                            .filter(s -> Optional.ofNullable(skoleResource.getOrganisasjonsnummer())
+                                    .map(Identifikator::getIdentifikatorverdi)
+                                    .filter(s.getOrganisasjonsnummer()::equals)
+                                    .isPresent())
+                            .findAny()
+                            .orElse(Skole.fromFint(skoleResource));
 
                     List<Trinn> levels = new ArrayList<>();
                     skoleResource.getBasisgruppe()
                             .stream()
                             .map(Link::getHref)
                             .map(String::toLowerCase)
-                            .map(fintRepository.getBasisGroups(orgId)::get)
+                            .map(groupId -> fintRepository.getBasisGroupById(orgId, groupId))
                             .filter(Objects::nonNull)
+                            .filter(isValidGroup)
                             .collect(Collectors.groupingBy(this::getLevel))
-                            .forEach((key, value) -> Optional.ofNullable(fintRepository.getLevels(orgId).get(key))
+                            .forEach((key, value) -> Optional.ofNullable(fintRepository.getLevelById(orgId, key))
                                     .map(this::getGrepCode)
                                     .ifPresent(code -> {
                                         Trinn level = new Trinn();
@@ -73,10 +85,11 @@ public class KulturtankenService {
                             .stream()
                             .map(Link::getHref)
                             .map(String::toLowerCase)
-                            .map(fintRepository.getTeachingGroups(orgId)::get)
+                            .map(groupId -> fintRepository.getTeachingGroupById(orgId, groupId))
                             .filter(Objects::nonNull)
+                            .filter(isValidGroup)
                             .collect(Collectors.groupingBy(this::getSubject))
-                            .forEach((key, value) -> Optional.ofNullable(fintRepository.getSubjects(orgId).get(key))
+                            .forEach((key, value) -> Optional.ofNullable(fintRepository.getSubjectById(orgId, key))
                                     .map(this::getGrepCode)
                                     .ifPresent(code -> {
                                         Fag subject = new Fag();
@@ -89,6 +102,7 @@ public class KulturtankenService {
                                     }));
                     school.setFag(subjects);
 
+                    return school;
                 }).collect(Collectors.toList());
 
         schoolOwner.setSkoler(schools);
@@ -114,13 +128,25 @@ public class KulturtankenService {
                 .orElse("");
     }
 
-    private<T extends FintLinks> String getGrepCode(T resource) {
+    private <T extends FintLinks> String getGrepCode(T resource) {
         return resource.getLinks()
                 .getOrDefault("grepreferanse", Collections.emptyList())
                 .stream()
                 .map(Link::getHref)
-                .map(href -> StringUtils.substringAfterLast(href,"/"))
+                .map(href -> StringUtils.substringAfterLast(href, "/"))
                 .findAny()
                 .orElse(null);
     }
+
+    private final Predicate<? super Gruppe> isValidGroup = group -> {
+        List<Periode> period = group.getPeriode();
+
+        if (period.isEmpty()) return true;
+
+        return period.stream()
+                .findFirst()
+                .filter(begin -> begin.getStart() != null && begin.getStart().compareTo(Date.from(ZonedDateTime.now().toInstant())) <= 0)
+                .filter(end -> end.getSlutt() == null || end.getSlutt().compareTo(Date.from(ZonedDateTime.now().toInstant())) >= 0)
+                .isPresent();
+    };
 }

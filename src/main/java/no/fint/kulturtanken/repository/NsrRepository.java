@@ -5,12 +5,12 @@ import no.fint.kulturtanken.model.Enhet;
 import no.fint.kulturtanken.model.Skole;
 import no.fint.kulturtanken.model.Skoleeier;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Predicate;
 
 @Slf4j
@@ -18,7 +18,7 @@ import java.util.function.Predicate;
 public class NsrRepository {
     private final WebClient webClient;
 
-    private final Map<String, List<Skole>> schools = new HashMap<>();
+    private final MultiValueMap<String, Skole> schools = new LinkedMultiValueMap<>();
     private final Map<String, Skoleeier> schoolOwners = new HashMap<>();
 
     public NsrRepository(WebClient.Builder webClientBuilder) {
@@ -28,48 +28,25 @@ public class NsrRepository {
                 .build();
     }
 
-    public Mono<Enhet> getUnit(String orgId) {
-        return webClient.get()
-                .uri("/{orgId}", orgId)
-                .retrieve()
-                .bodyToMono(Enhet.class);
-    }
-
     public List<Skole> getSchools(String orgId) {
-        List<Skole> resources = schools.get(orgId);
-
-        if (resources == null || resources.size() == 0) {
-            updateSchools(orgId);
-        }
-
-        return schools.get(orgId);
+        return schools.getOrDefault(orgId, Collections.emptyList());
     }
 
     public void updateSchools(String orgId) {
-        List<Skole> resources = getUnit(orgId)
+        getUnit(orgId)
                 .flatMapIterable(Enhet::getChildRelasjoner)
                 .map(Enhet.ChildRelasjon::getEnhet)
                 .map(Enhet::getOrgNr)
                 .distinct()
                 .flatMap(this::getUnit)
-                .filter(isValidUnit())
+                .filter(isValidUnit)
                 .map(Skole::fromNsr)
-                .collectList()
-                .block();
-
-        if (resources != null && resources.size() > 0) {
-            schools.put(orgId, resources);
-        }
+                .toStream()
+                .forEach(school -> schools.add(orgId, school));
     }
 
-    public Skoleeier getSchoolOwner(String orgId) {
-        Skoleeier resource = schoolOwners.get(orgId);
-
-        if (resource == null) {
-            updateSchoolOwner(orgId);
-        }
-
-        return schoolOwners.get(orgId);
+    public Skoleeier getSchoolOwnerById(String orgId) {
+        return Optional.ofNullable(schoolOwners.get(orgId)).orElse(null);
     }
 
     public void updateSchoolOwner(String orgId) {
@@ -77,12 +54,23 @@ public class NsrRepository {
                 .map(Skoleeier::fromNsr)
                 .block();
 
-        if (resource != null) {
-            schoolOwners.put(orgId, resource);
-        }
+        schoolOwners.put(orgId, resource);
     }
 
-    private Predicate<Enhet> isValidUnit() {
-        return unit -> unit.getErOffentligSkole() && unit.getErVideregaaendeSkole() && unit.getErAktiv();
+    public Mono<Enhet> getUnit(String orgId) {
+        return webClient.get()
+                .uri("/{orgId}", orgId)
+                .retrieve()
+                .bodyToMono(Enhet.class);
     }
+
+    public void updateResources(String orgId) {
+        schools.put(orgId, new ArrayList<>());
+
+        updateSchoolOwner(orgId);
+        updateSchools(orgId);
+    }
+
+    private final Predicate<Enhet> isValidUnit = unit ->
+            unit.getErOffentligSkole() && unit.getErVideregaaendeSkole() && unit.getErAktiv();
 }

@@ -21,19 +21,14 @@ public class SchedulingService {
         this.nsrRepository = nsrRepository;
     }
 
-    @Scheduled(cron = "0 0 6 * * MON-FRI")
+    @Scheduled(initialDelay = 5000, fixedDelay = 86400000)
     @CacheEvict(value = {"schoolOwner"}, allEntries = true)
     public void updateCache() {
-        kulturtankenProperties.getOrganisations().forEach((key, organisation) -> {
-            nsrRepository.updateSchoolOwner(key);
-            nsrRepository.updateSchools(key);
+        kulturtankenProperties.getOrganisations().forEach((orgId, organisation) -> {
+            nsrRepository.updateResources(orgId);
 
             if (organisation.getSource().equals("fint")) {
-                fintRepository.updateSchools(key);
-                fintRepository.updateBasisGroups(key);
-                fintRepository.updateLevels(key);
-                fintRepository.updateTeachingGroups(key);
-                fintRepository.updateSubjects(key);
+                fintRepository.updateResources(orgId);
             }
 
             log.info(organisation.getName());

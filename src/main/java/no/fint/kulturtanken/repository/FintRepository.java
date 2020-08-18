@@ -2,12 +2,10 @@ package no.fint.kulturtanken.repository;
 
 import lombok.extern.slf4j.Slf4j;
 import no.fint.kulturtanken.configuration.KulturtankenProperties;
-import no.fint.model.felles.kompleksedatatyper.Identifikator;
 import no.fint.model.resource.AbstractCollectionResources;
 import no.fint.model.resource.FintLinks;
 import no.fint.model.resource.Link;
-import no.fint.model.resource.utdanning.elev.BasisgruppeResource;
-import no.fint.model.resource.utdanning.elev.BasisgruppeResources;
+import no.fint.model.resource.utdanning.elev.*;
 import no.fint.model.resource.utdanning.timeplan.FagResource;
 import no.fint.model.resource.utdanning.timeplan.FagResources;
 import no.fint.model.resource.utdanning.timeplan.UndervisningsgruppeResource;
@@ -39,11 +37,8 @@ public class FintRepository {
     private final OAuth2AuthorizedClientManager authorizedClientManager;
     private final KulturtankenProperties kulturtankenProperties;
 
-    private final Map<String, Map<String, SkoleResource>> schools = new HashMap<>();
-    private final Map<String, Map<String, BasisgruppeResource>> basisGroups = new HashMap<>();
-    private final Map<String, Map<String, ArstrinnResource>> levels = new HashMap<>();
-    private final Map<String, Map<String, UndervisningsgruppeResource>> teachingGroups = new HashMap<>();
-    private final Map<String, Map<String, FagResource>> subjects = new HashMap<>();
+    private final Map<String, Map<String, String>> selfLinks = new HashMap<>();
+    private final Map<String, Map<String, FintLinks>> resources = new HashMap<>();
 
     public FintRepository(WebClient webClient, Authentication principal, OAuth2AuthorizedClientManager authorizedClientManager, KulturtankenProperties kulturtankenProperties) {
         this.webClient = webClient;
@@ -52,111 +47,40 @@ public class FintRepository {
         this.kulturtankenProperties = kulturtankenProperties;
     }
 
-    public Map<String, SkoleResource> getSchools(String orgId) {
-        Map<String, SkoleResource> resources = schools.get(orgId);
-
-        if (resources == null || resources.size() == 0) {
-            updateSchools(orgId);
-        }
-
-        return schools.get(orgId);
+    public List<SkoleResource> getSchools(String orgId) {
+        return getResourcesByType(orgId, SkoleResource.class);
     }
 
-    public void updateSchools(String orgId) {
-        Map<String, SkoleResource> resources = getResources(orgId, SkoleResources.class)
-                .filter(skoleResource -> Optional.ofNullable(skoleResource.getOrganisasjonsnummer())
-                        .map(Identifikator::getIdentifikatorverdi)
-                        .isPresent())
-                .collectMap(skoleResource -> skoleResource.getOrganisasjonsnummer().getIdentifikatorverdi())
-                .block();
-
-        if (resources != null && resources.size() > 0) {
-            schools.put(orgId, resources);
-        }
+    public BasisgruppeResource getBasisGroupById(String orgId, String groupId) {
+        String selfLinks = this.selfLinks.get(orgId).get(groupId);
+        return (BasisgruppeResource) resources.get(orgId).get(selfLinks);
     }
 
-    public Map<String, BasisgruppeResource> getBasisGroups(String orgId) {
-        Map<String, BasisgruppeResource> resources = basisGroups.get(orgId);
-
-        if (resources == null || resources.size() == 0) {
-            updateBasisGroups(orgId);
-        }
-
-        return basisGroups.get(orgId);
+    public ArstrinnResource getLevelById(String orgId, String groupId) {
+        String selfLinks = this.selfLinks.get(orgId).get(groupId);
+        return (ArstrinnResource) resources.get(orgId).get(selfLinks);
     }
 
-    public void updateBasisGroups(String orgId) {
-        Map<String, BasisgruppeResource> resources = getResources(orgId, BasisgruppeResources.class)
-                .collectMap(this::getSelfLink)
-                .block();
-
-        if (resources != null && resources.size() > 0) {
-            basisGroups.put(orgId, resources);
-        }
+    public UndervisningsgruppeResource getTeachingGroupById(String orgId, String groupId) {
+        String selfLinks = this.selfLinks.get(orgId).get(groupId);
+        return (UndervisningsgruppeResource) resources.get(orgId).get(selfLinks);
     }
 
-
-    public Map<String, ArstrinnResource> getLevels(String orgId) {
-        Map<String, ArstrinnResource> resources = levels.get(orgId);
-
-        if (resources == null || resources.size() == 0) {
-            updateLevels(orgId);
-        }
-
-        return levels.get(orgId);
+    public FagResource getSubjectById(String orgId, String groupId) {
+        String selfLinks = this.selfLinks.get(orgId).get(groupId);
+        return (FagResource) resources.get(orgId).get(selfLinks);
     }
 
-    public void updateLevels(String orgId) {
-        Map<String, ArstrinnResource> resources = getResources(orgId, ArstrinnResources.class)
-                .collectMap(this::getSelfLink)
-                .block();
-
-        if (resources != null && resources.size() > 0) {
-            levels.put(orgId, resources);
-        }
+    private <T> List<T> getResourcesByType(String orgId, Class<T> clazz) {
+        return resources.getOrDefault(orgId, Collections.emptyMap())
+                .values()
+                .stream()
+                .filter(clazz::isInstance)
+                .map(clazz::cast)
+                .collect(Collectors.toList());
     }
 
-    public Map<String, UndervisningsgruppeResource> getTeachingGroups(String orgId) {
-        Map<String, UndervisningsgruppeResource> resources = teachingGroups.get(orgId);
-
-        if (resources == null || resources.size() == 0) {
-            updateTeachingGroups(orgId);
-        }
-
-        return teachingGroups.get(orgId);
-    }
-
-    public void updateTeachingGroups(String orgId) {
-        Map<String, UndervisningsgruppeResource> resources = getResources(orgId, UndervisningsgruppeResources.class)
-                .collectMap(this::getSelfLink)
-                .block();
-
-        if (resources != null && resources.size() > 0) {
-            teachingGroups.put(orgId, resources);
-        }
-    }
-
-    public Map<String, FagResource> getSubjects(String orgId) {
-        Map<String, FagResource> resources = subjects.get(orgId);
-
-        if (resources == null || resources.size() == 0) {
-            updateSubjects(orgId);
-        }
-
-        return subjects.get(orgId);
-    }
-
-    public void updateSubjects(String orgId) {
-        Map<String, FagResource> resources = getResources(orgId, FagResources.class)
-                .collectMap(this::getSelfLink)
-                .block();
-
-        if (resources != null && resources.size() > 0) {
-            subjects.put(orgId, resources);
-        }
-    }
-
-    public <S, T extends AbstractCollectionResources<S>> Flux<S> getResources(String orgId, Class<T> clazz) {
+    private <S, T extends AbstractCollectionResources<S>> Flux<S> getResources(String orgId, Class<T> clazz) {
         KulturtankenProperties.Organisation organisation = kulturtankenProperties.getOrganisations().get(orgId);
 
         return Flux.merge(organisation.getRegistration().values()
@@ -166,7 +90,7 @@ public class FintRepository {
                 .collect(Collectors.toList()));
     }
 
-    public <T> Mono<T> get(KulturtankenProperties.Registration registration, Class<T> clazz) {
+    private <T> Mono<T> get(KulturtankenProperties.Registration registration, Class<T> clazz) {
         OAuth2AuthorizeRequest authorizeRequest = OAuth2AuthorizeRequest.withClientRegistrationId(registration.getId())
                 .principal(principal)
                 .attributes(attrs -> {
@@ -185,13 +109,27 @@ public class FintRepository {
                 .bodyToMono(clazz);
     }
 
-    private <T extends FintLinks> String getSelfLink(T resource) {
+    public void updateResources(String orgId) {
+        selfLinks.put(orgId, new HashMap<>());
+        resources.put(orgId, new HashMap<>());
+
+        Flux.merge(getResources(orgId, SkoleResources.class),
+                getResources(orgId, BasisgruppeResources.class),
+                getResources(orgId, UndervisningsgruppeResources.class),
+                getResources(orgId, ArstrinnResources.class),
+                getResources(orgId, FagResources.class))
+                .toStream()
+                .forEach(resource -> {
+                    getSelfLinks(resource).forEach(link -> selfLinks.get(orgId).put(link, resource.getSelfLinks().toString()));
+                    resources.get(orgId).put(resource.getSelfLinks().toString(), resource);
+                });
+    }
+
+    private <T extends FintLinks> Stream<String> getSelfLinks(T resource) {
         return resource.getSelfLinks()
                 .stream()
                 .map(Link::getHref)
-                .map(String::toLowerCase)
-                .findFirst()
-                .orElse(null);
+                .map(String::toLowerCase);
     }
 
     private static final Map<Class<?>, String> paths = Stream.of(
