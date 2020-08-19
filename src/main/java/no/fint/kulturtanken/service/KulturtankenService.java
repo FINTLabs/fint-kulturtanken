@@ -132,7 +132,7 @@ public class KulturtankenService {
                 .map(Link::getHref)
                 .map(String::toLowerCase)
                 .findAny()
-                .orElse(null);
+                .orElse("none");
     }
 
     private <T extends FintLinks> String getGrepCode(T resource) {
@@ -142,7 +142,7 @@ public class KulturtankenService {
                 .map(Link::getHref)
                 .map(href -> StringUtils.substringAfterLast(href, "/"))
                 .findAny()
-                .orElse(null);
+                .orElse("none");
     }
 
     private final Predicate<? super Gruppe> isValidGroup = group -> {
