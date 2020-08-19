@@ -3,6 +3,7 @@ package no.fint.kulturtanken.model;
 import lombok.Data;
 import no.fint.model.resource.utdanning.utdanningsprogram.SkoleResource;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -33,8 +34,9 @@ public class Skole {
 		}
 		school.setBesoksadresse(visitingAddress);
 
-		school.setTrinn(Collections.emptyList());
-		school.setFag(Collections.emptyList());
+		school.setTrinn(new ArrayList<>());
+		school.setFag(new ArrayList<>());
+
 		return school;
 	}
 
@@ -52,6 +54,14 @@ public class Skole {
 			contactInformation.setTelefonnummer(resource.getKontaktinformasjon().getTelefonnummer());
 		}
 		school.setKontaktinformasjon(contactInformation);
+
+		Besoksadresse visitingAddress = new Besoksadresse();
+		if (resource.getPostadresse() != null) {
+			visitingAddress.setAdresselinje(resource.getPostadresse().getAdresselinje());
+			visitingAddress.setPostnummer(resource.getPostadresse().getPostnummer());
+			visitingAddress.setPoststed(resource.getPostadresse().getPoststed());
+		}
+		school.setBesoksadresse(visitingAddress);
 
 		return school;
 	}

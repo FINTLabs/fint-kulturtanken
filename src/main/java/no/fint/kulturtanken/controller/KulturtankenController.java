@@ -18,7 +18,6 @@ import java.util.stream.Stream;
 @RestController
 @RequestMapping("/skoleeier")
 public class KulturtankenController {
-
     private final KulturtankenService kulturtankenService;
     private final KulturtankenProperties kulturtankenProperties;
 
@@ -37,16 +36,15 @@ public class KulturtankenController {
         }
     }
 
-    @GetMapping("/")
+    @GetMapping
     public Stream<KulturtankenProperties.Organisation> getOrganisations() {
-        return kulturtankenProperties.getOrganisations().entrySet().stream()
+        return kulturtankenProperties.getOrganisations().entrySet()
+                .stream()
                 .map(organisation -> {
                     organisation.getValue().setUri(ServletUriComponentsBuilder.fromCurrentContextPath()
                             .pathSegment("skoleeier", organisation.getKey()).build().toUri());
                     return organisation.getValue();
-                })
-                .filter(KulturtankenProperties.Organisation::isActive)
-                .sorted(Comparator.comparing(KulturtankenProperties.Organisation::getName));
+                }).sorted(Comparator.comparing(KulturtankenProperties.Organisation::getName));
     }
 
     @ExceptionHandler(RestClientResponseException.class)

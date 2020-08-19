@@ -3,11 +3,6 @@ package no.fint.kulturtanken.repository
 import com.fasterxml.jackson.databind.ObjectMapper
 import no.fint.kulturtanken.configuration.KulturtankenProperties
 import no.fint.kulturtanken.util.FintObjectFactory
-import no.fint.model.resource.Link
-import no.fint.model.resource.utdanning.elev.BasisgruppeResources
-import no.fint.model.resource.utdanning.timeplan.FagResources
-import no.fint.model.resource.utdanning.timeplan.UndervisningsgruppeResources
-import no.fint.model.resource.utdanning.utdanningsprogram.ArstrinnResources
 import no.fint.model.resource.utdanning.utdanningsprogram.SkoleResources
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -26,7 +21,9 @@ class FintRepositorySpec extends Specification {
     }
 
     KulturtankenProperties kulturtankenProperties = Mock {
-        2 * getOrganisations() >> [(_ as String): new KulturtankenProperties.Organisation(organisationNumber: _ as String, environment: _ as String, username: _ as String, password: _ as String)]
+        1 * getOrganisations() >> [(_ as String): new KulturtankenProperties.Organisation(organisationNumber: _ as String,
+                registration: [(_ as String): new KulturtankenProperties.Registration(id: _ as String, environment: _ as String,
+                        username: _ as String, password: _ as String)])]
     }
 
     FintRepository fintRepository
@@ -47,82 +44,9 @@ class FintRepositorySpec extends Specification {
                 .setResponseCode(200))
 
         when:
-        def resources = fintRepository.getSchools(_ as String)
+        def resources = fintRepository.getResources(_ as String, SkoleResources.class)
 
         then:
-        resources.size() == 1
-        resources.first().navn == 'School'
-    }
-
-    def "Get basis groups from Fint"() {
-        given:
-        def basisGroup = FintObjectFactory.newBasisGroup()
-        def basisGroups = new BasisgruppeResources()
-        basisGroups.addResource(basisGroup)
-        mockWebServer.enqueue(new MockResponse()
-                .setBody(new ObjectMapper().writeValueAsString(basisGroups))
-                .setHeader('content-type', 'application/json')
-                .setResponseCode(200))
-
-        when:
-        def resources = fintRepository.getBasisGroups(_ as String)
-
-        then:
-        resources.size() == 1
-        resources.get(Link.with('link.To.BasisGroup')).navn == 'Basis group'
-    }
-
-    def "Get levels from Fint"() {
-        given:
-        def level = FintObjectFactory.newLevel()
-        def levels = new ArstrinnResources()
-        levels.addResource(level)
-        mockWebServer.enqueue(new MockResponse()
-                .setBody(new ObjectMapper().writeValueAsString(levels))
-                .setHeader('content-type', 'application/json')
-                .setResponseCode(200))
-
-        when:
-        def resources = fintRepository.getLevels(_ as String)
-
-        then:
-        resources.size() == 1
-        resources.get(Link.with('link.To.Level')).navn == 'Level'
-    }
-
-    def "Get teaching groups from Fint"() {
-        given:
-        def teachingGroup = FintObjectFactory.newTeachingGroup()
-        def teachingGroups = new UndervisningsgruppeResources()
-        teachingGroups.addResource(teachingGroup)
-        mockWebServer.enqueue(new MockResponse()
-                .setBody(new ObjectMapper().writeValueAsString(teachingGroups))
-                .setHeader('content-type', 'application/json')
-                .setResponseCode(200))
-
-        when:
-        def resources = fintRepository.getTeachingGroups(_ as String)
-
-        then:
-        resources.size() == 1
-        resources.get(Link.with('link.To.TeachingGroup')).navn == 'Teaching group'
-    }
-
-    def "Get subjects from Fint"() {
-        given:
-        def subject = FintObjectFactory.newSubject()
-        def subjects = new FagResources()
-        subjects.addResource(subject)
-        mockWebServer.enqueue(new MockResponse()
-                .setBody(new ObjectMapper().writeValueAsString(subjects))
-                .setHeader('content-type', 'application/json')
-                .setResponseCode(200))
-
-        when:
-        def resources = fintRepository.getSubjects(_ as String)
-
-        then:
-        resources.size() == 1
-        resources.get(Link.with('link.To.Subject')).navn == 'Subject'
+        resources.blockLast().navn == 'School'
     }
 }
