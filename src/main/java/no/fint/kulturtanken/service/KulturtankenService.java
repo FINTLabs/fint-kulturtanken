@@ -59,47 +59,54 @@ public class KulturtankenService {
                             .orElse(Skole.fromFint(skoleResource));
 
                     List<Trinn> levels = new ArrayList<>();
-                    skoleResource.getBasisgruppe()
+
+                    Map<String, List<BasisgruppeResource>> basisGroupsByLevel = skoleResource.getBasisgruppe()
                             .stream()
                             .map(Link::getHref)
                             .map(String::toLowerCase)
                             .map(groupId -> fintRepository.getBasisGroupById(orgId, groupId))
                             .filter(Objects::nonNull)
                             .filter(isValidGroup)
-                            .collect(Collectors.groupingBy(this::getLevel))
-                            .forEach((key, value) -> Optional.ofNullable(fintRepository.getLevelById(orgId, key))
-                                    .map(this::getGrepCode)
-                                    .ifPresent(code -> {
-                                        Trinn level = new Trinn();
-                                        level.setNiva(code);
-                                        level.setBasisgrupper(value.stream()
-                                                .map(Basisgruppe::fromFint)
-                                                .filter(basisGroup -> basisGroup.getAntall() > 0)
-                                                .collect(Collectors.toList()));
-                                        levels.add(level);
-                                    }));
+                            .collect(Collectors.groupingBy(this::getLevel));
+
+                    basisGroupsByLevel.forEach((key, value) -> Optional.ofNullable(fintRepository.getLevelById(orgId, key))
+                            .map(this::getGrepCode)
+                            .ifPresent(code -> {
+                                Trinn level = new Trinn();
+                                level.setNiva(code);
+                                level.setBasisgrupper(value.stream()
+                                        .map(Basisgruppe::fromFint)
+                                        .filter(basisGroup -> basisGroup.getAntall() > 0)
+                                        .collect(Collectors.toList()));
+                                levels.add(level);
+                            }));
+
                     school.setTrinn(levels);
 
                     List<Fag> subjects = new ArrayList<>();
-                    skoleResource.getUndervisningsgruppe()
+
+                    Map<String, List<UndervisningsgruppeResource>> teachingGroupsBySubject = skoleResource.getUndervisningsgruppe()
                             .stream()
                             .map(Link::getHref)
                             .map(String::toLowerCase)
                             .map(groupId -> fintRepository.getTeachingGroupById(orgId, groupId))
                             .filter(Objects::nonNull)
                             .filter(isValidGroup)
-                            .collect(Collectors.groupingBy(this::getSubject))
-                            .forEach((key, value) -> Optional.ofNullable(fintRepository.getSubjectById(orgId, key))
-                                    .map(this::getGrepCode)
-                                    .ifPresent(code -> {
-                                        Fag subject = new Fag();
-                                        subject.setFagkode(code);
-                                        subject.setUndervisningsgrupper(value.stream()
-                                                .map(Undervisningsgruppe::fromFint)
-                                                .filter(teachingGroup -> teachingGroup.getAntall() > 0)
-                                                .collect(Collectors.toList()));
-                                        subjects.add(subject);
-                                    }));
+                            .collect(Collectors.groupingBy(this::getSubject));
+
+
+                    teachingGroupsBySubject.forEach((key, value) -> Optional.ofNullable(fintRepository.getSubjectById(orgId, key))
+                            .map(this::getGrepCode)
+                            .ifPresent(code -> {
+                                Fag subject = new Fag();
+                                subject.setFagkode(code);
+                                subject.setUndervisningsgrupper(value.stream()
+                                        .map(Undervisningsgruppe::fromFint)
+                                        .filter(teachingGroup -> teachingGroup.getAntall() > 0)
+                                        .collect(Collectors.toList()));
+                                subjects.add(subject);
+                            }));
+
                     school.setFag(subjects);
 
                     return school;
@@ -116,7 +123,7 @@ public class KulturtankenService {
                 .map(Link::getHref)
                 .map(String::toLowerCase)
                 .findAny()
-                .orElse("");
+                .orElse(null);
     }
 
     private String getSubject(UndervisningsgruppeResource teachingGroup) {
@@ -125,7 +132,7 @@ public class KulturtankenService {
                 .map(Link::getHref)
                 .map(String::toLowerCase)
                 .findAny()
-                .orElse("");
+                .orElse(null);
     }
 
     private <T extends FintLinks> String getGrepCode(T resource) {
