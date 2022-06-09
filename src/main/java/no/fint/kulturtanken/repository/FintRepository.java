@@ -123,6 +123,8 @@ public class FintRepository {
                     if (resource.getSelfLinks() != null) {
                         getSelfLinks(resource).forEach(link -> selfLinks.get(orgId).put(link, resource.getSelfLinks().toString()));
                         resources.get(orgId).put(resource.getSelfLinks().toString(), resource);
+                    } else {
+                        log.debug("Resource with missing selfLinks: {}", resource);
                     }
                 });
     }
