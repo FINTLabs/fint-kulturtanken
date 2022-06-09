@@ -18,7 +18,7 @@ configurations {
 
 repositories {
     jcenter()
-    maven { url "https://dl.bintray.com/fint/maven" }
+    maven { url "https://repo.fintlabs.no/releases" }
 }
 
 dependencies {
@@ -30,8 +30,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
     implementation 'org.springframework.boot:spring-boot-starter-security'
 
-    implementation 'no.fint:fint-administrasjon-resource-model-java:3.2.0'
-    implementation 'no.fint:fint-utdanning-resource-model-java:3.2.0'
+    implementation 'no.fint:fint-utdanning-resource-model-java:3.10.0-rc-1'
 
     implementation 'org.apache.commons:commons-lang3'
 

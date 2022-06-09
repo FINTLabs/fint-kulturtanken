@@ -2,16 +2,16 @@ package no.fint.kulturtanken.service;
 
 import lombok.extern.slf4j.Slf4j;
 import no.fint.kulturtanken.configuration.KulturtankenProperties;
+import no.fint.kulturtanken.model.*;
 import no.fint.kulturtanken.repository.FintRepository;
 import no.fint.kulturtanken.repository.NsrRepository;
-import no.fint.kulturtanken.model.*;
 import no.fint.model.felles.kompleksedatatyper.Identifikator;
 import no.fint.model.felles.kompleksedatatyper.Periode;
 import no.fint.model.resource.FintLinks;
 import no.fint.model.resource.Link;
+import no.fint.model.resource.utdanning.basisklasser.GruppeResource;
 import no.fint.model.resource.utdanning.elev.BasisgruppeResource;
 import no.fint.model.resource.utdanning.timeplan.UndervisningsgruppeResource;
-import no.fint.model.utdanning.basisklasser.Gruppe;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -145,7 +145,7 @@ public class KulturtankenService {
                 .orElse(null);
     }
 
-    private final Predicate<? super Gruppe> isValidGroup = group -> {
+    private final Predicate<? super GruppeResource> isValidGroup = group -> {
         List<Periode> period = group.getPeriode();
 
         if (period.isEmpty()) return true;
@@ -156,4 +156,5 @@ public class KulturtankenService {
                 .filter(end -> end.getSlutt() == null || end.getSlutt().compareTo(Date.from(ZonedDateTime.now().toInstant())) >= 0)
                 .isPresent();
     };
+
 }
