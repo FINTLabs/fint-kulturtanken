@@ -35,7 +35,6 @@ jobs:
           ./gradlew build
           mkdir data
           cp ./build/libs/${GITHUB_REPOSITORY#*/}-*.jar ./data/app.jar
-          
 
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v2.3.1
