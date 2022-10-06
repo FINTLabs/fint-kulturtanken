@@ -14,14 +14,14 @@ spec:
 #spec:
 #  itemPath: "vaults/aks-api-vault/items/dks-tffk"
 #---
-#apiVersion: onepassword.com/v1
-#kind: OnePasswordItem
-#metadata:
-#  name: kulturtanken-oslo
-#  labels:
-#spec:
-#  itemPath: "vaults/aks-api-vault/items/dks-oslo"
-#---
+apiVersion: onepassword.com/v1
+kind: OnePasswordItem
+metadata:
+ name: kulturtanken-oslo
+ labels:
+spec:
+ itemPath: "vaults/aks-api-vault/items/dks-oslo"
+---
 apiVersion: onepassword.com/v1
 kind: OnePasswordItem
 metadata:
@@ -365,50 +365,50 @@ spec:
               value: 'false'
 
             # Oslo
-            - name: kulturtanken.organisations.958935420.organisationnumber
-              value: '958935420'
-            - name: kulturtanken.organisations.958935420.source
-              value: nsr
-            - name: kulturtanken.organisations.958935420.groups
-              value: 'true'
-
-
             # - name: kulturtanken.organisations.958935420.organisationnumber
             #   value: '958935420'
             # - name: kulturtanken.organisations.958935420.source
-            #   value: fint
+            #   value: nsr
             # - name: kulturtanken.organisations.958935420.groups
             #   value: 'true'
-            # - name: kulturtanken.organisations.958935420.registration.1.id
-            #   value: 'oslo'
-            # - name: kulturtanken.organisations.958935420.registration.1.environment
-            #   value: https://api.felleskomponent.no
-            # - name: kulturtanken.organisations.958935420.registration.1.username
-            #   valueFrom:
-            #     secretKeyRef:
-            #       name: kulturtanken-oslo
-            #       key: username
-            # - name: kulturtanken.organisations.958935420.registration.1.password
-            #   valueFrom:
-            #     secretKeyRef:
-            #       name: kulturtanken-oslo
-            #       key: password
-            # - name: spring.security.oauth2.client.registration.oslo.client-id
-            #   valueFrom:
-            #     secretKeyRef:
-            #       key: client-id
-            #       name: kulturtanken-oslo
-            # - name: spring.security.oauth2.client.registration.oslo.client-secret
-            #   valueFrom:
-            #     secretKeyRef:
-            #       key: client-secret
-            #       name: kulturtanken-oslo
-            # - name: spring.security.oauth2.client.registration.oslo.authorization-grant-type
-            #   value: password
-            # - name: spring.security.oauth2.client.registration.oslo.scope
-            #   value: fint-client
-            # - name: spring.security.oauth2.client.registration.oslo.provider
-            #   value: fint
+
+
+            - name: kulturtanken.organisations.958935420.organisationnumber
+              value: '958935420'
+            - name: kulturtanken.organisations.958935420.source
+              value: fint
+            - name: kulturtanken.organisations.958935420.groups
+              value: 'true'
+            - name: kulturtanken.organisations.958935420.registration.1.id
+              value: 'oslo'
+            - name: kulturtanken.organisations.958935420.registration.1.environment
+              value: https://api.felleskomponent.no
+            - name: kulturtanken.organisations.958935420.registration.1.username
+              valueFrom:
+                secretKeyRef:
+                  name: kulturtanken-oslo
+                  key: username
+            - name: kulturtanken.organisations.958935420.registration.1.password
+              valueFrom:
+                secretKeyRef:
+                  name: kulturtanken-oslo
+                  key: password
+            - name: spring.security.oauth2.client.registration.oslo.client-id
+              valueFrom:
+                secretKeyRef:
+                  key: client-id
+                  name: kulturtanken-oslo
+            - name: spring.security.oauth2.client.registration.oslo.client-secret
+              valueFrom:
+                secretKeyRef:
+                  key: client-secret
+                  name: kulturtanken-oslo
+            - name: spring.security.oauth2.client.registration.oslo.authorization-grant-type
+              value: password
+            - name: spring.security.oauth2.client.registration.oslo.scope
+              value: fint-client
+            - name: spring.security.oauth2.client.registration.oslo.provider
+              value: fint
 
 
             # Troms og Finnmark
