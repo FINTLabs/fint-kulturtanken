@@ -70,6 +70,14 @@ metadata:
 spec:
   itemPath: "vaults/aks-api-vault/items/dks-viken"
 ---
+apiVersion: onepassword.com/v1
+kind: OnePasswordItem
+metadata:
+  name: kulturtanken-nordland
+  labels:
+spec:
+  itemPath: "vaults/aks-api-vault/items/dks-nfk"
+---
 
 apiVersion: v1
 kind: Service
@@ -356,13 +364,43 @@ spec:
             - name: spring.security.oauth2.client.registration.mrfk.provider
               value: fint
 
-            # Nordland
+      # Nordland
             - name: kulturtanken.organisations.964982953.organisationnumber
               value: '964982953'
             - name: kulturtanken.organisations.964982953.source
-              value: nsr
+              value: fint
             - name: kulturtanken.organisations.964982953.groups
-              value: 'false'
+              value: 'true'
+            - name: kulturtanken.organisations.964982953.registration.1.id
+              value: 'nfk'
+            - name: kulturtanken.organisations.964982953.registration.1.environment
+              value: https://api.felleskomponent.no
+            - name: kulturtanken.organisations.964982953.registration.1.username
+              valueFrom:
+                secretKeyRef:
+                  name: kulturtanken-nordland
+                  key: username
+            - name: kulturtanken.organisations.964982953.registration.1.password
+              valueFrom:
+                secretKeyRef:
+                  name: kulturtanken-nordland
+                  key: password
+            - name: spring.security.oauth2.client.registration.nfk.client-id
+              valueFrom:
+                secretKeyRef:
+                  key: client-id
+                  name: kulturtanken-nordland
+            - name: spring.security.oauth2.client.registration.nfk.client-secret
+              valueFrom:
+                secretKeyRef:
+                  key: client-secret
+                  name: kulturtanken-nordland
+            - name: spring.security.oauth2.client.registration.nfk.authorization-grant-type
+              value: password
+            - name: spring.security.oauth2.client.registration.nfk.scope
+              value: fint-client
+            - name: spring.security.oauth2.client.registration.nfk.provider
+              value: fint
 
             # Oslo
             # - name: kulturtanken.organisations.958935420.organisationnumber
