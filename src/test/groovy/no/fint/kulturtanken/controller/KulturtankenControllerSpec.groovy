@@ -1,6 +1,5 @@
 package no.fint.kulturtanken.controller
 
-import groovy.json.JsonOutput
 import no.fint.kulturtanken.configuration.KulturtankenProperties
 import no.fint.kulturtanken.model.Basisgruppe
 import no.fint.kulturtanken.model.Besoksadresse
