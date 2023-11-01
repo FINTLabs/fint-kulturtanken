@@ -1,10 +1,8 @@
-package no.fint.kulturtanken.controller;
+package no.fint.kulturtanken.kulturanken;
 
 import lombok.extern.slf4j.Slf4j;
-import no.fint.kulturtanken.configuration.KulturtankenProperties;
 import no.fint.kulturtanken.exception.SchoolOwnerNotFoundException;
 import no.fint.kulturtanken.model.Skoleeier;
-import no.fint.kulturtanken.service.KulturtankenService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestClientResponseException;

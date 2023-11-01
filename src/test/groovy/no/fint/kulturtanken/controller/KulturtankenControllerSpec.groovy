@@ -1,6 +1,7 @@
 package no.fint.kulturtanken.controller
 
-import no.fint.kulturtanken.configuration.KulturtankenProperties
+import no.fint.kulturtanken.kulturanken.KulturtankenProperties
+import no.fint.kulturtanken.kulturanken.KulturtankenController
 import no.fint.kulturtanken.model.Basisgruppe
 import no.fint.kulturtanken.model.Besoksadresse
 import no.fint.kulturtanken.model.Fag
@@ -10,7 +11,7 @@ import no.fint.kulturtanken.model.Skole
 import no.fint.kulturtanken.model.Skoleeier
 import no.fint.kulturtanken.model.Trinn
 import no.fint.kulturtanken.model.Undervisningsgruppe
-import no.fint.kulturtanken.service.KulturtankenService
+import no.fint.kulturtanken.kulturanken.KulturtankenService
 
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.setup.MockMvcBuilders

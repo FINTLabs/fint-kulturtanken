@@ -1,5 +1,6 @@
 package no.fint.kulturtanken.util
 
+import no.fint.kulturtanken.kulturanken.KulturtankenUtil
 import spock.lang.Specification
 
 import java.time.LocalDate

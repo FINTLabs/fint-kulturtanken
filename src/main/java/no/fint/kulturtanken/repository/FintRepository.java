@@ -1,7 +1,7 @@
 package no.fint.kulturtanken.repository;
 
 import lombok.extern.slf4j.Slf4j;
-import no.fint.kulturtanken.configuration.KulturtankenProperties;
+import no.fint.kulturtanken.kulturanken.KulturtankenProperties;
 import no.fint.model.resource.AbstractCollectionResources;
 import no.fint.model.resource.FintLinks;
 import no.fint.model.resource.Link;

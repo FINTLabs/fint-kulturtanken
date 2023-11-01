@@ -1,7 +1,7 @@
 package no.fint.kulturtanken.model;
 
 import lombok.Data;
-import no.fint.kulturtanken.util.KulturtankenUtil;
+import no.fint.kulturtanken.kulturanken.KulturtankenUtil;
 
 import java.time.LocalDate;
 import java.util.List;

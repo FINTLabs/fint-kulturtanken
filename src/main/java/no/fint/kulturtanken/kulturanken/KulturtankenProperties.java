@@ -1,4 +1,4 @@
-package no.fint.kulturtanken.configuration;
+package no.fint.kulturtanken.kulturanken;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
