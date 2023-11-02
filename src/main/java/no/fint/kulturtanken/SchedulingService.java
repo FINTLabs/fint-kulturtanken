@@ -1,7 +1,6 @@
-package no.fint.kulturtanken.service;
+package no.fint.kulturtanken;
 
 import lombok.extern.slf4j.Slf4j;
-import no.fint.kulturtanken.KulturtankenProperties;
 import no.fint.kulturtanken.repository.FintRepository;
 import no.fint.kulturtanken.repository.NsrRepository;
 import org.springframework.cache.annotation.CacheEvict;
