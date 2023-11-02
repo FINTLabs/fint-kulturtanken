@@ -1,7 +1,7 @@
 package no.fint.kulturtanken.service
 
-import no.fint.kulturtanken.kulturanken.KulturtankenProperties
-import no.fint.kulturtanken.kulturanken.KulturtankenService
+import no.fint.kulturtanken.KulturtankenProperties
+import no.fint.kulturtanken.KulturtankenService
 import no.fint.kulturtanken.model.Enhet
 import no.fint.kulturtanken.model.Skole
 import no.fint.kulturtanken.model.Skoleeier

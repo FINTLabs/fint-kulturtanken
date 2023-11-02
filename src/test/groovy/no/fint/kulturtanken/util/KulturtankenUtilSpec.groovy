@@ -1,6 +1,7 @@
 package no.fint.kulturtanken.util
 
-import no.fint.kulturtanken.kulturanken.KulturtankenUtil
+
+import no.fint.kulturtanken.model.Skoleeier
 import spock.lang.Specification
 
 import java.time.LocalDate
@@ -12,7 +13,7 @@ class KulturtankenUtilSpec extends Specification {
         def date = LocalDate.parse('2019-08-01')
 
         when:
-        def schoolYear = KulturtankenUtil.getSchoolYear(date)
+        def schoolYear = Skoleeier.getSchoolYear(date)
 
         then:
         schoolYear == '2019/2020'
@@ -23,7 +24,7 @@ class KulturtankenUtilSpec extends Specification {
         def date = LocalDate.parse('2019-07-31')
 
         when:
-        def schoolYear = KulturtankenUtil.getSchoolYear(date)
+        def schoolYear = Skoleeier.getSchoolYear(date)
 
         then:
         schoolYear == '2018/2019'

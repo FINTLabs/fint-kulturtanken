@@ -1,4 +1,4 @@
-package no.fint.kulturtanken.kulturanken;
+package no.fint.kulturtanken;
 
 import lombok.extern.slf4j.Slf4j;
 import no.fint.kulturtanken.exception.SchoolOwnerNotFoundException;
