@@ -3,9 +3,8 @@ name: CD
 on:
   repository_dispatch:
     types: [trigger-cd]
-  push:
-    branches:
-      - CT-1005-deploy-for-new-orgs
+  workflow_dispatch:
+
 
 env:
   REGISTRY: ghcr.io
