@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: fint-kulturtanken
+  name: kulturtanken
   labels:
     io.kompose.service: kulturtanken
 spec:
