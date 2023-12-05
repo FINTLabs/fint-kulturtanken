@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kulturtanken
+  labels:
+    io.kompose.service: kulturtanken
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: kulturtanken
+  template:
+    metadata:
+      labels:
+        io.kompose.service: kulturtanken
+    spec:
+      containers:
+        - name: kulturtanken
+          image: fintlabsacr.azurecr.io/fint-kulturtanken:f860eaf810bc1bee68c53accac76131b34d37d6c
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              cpu: '500m'
+              memory: '2Gi'
+            limits:
+              cpu: '1000m'
+              memory: '4Gi'
+          readinessProbe:
+            httpGet:
+              path: /tjenester/kulturtanken/actuator/health
+              port: 8080
+            initialDelaySeconds: 60
+            timeoutSeconds: 5
+          env:
+            - name: TZ
+              value: Europe/Oslo
+            - name: JAVA_TOOL_OPTIONS
+              value: -XX:+ExitOnOutOfMemoryError -Xmx3G
+            - name: server.servlet.context-path
+              value: /tjenester/kulturtanken
+            - name: spring.security.oauth2.client.provider.fint.token-uri
+              value: https://idp.felleskomponent.no/nidp/oauth/nam/token
