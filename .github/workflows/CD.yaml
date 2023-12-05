@@ -55,21 +55,11 @@ jobs:
     strategy:
       matrix:
         org:
-          - rogfk-no
-          - oslo-kommune-no
-          - mrfylke-no
-          - vtfk-no
-          - agderfk-no
-          - innlandetfylke-no
-          - viken-no
-          - nfk-no
-          - afk-no
-          - bfk-no
-          - ofk-no
+          - default
         cluster:
 #          - aks-alpha-fint-2021-11-18
           - aks-beta-fint-2021-11-23
-          - aks-api-fint-2022-02-08
+#          - aks-api-fint-2022-02-08
 #          - aks-pwf-fint-2021-10-20
 
     steps:
@@ -95,7 +85,7 @@ jobs:
         uses: azure/k8s-bake@v2.4
         with:
           renderEngine: 'kustomize'
-          kustomizationPath: 'kustomize/overlays/${{ steps.environment.outputs.result }}/${{ matrix.org }}'
+          kustomizationPath: 'kustomize/base'
 
       - uses: azure/login@v1
         with:
