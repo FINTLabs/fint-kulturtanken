@@ -1,0 +1,20 @@
+apiVersion: fintlabs.no/v1alpha1
+kind: FintClient
+metadata:
+  name: kulturtanken-afk
+  namespace: default
+  labels:
+    app.kubernetes.io/name: kulturtanken
+    app.kubernetes.io/instance: kulturtanken_default
+    app.kubernetes.io/version: latest
+    app.kubernetes.io/component: backend
+    app.kubernetes.io/part-of: fint-core
+    fintlabs.no/team: core
+    fintlabs.no/org-id: ofk.no
+spec:
+  orgId: ofk.no
+  note: Kulturtanken
+  components:
+    - utdanning_elev
+    - utdanning_timeplan
+    - utdanning_utdanningsprogram
