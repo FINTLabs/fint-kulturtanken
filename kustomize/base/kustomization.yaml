@@ -1,4 +1,6 @@
 resources:
   - deployment.yaml
   - service.yaml
-  - onePasswordItems.yaml
+  - onepassworditem.yaml
+patchesStrategicMerge:
+  - deployment_patch.yaml
