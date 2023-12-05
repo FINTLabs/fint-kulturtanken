@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: kulturtanken
-          image: fintlabsacr.azurecr.io/fint-kulturtanken:f860eaf810bc1bee68c53accac76131b34d37d6c
+          image: ghcr.io/fintlabs/fint-kulturtanken:latest
           ports:
             - containerPort: 8080
           resources:
