@@ -1,5 +1,6 @@
 package no.fint.kulturtanken.controller;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import no.fint.kulturtanken.configuration.KulturtankenProperties;
 import no.fint.kulturtanken.exception.SchoolOwnerNotFoundException;
@@ -17,14 +18,11 @@ import java.util.stream.Stream;
 @Slf4j
 @RestController
 @RequestMapping("/skoleeier")
+@RequiredArgsConstructor
 public class KulturtankenController {
+
     private final KulturtankenService kulturtankenService;
     private final KulturtankenProperties kulturtankenProperties;
-
-    public KulturtankenController(KulturtankenService kulturtankenService, KulturtankenProperties kulturtankenProperties) {
-        this.kulturtankenService = kulturtankenService;
-        this.kulturtankenProperties = kulturtankenProperties;
-    }
 
     @GetMapping("/{orgId}")
     public Skoleeier getSchoolOwner(@PathVariable String orgId) {

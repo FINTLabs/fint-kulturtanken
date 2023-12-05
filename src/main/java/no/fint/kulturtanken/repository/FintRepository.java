@@ -1,5 +1,6 @@
 package no.fint.kulturtanken.repository;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import no.fint.kulturtanken.configuration.KulturtankenProperties;
 import no.fint.model.resource.AbstractCollectionResources;
@@ -31,7 +32,9 @@ import java.util.stream.Stream;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class FintRepository {
+
     private final WebClient webClient;
     private final Authentication principal;
     private final OAuth2AuthorizedClientManager authorizedClientManager;
@@ -39,13 +42,6 @@ public class FintRepository {
 
     private final Map<String, Map<String, String>> selfLinks = new HashMap<>();
     private final Map<String, Map<String, FintLinks>> resources = new HashMap<>();
-
-    public FintRepository(WebClient webClient, Authentication principal, OAuth2AuthorizedClientManager authorizedClientManager, KulturtankenProperties kulturtankenProperties) {
-        this.webClient = webClient;
-        this.principal = principal;
-        this.authorizedClientManager = authorizedClientManager;
-        this.kulturtankenProperties = kulturtankenProperties;
-    }
 
     public List<SkoleResource> getSchools(String orgId) {
         return getResourcesByType(orgId, SkoleResource.class);

@@ -16,6 +16,7 @@ import java.util.function.Predicate;
 @Slf4j
 @Repository
 public class NsrRepository {
+
     private final WebClient webClient;
 
     private final MultiValueMap<String, Skole> schools = new LinkedMultiValueMap<>();

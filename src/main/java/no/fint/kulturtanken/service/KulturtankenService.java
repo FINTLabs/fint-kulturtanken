@@ -1,5 +1,6 @@
 package no.fint.kulturtanken.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import no.fint.kulturtanken.configuration.KulturtankenProperties;
 import no.fint.kulturtanken.model.*;
@@ -23,16 +24,12 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class KulturtankenService {
+
     private final NsrRepository nsrRepository;
     private final FintRepository fintRepository;
     private final KulturtankenProperties kulturtankenProperties;
-
-    public KulturtankenService(NsrRepository nsrRepository, FintRepository fintRepository, KulturtankenProperties kulturtankenProperties) {
-        this.nsrRepository = nsrRepository;
-        this.fintRepository = fintRepository;
-        this.kulturtankenProperties = kulturtankenProperties;
-    }
 
     @Cacheable(value = "schoolOwner", unless = "#result == null")
     public Skoleeier getSchoolOwner(String orgId) {
