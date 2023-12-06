@@ -22,13 +22,12 @@ public class SchedulingService {
     @CacheEvict(value = {"schoolOwner"}, allEntries = true)
     public void updateCache() {
         kulturtankenProperties.getOrganisations().forEach((orgId, organisation) -> {
+            log.info("Updating cache for {}", organisation.getName());
             nsrRepository.updateResources(orgId);
 
             if (organisation.getSource().equals("fint")) {
                 fintRepository.updateResources(orgId);
             }
-
-            log.info(organisation.getName());
         });
     }
 }
