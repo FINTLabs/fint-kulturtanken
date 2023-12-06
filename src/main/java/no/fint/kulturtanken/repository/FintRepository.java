@@ -83,7 +83,8 @@ public class FintRepository {
                 .stream()
                 .map(registration -> get(registration, clazz)
                         .flatMapIterable(T::getContent))
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList()))
+                .doOnError(throwable -> log.error("Error getting resource {}", clazz.getSimpleName(), throwable));
     }
 
     private <T> Mono<T> get(KulturtankenProperties.Registration registration, Class<T> clazz) {
