@@ -44,28 +44,6 @@ kulturtanken:
           username:
           password:
           environment:
-    930580783:
-      name: Akershus fylkeskommune
-      organisationnumber:
-      source:
-      groups:
-      registration:
-        1:
-          id:
-          username:
-          password:
-          environment:
-    921707134:
-      name: Agder
-      organisationnumber:
-      source:
-      groups:
-      registration:
-        1:
-          id:
-          username:
-          password:
-          environment:
     920717152:
       name: Innlandet
       organisationnumber:
