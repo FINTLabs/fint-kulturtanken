@@ -1,5 +1,49 @@
 kulturtanken:
   organisations:
+    930580694:
+      name: Østfold fylkeskommune
+      organisationnumber:
+      source:
+      groups:
+      registration:
+        1:
+          id:
+          username:
+          password:
+          environment:
+    930580260:
+      name: Buskerud fylkeskommune
+      organisationnumber:
+      source:
+      groups:
+      registration:
+        1:
+          id:
+          username:
+          password:
+          environment:
+    930580783:
+      name: Akershus fylkeskommune
+      organisationnumber:
+      source:
+      groups:
+      registration:
+        1:
+          id:
+          username:
+          password:
+          environment:
+    921707134:
+      name: Agder
+      organisationnumber:
+      source:
+      groups:
+      registration:
+        1:
+          id:
+          username:
+          password:
+          environment:
     930580783:
       name: Akershus fylkeskommune
       organisationnumber:
