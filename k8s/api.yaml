@@ -165,43 +165,43 @@ spec:
             - name: spring.security.oauth2.client.registration.rogaland.provider
               value: fint
 
-            # Vestfold og Telemark
-            - name: kulturtanken.organisations.821227062.organisationnumber
-              value: '821227062'
-            - name: kulturtanken.organisations.821227062.source
-              value: fint
-            - name: kulturtanken.organisations.821227062.groups
-              value: 'true'
-            - name: kulturtanken.organisations.821227062.registration.1.id
-              value: 'vtfk'
-            - name: kulturtanken.organisations.821227062.registration.1.environment
-              value: https://api.felleskomponent.no
-            - name: kulturtanken.organisations.821227062.registration.1.username
-              valueFrom:
-                secretKeyRef:
-                  name: kulturtanken-vtfk
-                  key: username
-            - name: kulturtanken.organisations.821227062.registration.1.password
-              valueFrom:
-                secretKeyRef:
-                  name: kulturtanken-vtfk
-                  key: password
-            - name: spring.security.oauth2.client.registration.vtfk.client-id
-              valueFrom:
-                secretKeyRef:
-                  key: client-id
-                  name: kulturtanken-vtfk
-            - name: spring.security.oauth2.client.registration.vtfk.client-secret
-              valueFrom:
-                secretKeyRef:
-                  key: client-secret
-                  name: kulturtanken-vtfk
-            - name: spring.security.oauth2.client.registration.vtfk.authorization-grant-type
-              value: password
-            - name: spring.security.oauth2.client.registration.vtfk.scope
-              value: fint-client
-            - name: spring.security.oauth2.client.registration.vtfk.provider
-              value: fint
+#            # Vestfold og Telemark
+#            - name: kulturtanken.organisations.821227062.organisationnumber
+#              value: '821227062'
+#            - name: kulturtanken.organisations.821227062.source
+#              value: fint
+#            - name: kulturtanken.organisations.821227062.groups
+#              value: 'true'
+#            - name: kulturtanken.organisations.821227062.registration.1.id
+#              value: 'vtfk'
+#            - name: kulturtanken.organisations.821227062.registration.1.environment
+#              value: https://api.felleskomponent.no
+#            - name: kulturtanken.organisations.821227062.registration.1.username
+#              valueFrom:
+#                secretKeyRef:
+#                  name: kulturtanken-vtfk
+#                  key: username
+#            - name: kulturtanken.organisations.821227062.registration.1.password
+#              valueFrom:
+#                secretKeyRef:
+#                  name: kulturtanken-vtfk
+#                  key: password
+#            - name: spring.security.oauth2.client.registration.vtfk.client-id
+#              valueFrom:
+#                secretKeyRef:
+#                  key: client-id
+#                  name: kulturtanken-vtfk
+#            - name: spring.security.oauth2.client.registration.vtfk.client-secret
+#              valueFrom:
+#                secretKeyRef:
+#                  key: client-secret
+#                  name: kulturtanken-vtfk
+#            - name: spring.security.oauth2.client.registration.vtfk.authorization-grant-type
+#              value: password
+#            - name: spring.security.oauth2.client.registration.vtfk.scope
+#              value: fint-client
+#            - name: spring.security.oauth2.client.registration.vtfk.provider
+#              value: fint
 
             # Agder
             - name: kulturtanken.organisations.921707134.organisationnumber

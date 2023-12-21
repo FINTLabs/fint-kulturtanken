@@ -110,14 +110,14 @@ kulturtanken:
           username:
           password:
           environment:
-    921693230:
-      name: Viken
-      organisationnumber:
-      source:
-      groups:
-      registration:
-        1:
-          id:
-          username:
-          password:
-          environment:
+#    921693230:
+#      name: Viken
+#      organisationnumber:
+#      source:
+#      groups:
+#      registration:
+#        1:
+#          id:
+#          username:
+#          password:
+#          environment:
