@@ -1,7 +1,7 @@
 kulturtanken:
   organisations:
     830090282:
-      name: Finnmark fylkeskommune
+      name: Finnmark
       organisationnumber:
       source:
       groups:
@@ -12,7 +12,7 @@ kulturtanken:
           password:
           environment:
     930068128:
-      name: Troms fylkeskommune
+      name: Troms
       organisationnumber:
       source:
       groups:
@@ -23,7 +23,7 @@ kulturtanken:
           password:
           environment:
     930580694:
-      name: Østfold fylkeskommune
+      name: Østfold
       organisationnumber:
       source:
       groups:
@@ -34,7 +34,7 @@ kulturtanken:
           password:
           environment:
     929882989:
-      name: Telemark fylkeskommune
+      name: Telemark
       organisationnumber:
       source:
       groups:
@@ -45,7 +45,7 @@ kulturtanken:
           password:
           environment:
     929882385:
-      name: Vestfold fylkeskommune
+      name: Vestfold
       organisationnumber:
       source:
       groups:
@@ -56,7 +56,7 @@ kulturtanken:
           password:
           environment:
     930580260:
-      name: Buskerud fylkeskommune
+      name: Buskerud
       organisationnumber:
       source:
       groups:
@@ -67,7 +67,7 @@ kulturtanken:
           password:
           environment:
     930580783:
-      name: Akershus fylkeskommune
+      name: Akershus
       organisationnumber:
       source:
       groups:
