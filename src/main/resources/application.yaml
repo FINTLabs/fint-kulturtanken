@@ -11,6 +11,28 @@ kulturtanken:
           username:
           password:
           environment:
+    929882989:
+      name: Telemark fylkeskommune
+      organisationnumber:
+      source:
+      groups:
+      registration:
+        1:
+          id:
+          username:
+          password:
+          environment:
+    929882385:
+      name: Vestfold fylkeskommune
+      organisationnumber:
+      source:
+      groups:
+      registration:
+        1:
+          id:
+          username:
+          password:
+          environment:
     930580260:
       name: Buskerud fylkeskommune
       organisationnumber:
@@ -121,30 +143,8 @@ kulturtanken:
           username:
           password:
           environment:
-    821227062:
-      name: Vestfold og Telemark
-      organisationnumber:
-      source:
-      groups:
-      registration:
-        1:
-          id:
-          username:
-          password:
-          environment:
     821311632:
       name: Vestland
-      organisationnumber:
-      source:
-      groups:
-      registration:
-        1:
-          id:
-          username:
-          password:
-          environment:
-    921693230:
-      name: Viken
       organisationnumber:
       source:
       groups:

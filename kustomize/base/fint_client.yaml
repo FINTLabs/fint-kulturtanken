@@ -60,3 +60,45 @@ spec:
     - utdanning_elev
     - utdanning_timeplan
     - utdanning_utdanningsprogram
+---
+apiVersion: fintlabs.no/v1alpha1
+kind: FintClient
+metadata:
+  name: kulturtanken-vestfoldfylke
+  namespace: default
+  labels:
+    app.kubernetes.io/name: kulturtanken
+    app.kubernetes.io/instance: kulturtanken_default
+    app.kubernetes.io/version: latest
+    app.kubernetes.io/component: backend
+    app.kubernetes.io/part-of: fint-core
+    fintlabs.no/team: core
+    fintlabs.no/org-id: vestfoldfylke.no
+spec:
+  orgId: vestfoldfylke.no
+  note: Kulturtanken
+  components:
+    - utdanning_elev
+    - utdanning_timeplan
+    - utdanning_utdanningsprogram
+---
+apiVersion: fintlabs.no/v1alpha1
+kind: FintClient
+metadata:
+  name: kulturtanken-telemarkfylke
+  namespace: default
+  labels:
+    app.kubernetes.io/name: kulturtanken
+    app.kubernetes.io/instance: kulturtanken_default
+    app.kubernetes.io/version: latest
+    app.kubernetes.io/component: backend
+    app.kubernetes.io/part-of: fint-core
+    fintlabs.no/team: core
+    fintlabs.no/org-id: telemarkfylke.no
+spec:
+  orgId: telemarkfylke.no
+  note: Kulturtanken
+  components:
+    - utdanning_elev
+    - utdanning_timeplan
+    - utdanning_utdanningsprogram
