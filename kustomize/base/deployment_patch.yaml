@@ -288,23 +288,23 @@ spec:
             - name: kulturtanken.organisations.971045698.registration.1.username
               valueFrom:
                 secretKeyRef:
-                  name: kulturtanken-rogaland
-                  key: username
+                  name: kulturtanken-rogfk
+                  key: fint.core.oauth2.username
             - name: kulturtanken.organisations.971045698.registration.1.password
               valueFrom:
                 secretKeyRef:
-                  name: kulturtanken-rogaland
-                  key: password
+                  name: kulturtanken-rogfk
+                  key: fint.core.oauth2.password
             - name: spring.security.oauth2.client.registration.rogaland.client-id
               valueFrom:
                 secretKeyRef:
-                  key: client-id
-                  name: kulturtanken-rogaland
+                  key: fint.core.oauth2.client-id
+                  name: fint-flyt-archive-dispatch-gateway-op
             - name: spring.security.oauth2.client.registration.rogaland.client-secret
               valueFrom:
                 secretKeyRef:
-                  key: client-secret
-                  name: kulturtanken-rogaland
+                  key: fint.core.oauth2.client-secret
+                  name: fint-flyt-archive-dispatch-gateway-op
             - name: spring.security.oauth2.client.registration.rogaland.authorization-grant-type
               value: password
             - name: spring.security.oauth2.client.registration.rogaland.scope
@@ -326,23 +326,23 @@ spec:
             - name: kulturtanken.organisations.921707134.registration.1.username
               valueFrom:
                 secretKeyRef:
-                  name: kulturtanken-agder
-                  key: username
+                  name: kulturtanken-agderfk
+                  key: fint.core.oauth2.username
             - name: kulturtanken.organisations.921707134.registration.1.password
               valueFrom:
                 secretKeyRef:
-                  name: kulturtanken-agder
-                  key: password
+                  name: kulturtanken-agderfk
+                  key: fint.core.oauth2.password
             - name: spring.security.oauth2.client.registration.agderfk.client-id
               valueFrom:
                 secretKeyRef:
-                  key: client-id
-                  name: kulturtanken-agder
+                  key: fint.core.oauth2.client-id
+                  name: kulturtanken-agderfk
             - name: spring.security.oauth2.client.registration.agderfk.client-secret
               valueFrom:
                 secretKeyRef:
-                  key: client-secret
-                  name: kulturtanken-agder
+                  key: fint.core.oauth2.client-secret
+                  name: kulturtanken-agderfk
             - name: spring.security.oauth2.client.registration.agderfk.authorization-grant-type
               value: password
             - name: spring.security.oauth2.client.registration.agderfk.scope
@@ -364,23 +364,23 @@ spec:
             - name: kulturtanken.organisations.920717152.registration.1.username
               valueFrom:
                 secretKeyRef:
-                  name: kulturtanken-innlandet
-                  key: username
+                  name: kulturtanken-innlandetfylke
+                  key: fint.core.oauth2.username
             - name: kulturtanken.organisations.920717152.registration.1.password
               valueFrom:
                 secretKeyRef:
-                  name: kulturtanken-innlandet
-                  key: password
+                  name: kulturtanken-innlandetfylke
+                  key: fint.core.oauth2.password
             - name: spring.security.oauth2.client.registration.innlandet.client-id
               valueFrom:
                 secretKeyRef:
-                  key: client-id
-                  name: kulturtanken-innlandet
+                  key: fint.core.oauth2.client-id
+                  name: kulturtanken-innlandetfylke
             - name: spring.security.oauth2.client.registration.innlandet.client-secret
               valueFrom:
                 secretKeyRef:
-                  key: client-secret
-                  name: kulturtanken-innlandet
+                  key: fint.core.oauth2.client-secret
+                  name: kulturtanken-innlandetfylke
             - name: spring.security.oauth2.client.registration.innlandet.authorization-grant-type
               value: password
             - name: spring.security.oauth2.client.registration.innlandet.scope
@@ -402,23 +402,23 @@ spec:
             - name: kulturtanken.organisations.944183779.registration.1.username
               valueFrom:
                 secretKeyRef:
-                  name: kulturtanken-mrfk
-                  key: username
+                  name: kulturtanken-mrfylke
+                  key: fint.core.oauth2.username
             - name: kulturtanken.organisations.944183779.registration.1.password
               valueFrom:
                 secretKeyRef:
-                  name: kulturtanken-mrfk
-                  key: password
+                  name: kulturtanken-mrfylke
+                  key: fint.core.oauth2.password
             - name: spring.security.oauth2.client.registration.mrfk.client-id
               valueFrom:
                 secretKeyRef:
-                  key: client-id
-                  name: kulturtanken-mrfk
+                  key: fint.core.oauth2.client-id
+                  name: kulturtanken-mrfylke
             - name: spring.security.oauth2.client.registration.mrfk.client-secret
               valueFrom:
                 secretKeyRef:
-                  key: client-secret
-                  name: kulturtanken-mrfk
+                  key: fint.core.oauth2.client-secret
+                  name: kulturtanken-mrfylke
             - name: spring.security.oauth2.client.registration.mrfk.authorization-grant-type
               value: password
             - name: spring.security.oauth2.client.registration.mrfk.scope
@@ -440,23 +440,23 @@ spec:
             - name: kulturtanken.organisations.964982953.registration.1.username
               valueFrom:
                 secretKeyRef:
-                  name: kulturtanken-nordland
-                  key: username
+                  name: kulturtanken-nfk
+                  key: fint.core.oauth2.username
             - name: kulturtanken.organisations.964982953.registration.1.password
               valueFrom:
                 secretKeyRef:
-                  name: kulturtanken-nordland
-                  key: password
+                  name: kulturtanken-nfk
+                  key: fint.core.oauth2.password
             - name: spring.security.oauth2.client.registration.nfk.client-id
               valueFrom:
                 secretKeyRef:
-                  key: client-id
-                  name: kulturtanken-nordland
+                  key: fint.core.oauth2.client-id
+                  name: kulturtanken-nfk
             - name: spring.security.oauth2.client.registration.nfk.client-secret
               valueFrom:
                 secretKeyRef:
-                  key: client-secret
-                  name: kulturtanken-nordland
+                  key: fint.core.oauth2.client-secret
+                  name: kulturtanken-nfk
             - name: spring.security.oauth2.client.registration.nfk.authorization-grant-type
               value: password
             - name: spring.security.oauth2.client.registration.nfk.scope
@@ -479,21 +479,21 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: kulturtanken-oslo
-                  key: username
+                  key: fint.core.oauth2.username
             - name: kulturtanken.organisations.958935420.registration.1.password
               valueFrom:
                 secretKeyRef:
                   name: kulturtanken-oslo
-                  key: password
+                  key: fint.core.oauth2.password
             - name: spring.security.oauth2.client.registration.oslo.client-id
               valueFrom:
                 secretKeyRef:
-                  key: client-id
+                  key: fint.core.oauth2.client-id
                   name: kulturtanken-oslo
             - name: spring.security.oauth2.client.registration.oslo.client-secret
               valueFrom:
                 secretKeyRef:
-                  key: client-secret
+                  key: fint.core.oauth2.client-secret
                   name: kulturtanken-oslo
             - name: spring.security.oauth2.client.registration.oslo.authorization-grant-type
               value: password
