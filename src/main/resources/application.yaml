@@ -1,5 +1,27 @@
 kulturtanken:
   organisations:
+    830090282:
+      name: Finnmark fylkeskommune
+      organisationnumber:
+      source:
+      groups:
+      registration:
+        1:
+          id:
+          username:
+          password:
+          environment:
+    930068128:
+      name: Troms fylkeskommune
+      organisationnumber:
+      source:
+      groups:
+      registration:
+        1:
+          id:
+          username:
+          password:
+          environment:
     930580694:
       name: Østfold fylkeskommune
       organisationnumber:
@@ -112,17 +134,6 @@ kulturtanken:
           environment:
     971045698:
       name: Rogaland
-      organisationnumber:
-      source:
-      groups:
-      registration:
-        1:
-          id:
-          username:
-          password:
-          environment:
-    922420866:
-      name: Troms og Finnmark
       organisationnumber:
       source:
       groups:
