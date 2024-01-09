@@ -1,5 +1,82 @@
 kulturtanken:
   organisations:
+    830090282:
+      name: Finnmark
+      organisationnumber:
+      source:
+      groups:
+      registration:
+        1:
+          id:
+          username:
+          password:
+          environment:
+    930068128:
+      name: Troms
+      organisationnumber:
+      source:
+      groups:
+      registration:
+        1:
+          id:
+          username:
+          password:
+          environment:
+    930580694:
+      name: Østfold
+      organisationnumber:
+      source:
+      groups:
+      registration:
+        1:
+          id:
+          username:
+          password:
+          environment:
+    929882989:
+      name: Telemark
+      organisationnumber:
+      source:
+      groups:
+      registration:
+        1:
+          id:
+          username:
+          password:
+          environment:
+    929882385:
+      name: Vestfold
+      organisationnumber:
+      source:
+      groups:
+      registration:
+        1:
+          id:
+          username:
+          password:
+          environment:
+    930580260:
+      name: Buskerud
+      organisationnumber:
+      source:
+      groups:
+      registration:
+        1:
+          id:
+          username:
+          password:
+          environment:
+    930580783:
+      name: Akershus
+      organisationnumber:
+      source:
+      groups:
+      registration:
+        1:
+          id:
+          username:
+          password:
+          environment:
     921707134:
       name: Agder
       organisationnumber:
@@ -66,30 +143,8 @@ kulturtanken:
           username:
           password:
           environment:
-    922420866:
-      name: Troms og Finnmark
-      organisationnumber:
-      source:
-      groups:
-      registration:
-        1:
-          id:
-          username:
-          password:
-          environment:
     817920632:
       name: Trøndelag
-      organisationnumber:
-      source:
-      groups:
-      registration:
-        1:
-          id:
-          username:
-          password:
-          environment:
-    821227062:
-      name: Vestfold og Telemark
       organisationnumber:
       source:
       groups:
@@ -110,14 +165,3 @@ kulturtanken:
           username:
           password:
           environment:
-#    921693230:
-#      name: Viken
-#      organisationnumber:
-#      source:
-#      groups:
-#      registration:
-#        1:
-#          id:
-#          username:
-#          password:
-#          environment:

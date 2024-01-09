@@ -1,0 +1,7 @@
+resources:
+  - deployment.yaml
+  - service.yaml
+  - onepassworditem.yaml
+  - fint_client.yaml
+patchesStrategicMerge:
+  - deployment_patch.yaml

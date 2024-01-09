@@ -93,7 +93,7 @@ spec:
     spec:
       containers:
         - name: kulturtanken
-          image: fintlabsacr.azurecr.io/fint-kulturtanken:init
+          image: fintlabsacr.azurecr.io/fint-kulturtanken:f860eaf810bc1bee68c53accac76131b34d37d6c
           resources:
             limits:
               cpu: '1000m'

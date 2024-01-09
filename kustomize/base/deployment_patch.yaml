@@ -1,0 +1,511 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kulturtanken
+spec:
+  template:
+    spec:
+      containers:
+        - name: kulturtanken
+          env:
+            # Troms fylkeskommune
+            - name: kulturtanken.organisations.930068128.organisationnumber
+              value: '930068128'
+            - name: kulturtanken.organisations.930068128.source
+              value: fint
+            - name: kulturtanken.organisations.930068128.groups
+              value: 'true'
+            - name: kulturtanken.organisations.930068128.registration.1.id
+              value: 'tromsfylke'
+            - name: kulturtanken.organisations.930068128.registration.1.environment
+              value: https://api.felleskomponent.no
+            - name: kulturtanken.organisations.930068128.registration.1.username
+              valueFrom:
+                secretKeyRef:
+                  name: kulturtanken-tromsfylke
+                  key: fint.core.oauth2.username
+            - name: kulturtanken.organisations.930068128.registration.1.password
+              valueFrom:
+                secretKeyRef:
+                  name: kulturtanken-tromsfylke
+                  key: fint.core.oauth2.password
+            - name: spring.security.oauth2.client.registration.tromsfylke.client-id
+              valueFrom:
+                secretKeyRef:
+                  name: kulturtanken-tromsfylke
+                  key: fint.core.oauth2.client-id
+            - name: spring.security.oauth2.client.registration.tromsfylke.client-secret
+              valueFrom:
+                secretKeyRef:
+                  name: kulturtanken-tromsfylke
+                  key: fint.core.oauth2.client-secret
+            - name: spring.security.oauth2.client.registration.tromsfylke.authorization-grant-type
+              value: password
+            - name: spring.security.oauth2.client.registration.tromsfylke.scope
+              value: fint-client
+            - name: spring.security.oauth2.client.registration.tromsfylke.provider
+              value: fint
+
+            # Finnmark fylkeskommune
+            - name: kulturtanken.organisations.830090282.organisationnumber
+              value: '830090282'
+            - name: kulturtanken.organisations.830090282.source
+              value: fint
+            - name: kulturtanken.organisations.830090282.groups
+              value: 'true'
+            - name: kulturtanken.organisations.830090282.registration.1.id
+              value: 'ffk'
+            - name: kulturtanken.organisations.830090282.registration.1.environment
+              value: https://api.felleskomponent.no
+            - name: kulturtanken.organisations.830090282.registration.1.username
+              valueFrom:
+                secretKeyRef:
+                  name: kulturtanken-ffk
+                  key: fint.core.oauth2.username
+            - name: kulturtanken.organisations.830090282.registration.1.password
+              valueFrom:
+                secretKeyRef:
+                  name: kulturtanken-ffk
+                  key: fint.core.oauth2.password
+            - name: spring.security.oauth2.client.registration.ffk.client-id
+              valueFrom:
+                secretKeyRef:
+                  name: kulturtanken-ffk
+                  key: fint.core.oauth2.client-id
+            - name: spring.security.oauth2.client.registration.ffk.client-secret
+              valueFrom:
+                secretKeyRef:
+                  name: kulturtanken-ffk
+                  key: fint.core.oauth2.client-secret
+            - name: spring.security.oauth2.client.registration.ffk.authorization-grant-type
+              value: password
+            - name: spring.security.oauth2.client.registration.ffk.scope
+              value: fint-client
+            - name: spring.security.oauth2.client.registration.ffk.provider
+              value: fint
+
+            # Østfold fylkeskommune
+            - name: kulturtanken.organisations.930580694.organisationnumber
+              value: '930580694'
+            - name: kulturtanken.organisations.930580694.source
+              value: fint
+            - name: kulturtanken.organisations.930580694.groups
+              value: 'true'
+            - name: kulturtanken.organisations.930580694.registration.1.id
+              value: 'ofk'
+            - name: kulturtanken.organisations.930580694.registration.1.environment
+              value: https://api.felleskomponent.no
+            - name: kulturtanken.organisations.930580694.registration.1.username
+              valueFrom:
+                secretKeyRef:
+                  name: kulturtanken-ofk
+                  key: fint.core.oauth2.username
+            - name: kulturtanken.organisations.930580694.registration.1.password
+              valueFrom:
+                secretKeyRef:
+                  name: kulturtanken-ofk
+                  key: fint.core.oauth2.password
+            - name: spring.security.oauth2.client.registration.ofk.client-id
+              valueFrom:
+                secretKeyRef:
+                  name: kulturtanken-ofk
+                  key: fint.core.oauth2.client-id
+            - name: spring.security.oauth2.client.registration.ofk.client-secret
+              valueFrom:
+                secretKeyRef:
+                  name: kulturtanken-ofk
+                  key: fint.core.oauth2.client-secret
+            - name: spring.security.oauth2.client.registration.ofk.authorization-grant-type
+              value: password
+            - name: spring.security.oauth2.client.registration.ofk.scope
+              value: fint-client
+            - name: spring.security.oauth2.client.registration.ofk.provider
+              value: fint
+
+            # Buskerud fylkeskommune
+            - name: kulturtanken.organisations.930580260.organisationnumber
+              value: '930580260'
+            - name: kulturtanken.organisations.930580260.source
+              value: fint
+            - name: kulturtanken.organisations.930580260.groups
+              value: 'true'
+            - name: kulturtanken.organisations.930580260.registration.1.id
+              value: 'bfk'
+            - name: kulturtanken.organisations.930580260.registration.1.environment
+              value: https://api.felleskomponent.no
+            - name: kulturtanken.organisations.930580260.registration.1.username
+              valueFrom:
+                secretKeyRef:
+                  name: kulturtanken-bfk
+                  key: fint.core.oauth2.username
+            - name: kulturtanken.organisations.930580260.registration.1.password
+              valueFrom:
+                secretKeyRef:
+                  name: kulturtanken-bfk
+                  key: fint.core.oauth2.password
+            - name: spring.security.oauth2.client.registration.bfk.client-id
+              valueFrom:
+                secretKeyRef:
+                  name: kulturtanken-bfk
+                  key: fint.core.oauth2.client-id
+            - name: spring.security.oauth2.client.registration.bfk.client-secret
+              valueFrom:
+                secretKeyRef:
+                  name: kulturtanken-bfk
+                  key: fint.core.oauth2.client-secret
+            - name: spring.security.oauth2.client.registration.bfk.authorization-grant-type
+              value: password
+            - name: spring.security.oauth2.client.registration.bfk.scope
+              value: fint-client
+            - name: spring.security.oauth2.client.registration.bfk.provider
+              value: fint
+
+            # Vestfoldfylke
+            - name: kulturtanken.organisations.929882385.organisationnumber
+              value: '929882385'
+            - name: kulturtanken.organisations.929882385.source
+              value: fint
+            - name: kulturtanken.organisations.929882385.groups
+              value: 'true'
+            - name: kulturtanken.organisations.929882385.registration.1.id
+              value: 'vestfoldfylke'
+            - name: kulturtanken.organisations.929882385.registration.1.environment
+              value: https://api.felleskomponent.no
+            - name: kulturtanken.organisations.929882385.registration.1.username
+              valueFrom:
+                secretKeyRef:
+                  name: kulturtanken-vestfoldfylke
+                  key: fint.core.oauth2.username
+            - name: kulturtanken.organisations.929882385.registration.1.password
+              valueFrom:
+                secretKeyRef:
+                  name: kulturtanken-vestfoldfylke
+                  key: fint.core.oauth2.password
+            - name: spring.security.oauth2.client.registration.vestfoldfylke.client-id
+              valueFrom:
+                secretKeyRef:
+                  name: kulturtanken-vestfoldfylke
+                  key: fint.core.oauth2.client-id
+            - name: spring.security.oauth2.client.registration.vestfoldfylke.client-secret
+              valueFrom:
+                secretKeyRef:
+                  name: kulturtanken-vestfoldfylke
+                  key: fint.core.oauth2.client-secret
+            - name: spring.security.oauth2.client.registration.vestfoldfylke.authorization-grant-type
+              value: password
+            - name: spring.security.oauth2.client.registration.vestfoldfylke.scope
+              value: fint-client
+            - name: spring.security.oauth2.client.registration.vestfoldfylke.provider
+              value: fint
+
+            # Telemarkfylke
+            - name: kulturtanken.organisations.929882989.organisationnumber
+              value: '929882989'
+            - name: kulturtanken.organisations.929882989.source
+              value: fint
+            - name: kulturtanken.organisations.929882989.groups
+              value: 'true'
+            - name: kulturtanken.organisations.929882989.registration.1.id
+              value: 'telemarkfylke'
+            - name: kulturtanken.organisations.929882989.registration.1.environment
+              value: https://api.felleskomponent.no
+            - name: kulturtanken.organisations.929882989.registration.1.username
+              valueFrom:
+                secretKeyRef:
+                  name: kulturtanken-telemarkfylke
+                  key: fint.core.oauth2.username
+            - name: kulturtanken.organisations.929882989.registration.1.password
+              valueFrom:
+                secretKeyRef:
+                  name: kulturtanken-telemarkfylke
+                  key: fint.core.oauth2.password
+            - name: spring.security.oauth2.client.registration.telemarkfylke.client-id
+              valueFrom:
+                secretKeyRef:
+                  name: kulturtanken-telemarkfylke
+                  key: fint.core.oauth2.client-id
+            - name: spring.security.oauth2.client.registration.telemarkfylke.client-secret
+              valueFrom:
+                secretKeyRef:
+                  name: kulturtanken-telemarkfylke
+                  key: fint.core.oauth2.client-secret
+            - name: spring.security.oauth2.client.registration.telemarkfylke.authorization-grant-type
+              value: password
+            - name: spring.security.oauth2.client.registration.telemarkfylke.scope
+              value: fint-client
+            - name: spring.security.oauth2.client.registration.telemarkfylke.provider
+              value: fint
+
+            # Akershus fylkeskommune
+            - name: kulturtanken.organisations.930580783.organisationnumber
+              value: '930580783'
+            - name: kulturtanken.organisations.930580783.source
+              value: fint
+            - name: kulturtanken.organisations.930580783.groups
+              value: 'true'
+            - name: kulturtanken.organisations.930580783.registration.1.id
+              value: 'afk'
+            - name: kulturtanken.organisations.930580783.registration.1.environment
+              value: https://api.felleskomponent.no
+            - name: kulturtanken.organisations.930580783.registration.1.username
+              valueFrom:
+                secretKeyRef:
+                  name: kulturtanken-afk
+                  key: fint.core.oauth2.username
+            - name: kulturtanken.organisations.930580783.registration.1.password
+              valueFrom:
+                secretKeyRef:
+                  name: kulturtanken-afk
+                  key: fint.core.oauth2.password
+            - name: spring.security.oauth2.client.registration.afk.client-id
+              valueFrom:
+                secretKeyRef:
+                  name: kulturtanken-afk
+                  key: fint.core.oauth2.client-id
+            - name: spring.security.oauth2.client.registration.afk.client-secret
+              valueFrom:
+                secretKeyRef:
+                  name: kulturtanken-afk
+                  key: fint.core.oauth2.client-secret
+            - name: spring.security.oauth2.client.registration.afk.authorization-grant-type
+              value: password
+            - name: spring.security.oauth2.client.registration.afk.scope
+              value: fint-client
+            - name: spring.security.oauth2.client.registration.afk.provider
+              value: fint
+
+            # Rogaland
+            - name: kulturtanken.organisations.971045698.organisationnumber
+              value: '971045698'
+            - name: kulturtanken.organisations.971045698.source
+              value: fint
+            - name: kulturtanken.organisations.971045698.groups
+              value: 'true'
+            - name: kulturtanken.organisations.971045698.registration.1.id
+              value: 'rogaland'
+            - name: kulturtanken.organisations.971045698.registration.1.environment
+              value: https://api.felleskomponent.no
+            - name: kulturtanken.organisations.971045698.registration.1.username
+              valueFrom:
+                secretKeyRef:
+                  name: kulturtanken-rogfk
+                  key: fint.core.oauth2.username
+            - name: kulturtanken.organisations.971045698.registration.1.password
+              valueFrom:
+                secretKeyRef:
+                  name: kulturtanken-rogfk
+                  key: fint.core.oauth2.password
+            - name: spring.security.oauth2.client.registration.rogaland.client-id
+              valueFrom:
+                secretKeyRef:
+                  key: fint.core.oauth2.client-id
+                  name: kulturtanken-rogfk
+            - name: spring.security.oauth2.client.registration.rogaland.client-secret
+              valueFrom:
+                secretKeyRef:
+                  key: fint.core.oauth2.client-secret
+                  name: kulturtanken-rogfk
+            - name: spring.security.oauth2.client.registration.rogaland.authorization-grant-type
+              value: password
+            - name: spring.security.oauth2.client.registration.rogaland.scope
+              value: fint-client
+            - name: spring.security.oauth2.client.registration.rogaland.provider
+              value: fint
+
+            # Agder
+            - name: kulturtanken.organisations.921707134.organisationnumber
+              value: '921707134'
+            - name: kulturtanken.organisations.921707134.source
+              value: fint
+            - name: kulturtanken.organisations.921707134.groups
+              value: 'true'
+            - name: kulturtanken.organisations.921707134.registration.1.id
+              value: 'agderfk'
+            - name: kulturtanken.organisations.921707134.registration.1.environment
+              value: https://api.felleskomponent.no
+            - name: kulturtanken.organisations.921707134.registration.1.username
+              valueFrom:
+                secretKeyRef:
+                  name: kulturtanken-agderfk
+                  key: fint.core.oauth2.username
+            - name: kulturtanken.organisations.921707134.registration.1.password
+              valueFrom:
+                secretKeyRef:
+                  name: kulturtanken-agderfk
+                  key: fint.core.oauth2.password
+            - name: spring.security.oauth2.client.registration.agderfk.client-id
+              valueFrom:
+                secretKeyRef:
+                  key: fint.core.oauth2.client-id
+                  name: kulturtanken-agderfk
+            - name: spring.security.oauth2.client.registration.agderfk.client-secret
+              valueFrom:
+                secretKeyRef:
+                  key: fint.core.oauth2.client-secret
+                  name: kulturtanken-agderfk
+            - name: spring.security.oauth2.client.registration.agderfk.authorization-grant-type
+              value: password
+            - name: spring.security.oauth2.client.registration.agderfk.scope
+              value: fint-client
+            - name: spring.security.oauth2.client.registration.agderfk.provider
+              value: fint
+
+            # Innlandet
+            - name: kulturtanken.organisations.920717152.organisationnumber
+              value: '920717152'
+            - name: kulturtanken.organisations.920717152.source
+              value: fint
+            - name: kulturtanken.organisations.920717152.groups
+              value: 'true'
+            - name: kulturtanken.organisations.920717152.registration.1.id
+              value: 'innlandet'
+            - name: kulturtanken.organisations.920717152.registration.1.environment
+              value: https://api.felleskomponent.no
+            - name: kulturtanken.organisations.920717152.registration.1.username
+              valueFrom:
+                secretKeyRef:
+                  name: kulturtanken-innlandetfylke
+                  key: fint.core.oauth2.username
+            - name: kulturtanken.organisations.920717152.registration.1.password
+              valueFrom:
+                secretKeyRef:
+                  name: kulturtanken-innlandetfylke
+                  key: fint.core.oauth2.password
+            - name: spring.security.oauth2.client.registration.innlandet.client-id
+              valueFrom:
+                secretKeyRef:
+                  key: fint.core.oauth2.client-id
+                  name: kulturtanken-innlandetfylke
+            - name: spring.security.oauth2.client.registration.innlandet.client-secret
+              valueFrom:
+                secretKeyRef:
+                  key: fint.core.oauth2.client-secret
+                  name: kulturtanken-innlandetfylke
+            - name: spring.security.oauth2.client.registration.innlandet.authorization-grant-type
+              value: password
+            - name: spring.security.oauth2.client.registration.innlandet.scope
+              value: fint-client
+            - name: spring.security.oauth2.client.registration.innlandet.provider
+              value: fint
+
+            # Møre og Romsdal
+            - name: kulturtanken.organisations.944183779.organisationnumber
+              value: '944183779'
+            - name: kulturtanken.organisations.944183779.source
+              value: fint
+            - name: kulturtanken.organisations.944183779.groups
+              value: 'true'
+            - name: kulturtanken.organisations.944183779.registration.1.id
+              value: 'mrfk'
+            - name: kulturtanken.organisations.944183779.registration.1.environment
+              value: https://api.felleskomponent.no
+            - name: kulturtanken.organisations.944183779.registration.1.username
+              valueFrom:
+                secretKeyRef:
+                  name: kulturtanken-mrfylke
+                  key: fint.core.oauth2.username
+            - name: kulturtanken.organisations.944183779.registration.1.password
+              valueFrom:
+                secretKeyRef:
+                  name: kulturtanken-mrfylke
+                  key: fint.core.oauth2.password
+            - name: spring.security.oauth2.client.registration.mrfk.client-id
+              valueFrom:
+                secretKeyRef:
+                  key: fint.core.oauth2.client-id
+                  name: kulturtanken-mrfylke
+            - name: spring.security.oauth2.client.registration.mrfk.client-secret
+              valueFrom:
+                secretKeyRef:
+                  key: fint.core.oauth2.client-secret
+                  name: kulturtanken-mrfylke
+            - name: spring.security.oauth2.client.registration.mrfk.authorization-grant-type
+              value: password
+            - name: spring.security.oauth2.client.registration.mrfk.scope
+              value: fint-client
+            - name: spring.security.oauth2.client.registration.mrfk.provider
+              value: fint
+
+            # Nordland
+            - name: kulturtanken.organisations.964982953.organisationnumber
+              value: '964982953'
+            - name: kulturtanken.organisations.964982953.source
+              value: fint
+            - name: kulturtanken.organisations.964982953.groups
+              value: 'true'
+            - name: kulturtanken.organisations.964982953.registration.1.id
+              value: 'nfk'
+            - name: kulturtanken.organisations.964982953.registration.1.environment
+              value: https://api.felleskomponent.no
+            - name: kulturtanken.organisations.964982953.registration.1.username
+              valueFrom:
+                secretKeyRef:
+                  name: kulturtanken-nfk
+                  key: fint.core.oauth2.username
+            - name: kulturtanken.organisations.964982953.registration.1.password
+              valueFrom:
+                secretKeyRef:
+                  name: kulturtanken-nfk
+                  key: fint.core.oauth2.password
+            - name: spring.security.oauth2.client.registration.nfk.client-id
+              valueFrom:
+                secretKeyRef:
+                  key: fint.core.oauth2.client-id
+                  name: kulturtanken-nfk
+            - name: spring.security.oauth2.client.registration.nfk.client-secret
+              valueFrom:
+                secretKeyRef:
+                  key: fint.core.oauth2.client-secret
+                  name: kulturtanken-nfk
+            - name: spring.security.oauth2.client.registration.nfk.authorization-grant-type
+              value: password
+            - name: spring.security.oauth2.client.registration.nfk.scope
+              value: fint-client
+            - name: spring.security.oauth2.client.registration.nfk.provider
+              value: fint
+
+            # Oslo
+            - name: kulturtanken.organisations.958935420.organisationnumber
+              value: '958935420'
+            - name: kulturtanken.organisations.958935420.source
+              value: fint
+            - name: kulturtanken.organisations.958935420.groups
+              value: 'true'
+            - name: kulturtanken.organisations.958935420.registration.1.id
+              value: 'oslo'
+            - name: kulturtanken.organisations.958935420.registration.1.environment
+              value: https://api.felleskomponent.no
+            - name: kulturtanken.organisations.958935420.registration.1.username
+              valueFrom:
+                secretKeyRef:
+                  name: kulturtanken-ude-oslo
+                  key: fint.core.oauth2.username
+            - name: kulturtanken.organisations.958935420.registration.1.password
+              valueFrom:
+                secretKeyRef:
+                  name: kulturtanken-ude-oslo
+                  key: fint.core.oauth2.password
+            - name: spring.security.oauth2.client.registration.oslo.client-id
+              valueFrom:
+                secretKeyRef:
+                  key: fint.core.oauth2.client-id
+                  name: kulturtanken-ude-oslo
+            - name: spring.security.oauth2.client.registration.oslo.client-secret
+              valueFrom:
+                secretKeyRef:
+                  key: fint.core.oauth2.client-secret
+                  name: kulturtanken-ude-oslo
+            - name: spring.security.oauth2.client.registration.oslo.authorization-grant-type
+              value: password
+            - name: spring.security.oauth2.client.registration.oslo.scope
+              value: fint-client
+            - name: spring.security.oauth2.client.registration.oslo.provider
+              value: fint
+
+            # Trøndelag
+            - name: kulturtanken.organisations.817920632.organisationnumber
+              value: '817920632'
+            - name: kulturtanken.organisations.817920632.source
+              value: nsr
+            - name: kulturtanken.organisations.817920632.groups
+              value: 'false'
