@@ -232,7 +232,7 @@ spec:
 apiVersion: fintlabs.no/v1alpha1
 kind: FintClient
 metadata:
-  name: kulturtanken-oslo
+  name: kulturtanken-ude-oslo
   namespace: default
   labels:
     app.kubernetes.io/name: kulturtanken
@@ -241,9 +241,9 @@ metadata:
     app.kubernetes.io/component: backend
     app.kubernetes.io/part-of: fint-core
     fintlabs.no/team: core
-    fintlabs.no/org-id: oslo.kommune.no
+    fintlabs.no/org-id: ude.oslo.kommune.no
 spec:
-  orgId: oslo.kommune.no
+  orgId: ude.oslo.kommune.no
   note: Kulturtanken
   components:
     - utdanning_elev

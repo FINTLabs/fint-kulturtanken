@@ -478,23 +478,23 @@ spec:
             - name: kulturtanken.organisations.958935420.registration.1.username
               valueFrom:
                 secretKeyRef:
-                  name: kulturtanken-oslo
+                  name: kulturtanken-ude-oslo
                   key: fint.core.oauth2.username
             - name: kulturtanken.organisations.958935420.registration.1.password
               valueFrom:
                 secretKeyRef:
-                  name: kulturtanken-oslo
+                  name: kulturtanken-ude-oslo
                   key: fint.core.oauth2.password
             - name: spring.security.oauth2.client.registration.oslo.client-id
               valueFrom:
                 secretKeyRef:
                   key: fint.core.oauth2.client-id
-                  name: kulturtanken-oslo
+                  name: kulturtanken-ude-oslo
             - name: spring.security.oauth2.client.registration.oslo.client-secret
               valueFrom:
                 secretKeyRef:
                   key: fint.core.oauth2.client-secret
-                  name: kulturtanken-oslo
+                  name: kulturtanken-ude-oslo
             - name: spring.security.oauth2.client.registration.oslo.authorization-grant-type
               value: password
             - name: spring.security.oauth2.client.registration.oslo.scope
