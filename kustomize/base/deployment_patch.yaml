@@ -299,12 +299,12 @@ spec:
               valueFrom:
                 secretKeyRef:
                   key: fint.core.oauth2.client-id
-                  name: fint-flyt-archive-dispatch-gateway-op
+                  name: kulturtanken-rogfk
             - name: spring.security.oauth2.client.registration.rogaland.client-secret
               valueFrom:
                 secretKeyRef:
                   key: fint.core.oauth2.client-secret
-                  name: fint-flyt-archive-dispatch-gateway-op
+                  name: kulturtanken-rogfk
             - name: spring.security.oauth2.client.registration.rogaland.authorization-grant-type
               value: password
             - name: spring.security.oauth2.client.registration.rogaland.scope
