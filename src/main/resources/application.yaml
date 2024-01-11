@@ -154,14 +154,3 @@ kulturtanken:
           username:
           password:
           environment:
-    821311632:
-      name: Vestland
-      organisationnumber:
-      source:
-      groups:
-      registration:
-        1:
-          id:
-          username:
-          password:
-          environment:
