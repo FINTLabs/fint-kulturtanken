@@ -15,10 +15,12 @@ import no.fint.kulturtanken.service.KulturtankenService
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import spock.lang.Specification
+import groovy.json.JsonOutput
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
+
 
 class KulturtankenControllerSpec extends Specification {
     KulturtankenService kulturtankenService
