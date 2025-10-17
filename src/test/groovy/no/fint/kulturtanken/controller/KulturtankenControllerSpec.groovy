@@ -64,7 +64,7 @@ class KulturtankenControllerSpec extends Specification {
 
     def "Get all organisations"() {
         when:
-        def response = mockMvc.perform(get("/skoleeier/"))
+        def response = mockMvc.perform(get("/skoleeier"))
 
         then:
         1 * kulturtankenProperties.getOrganisations() >> [(_ as String): new KulturtankenProperties.Organisation()]

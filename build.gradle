@@ -1,5 +1,5 @@
 plugins {
-    id 'org.springframework.boot' version '2.7.17'
+    id 'org.springframework.boot' version '3.5.6'
     id 'java'
     id 'groovy'
 }
@@ -21,7 +21,7 @@ configurations {
 repositories {
     mavenLocal()
     mavenCentral()
-    maven { url "https://repo.fintlabs.no/releases" }
+    maven { url = "https://repo.fintlabs.no/releases" }
 }
 
 dependencies {
@@ -32,6 +32,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-cache'
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
     implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
 
     implementation 'no.fint:fint-utdanning-resource-model-java:3.20.0'
 
@@ -42,13 +43,10 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.spockframework:spock-spring:2.1-groovy-3.0'
+    testImplementation 'org.spockframework:spock-spring:2.3-groovy-4.0'
     testImplementation 'com.squareup.okhttp3:mockwebserver:4.3.1'
     testImplementation 'com.squareup.okhttp3:okhttp:4.3.1'
-    // Needs to be 6.2.5.Final https://stackoverflow.com/questions/36329001/unable-to-create-a-configuration-because-no-bean-validation-provider-could-be-f
-    testImplementation 'org.hibernate.validator:hibernate-validator:6.2.5.Final'
-    testImplementation 'org.codehaus.groovy:groovy-json:3.0.21'
-
+    testImplementation 'org.apache.groovy:groovy-json:4.0.28'
 }
 
 jar {
