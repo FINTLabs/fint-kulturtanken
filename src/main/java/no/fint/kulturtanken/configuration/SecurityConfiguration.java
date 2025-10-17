@@ -30,13 +30,14 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http.authorizeRequests(authorizeRequests ->
-                authorizeRequests
+        return http.authorizeHttpRequests(authorize ->
+                authorize
                         .requestMatchers(EndpointRequest.to("health")).permitAll()
-                        .antMatchers("/skoleeier/**").permitAll()
+                        .requestMatchers("/skoleeier/**").permitAll()
                         .anyRequest().denyAll()
         ).build();
     }
+
 
     @Bean
     public Authentication authentication() {
@@ -48,7 +49,10 @@ public class SecurityConfiguration {
                                                                  OAuth2AuthorizedClientService authorizedClientService) {
 
         OAuth2AuthorizedClientProvider authorizedClientProvider = OAuth2AuthorizedClientProviderBuilder.builder()
-                .password().refreshToken().build();
+                .authorizationCode()
+                .refreshToken()
+                .clientCredentials()
+                .build();
 
         AuthorizedClientServiceOAuth2AuthorizedClientManager authorizedClientManager =
                 new AuthorizedClientServiceOAuth2AuthorizedClientManager(clientRegistrationRepository, authorizedClientService);
