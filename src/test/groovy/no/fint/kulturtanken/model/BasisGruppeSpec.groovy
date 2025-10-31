@@ -7,10 +7,10 @@ class BasisGruppeSpec extends Specification {
 
     def "Build basis group from Fint basis group"() {
         given:
-        def fintBasisGroup = FintObjectFactory.newBasisGroup()
+        def fintBasisGroup = FintObjectFactory.newKlasse()
 
         when:
-        def basisGroup = Basisgruppe.fromFint(fintBasisGroup)
+        def basisGroup = Klasse.fromFint(fintBasisGroup)
 
         then:
         basisGroup.navn == 'Basis group'
