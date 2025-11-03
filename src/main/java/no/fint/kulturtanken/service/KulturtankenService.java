@@ -86,15 +86,15 @@ public class KulturtankenService {
                             .filter(group -> isValidGroup(group, orgId))
                             .collect(Collectors.groupingBy(this::getLevel));
 
-                    // For each level, create Trinn and add basisgrupper
+                    // For each level, create Trinn and add klasser
                     schoolClassesByLevel.forEach((key, value) -> Optional.ofNullable(fintRepository.getLevelById(orgId, key))
                             .map(this::getGrepCode)
                             .ifPresent(code -> {
                                 Trinn level = new Trinn();
                                 level.setNiva(code);
-                                level.setBasisgrupper(value.stream()
+                                level.setKlasser(value.stream()
                                         .map(Klasse::fromFint)
-                                        .filter(basisGroup -> basisGroup.getAntall() > 0)
+                                        .filter(klasse -> klasse.getAntall() > 0)
                                         .collect(Collectors.toList()));
                                 levels.add(level);
                             }));

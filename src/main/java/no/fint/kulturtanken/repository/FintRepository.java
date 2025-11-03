@@ -141,7 +141,7 @@ public class FintRepository {
 
     private static final Map<Class<?>, String> paths = Stream.of(
             new AbstractMap.SimpleImmutableEntry<>(SkoleResources.class, "/utdanning/utdanningsprogram/skole"),
-            new AbstractMap.SimpleImmutableEntry<>(KlasseResource.class, "/utdanning/elev/basisgruppe"),
+            new AbstractMap.SimpleImmutableEntry<>(KlasseResource.class, "/utdanning/elev/klasse"),
             new AbstractMap.SimpleImmutableEntry<>(ArstrinnResources.class, "/utdanning/utdanningsprogram/arstrinn"),
             new AbstractMap.SimpleImmutableEntry<>(UndervisningsgruppeResources.class, "/utdanning/timeplan/undervisningsgruppe"),
             new AbstractMap.SimpleImmutableEntry<>(FagResources.class, "/utdanning/timeplan/fag"))

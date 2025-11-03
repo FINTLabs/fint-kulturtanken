@@ -9,9 +9,9 @@ public class Klasse {
     private int antall;
 
     public static Klasse fromFint(KlasseResource resource) {
-        Klasse basisGroup = new Klasse();
-        basisGroup.setNavn(resource.getNavn());
-        basisGroup.setAntall(resource.getKlassemedlemskap().size());
-        return basisGroup;
+        Klasse klasse = new Klasse();
+        klasse.setNavn(resource.getNavn());
+        klasse.setAntall(resource.getKlassemedlemskap().size());
+        return klasse;
     }
 }
