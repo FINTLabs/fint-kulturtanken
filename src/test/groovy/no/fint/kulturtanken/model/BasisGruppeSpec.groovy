@@ -3,17 +3,17 @@ package no.fint.kulturtanken.model
 import no.fint.kulturtanken.util.FintObjectFactory
 import spock.lang.Specification
 
-class BasisGruppeSpec extends Specification {
+class KlasseSpec extends Specification {
 
-    def "Build basis group from Fint basis group"() {
+    def "Build klasse from Fint klasse"() {
         given:
-        def fintBasisGroup = FintObjectFactory.newBasisGroup()
+        def fintKlasse = FintObjectFactory.newKlasse()
 
         when:
-        def basisGroup = Basisgruppe.fromFint(fintBasisGroup)
+        def klasse = Klasse.fromFint(fintKlasse)
 
         then:
-        basisGroup.navn == 'Basis group'
-        basisGroup.antall == 1
+        klasse.navn == 'Klasse'
+        klasse.antall == 1
     }
 }

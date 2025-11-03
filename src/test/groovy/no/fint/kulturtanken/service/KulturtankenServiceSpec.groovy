@@ -1,5 +1,6 @@
 package no.fint.kulturtanken.service
 
+
 import no.fint.kulturtanken.configuration.KulturtankenProperties
 import no.fint.kulturtanken.model.Enhet
 import no.fint.kulturtanken.model.Skole
@@ -8,6 +9,10 @@ import no.fint.kulturtanken.repository.FintRepository
 import no.fint.kulturtanken.repository.NsrRepository
 import no.fint.kulturtanken.util.FintObjectFactory
 import spock.lang.Specification
+
+import java.time.Clock
+import java.time.Instant
+import java.time.ZoneId
 
 class KulturtankenServiceSpec extends Specification {
     private KulturtankenService kulturtankenService
@@ -19,7 +24,8 @@ class KulturtankenServiceSpec extends Specification {
         nsrRepository = Mock()
         fintRepository = Mock()
         kulturtankenProperties = Mock()
-        kulturtankenService = new KulturtankenService(nsrRepository, fintRepository, kulturtankenProperties)
+        Clock clock = Clock.fixed(Instant.parse("2025-09-15T00:00:00Z"), ZoneId.systemDefault())
+        kulturtankenService = new KulturtankenService(nsrRepository, fintRepository, kulturtankenProperties, clock)
     }
 
     def "Given valid orgId and source equal fint get school owner, schools and groups"() {
@@ -31,23 +37,25 @@ class KulturtankenServiceSpec extends Specification {
         def nsrSchoolOwner = new Enhet(navn: 'School owner', orgNr: '876543210',
                 childRelasjoner: [new Enhet.ChildRelasjon(enhet: nsrSchool)])
         def school = FintObjectFactory.newSchool()
-        def basisGroup = FintObjectFactory.newBasisGroup()
+        def klasse = FintObjectFactory.newKlasse()
         def level = FintObjectFactory.newLevel()
         def teachingGroup = FintObjectFactory.newTeachingGroup()
         def subject = FintObjectFactory.newSubject()
+        def skolear = FintObjectFactory.newSchoolYear()
 
         when:
-        def schoolOwner = kulturtankenService.getSchoolOwner(_ as String)
+        def schoolOwner = kulturtankenService.getSchoolOwner("876543210")
 
         then:
         1 * nsrRepository.getSchoolOwnerById(_ as String) >> Skoleeier.fromNsr(nsrSchoolOwner)
-        1 * kulturtankenProperties.getOrganisations() >> [(_ as String): new KulturtankenProperties.Organisation(source: 'fint')]
+        1 * kulturtankenProperties.getOrganisations() >> ["876543210": new KulturtankenProperties.Organisation(source: 'fint')]
         1 * nsrRepository.getSchools(_ as String) >> [Skole.fromNsr(nsrSchool)]
         1 * fintRepository.getSchools(_ as String) >> [school]
-        1 * fintRepository.getBasisGroupById(_ as String, _ as String) >> basisGroup
+        1 * fintRepository.getKlasseById(_ as String, _ as String) >> klasse
         1 * fintRepository.getLevelById(_ as String, _ as String) >> level
         1 * fintRepository.getTeachingGroupById(_ as String, _ as String) >> teachingGroup
         1 * fintRepository.getSubjectById(_ as String, _ as String) >> subject
+        2 * fintRepository.getSkolearById(_ as String, _ as String) >> skolear
 
         schoolOwner.navn == 'School owner'
         schoolOwner.organisasjonsnummer == '876543210'
@@ -63,9 +71,9 @@ class KulturtankenServiceSpec extends Specification {
 
         schoolOwner.skoler[0].trinn.size() == 1
         schoolOwner.skoler[0].trinn[0].niva == 'Grep'
-        schoolOwner.skoler[0].trinn[0].basisgrupper.size() == 1
-        schoolOwner.skoler[0].trinn[0].basisgrupper[0].navn == 'Basis group'
-        schoolOwner.skoler[0].trinn[0].basisgrupper[0].antall == 1
+        schoolOwner.skoler[0].trinn[0].klasser.size() == 1
+        schoolOwner.skoler[0].trinn[0].klasser[0].navn == 'Klasse'
+        schoolOwner.skoler[0].trinn[0].klasser[0].antall == 1
 
         schoolOwner.skoler[0].fag.size() == 1
         schoolOwner.skoler[0].fag[0].fagkode == 'Grep'

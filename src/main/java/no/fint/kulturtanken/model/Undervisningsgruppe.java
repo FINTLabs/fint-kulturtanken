@@ -11,7 +11,7 @@ public class Undervisningsgruppe {
     public static Undervisningsgruppe fromFint(UndervisningsgruppeResource resource) {
         Undervisningsgruppe teachingGroup = new Undervisningsgruppe();
         teachingGroup.setNavn(resource.getNavn());
-        teachingGroup.setAntall(resource.getElevforhold().size());
+        teachingGroup.setAntall(resource.getGruppemedlemskap().size());
         return teachingGroup;
     }
 }
