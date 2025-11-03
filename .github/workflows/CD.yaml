@@ -1,8 +1,11 @@
 name: CD
 
 on:
-  repository_dispatch:
-    types: [trigger-cd]
+  workflow_call:
+    inputs:
+      cluster:
+        required: true
+        type: string
 
 env:
   REGISTRY: ghcr.io
@@ -57,14 +60,11 @@ jobs:
         org:
           - default
         cluster:
-#          - aks-alpha-fint-2021-11-18
-          - aks-beta-fint-2021-11-23
-          - aks-api-fint-2022-02-08
-#          - aks-pwf-fint-2021-10-20
+          - ${{ inputs.cluster }}
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4.0.0
+        uses: actions/checkout@v4
 
       - name: Get environment
         uses: actions/github-script@v6
@@ -82,7 +82,7 @@ jobs:
 
       - name: Bake manifests with Kustomize
         id: bake
-        uses: azure/k8s-bake@v2.4
+        uses: azure/k8s-bake@v2
         with:
           renderEngine: 'kustomize'
           kustomizationPath: 'kustomize/base'
