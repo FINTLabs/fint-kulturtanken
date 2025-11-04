@@ -16,5 +16,6 @@ on:
 jobs:
   deploy:
     uses: ./.github/workflows/CD.yaml
+    secrets: inherit
     with:
       cluster: ${{ github.event.inputs.cluster }}
