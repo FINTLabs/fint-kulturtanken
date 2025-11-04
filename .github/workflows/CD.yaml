@@ -70,7 +70,7 @@ jobs:
         uses: actions/github-script@v6
         id: environment
         with:
-          script: return '${{ matrix.cluster }}'.split('-')[1]
+          script: return '${{ inputs.cluster }}'.split('-')[1]
           result-encoding: string
 
       - name: Get resource group name
