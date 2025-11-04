@@ -91,6 +91,8 @@ jobs:
         id: secretname
         run: |
           echo "SECRET_NAME=$(echo AKS_${{ steps.environment.outputs.result }}_FINT_GITHUB | tr '[:lower:]' '[:upper:]')" >> $GITHUB_OUTPUT
+      - name: Debug SECRET_NAME output
+        run: echo "SECRET_NAME is ${{ steps.secretname.outputs.SECRET_NAME }}"
       - uses: azure/login@v2
         with:
           creds: ${{ secrets[ steps.secretname.outputs.SECRET_NAME ] }}
