@@ -95,7 +95,7 @@ jobs:
         run: echo "SECRET_NAME is ${{ steps.secretname.outputs.SECRET_NAME }}"
       - uses: azure/login@v2
         with:
-          creds: ${{ steps.secretname.outputs.SECRET_NAME }}
+          creds: ${{ secrets[ steps.secretname.outputs.SECRET_NAME ] }}
 
       - uses: azure/use-kubelogin@v1.1
         with:
