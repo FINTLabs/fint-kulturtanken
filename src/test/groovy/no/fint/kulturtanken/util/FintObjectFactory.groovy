@@ -1,16 +1,16 @@
 package no.fint.kulturtanken.util
 
-import no.fint.model.felles.kompleksedatatyper.Identifikator
-import no.fint.model.felles.kompleksedatatyper.Kontaktinformasjon
-import no.fint.model.felles.kompleksedatatyper.Periode
-import no.fint.model.resource.Link
-import no.fint.model.resource.felles.kompleksedatatyper.AdresseResource
-import no.fint.model.resource.utdanning.elev.KlasseResource
-import no.fint.model.resource.utdanning.kodeverk.SkolearResource
-import no.fint.model.resource.utdanning.timeplan.FagResource
-import no.fint.model.resource.utdanning.timeplan.UndervisningsgruppeResource
-import no.fint.model.resource.utdanning.utdanningsprogram.ArstrinnResource
-import no.fint.model.resource.utdanning.utdanningsprogram.SkoleResource
+import no.novari.fint.model.felles.kompleksedatatyper.Identifikator
+import no.novari.fint.model.felles.kompleksedatatyper.Kontaktinformasjon
+import no.novari.fint.model.felles.kompleksedatatyper.Periode
+import no.novari.fint.model.resource.Link
+import no.novari.fint.model.resource.felles.kompleksedatatyper.AdresseResource
+import no.novari.fint.model.resource.utdanning.elev.KlasseResource
+import no.novari.fint.model.resource.utdanning.kodeverk.SkolearResource
+import no.novari.fint.model.resource.utdanning.timeplan.FagResource
+import no.novari.fint.model.resource.utdanning.timeplan.UndervisningsgruppeResource
+import no.novari.fint.model.resource.utdanning.utdanningsprogram.ArstrinnResource
+import no.novari.fint.model.resource.utdanning.utdanningsprogram.SkoleResource
 
 import java.text.SimpleDateFormat
 

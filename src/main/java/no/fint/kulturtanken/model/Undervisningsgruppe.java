@@ -1,7 +1,7 @@
 package no.fint.kulturtanken.model;
 
 import lombok.Data;
-import no.fint.model.resource.utdanning.timeplan.UndervisningsgruppeResource;
+import no.novari.fint.model.resource.utdanning.timeplan.UndervisningsgruppeResource;
 
 @Data
 public class Undervisningsgruppe {

@@ -1,7 +1,7 @@
 package no.fint.kulturtanken.model;
 
 import lombok.Data;
-import no.fint.model.resource.felles.kompleksedatatyper.AdresseResource;
+import no.novari.fint.model.resource.felles.kompleksedatatyper.AdresseResource;
 
 import java.util.Collections;
 import java.util.List;

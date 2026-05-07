@@ -1,7 +1,7 @@
 package no.fint.kulturtanken.model;
 
 import lombok.Data;
-import no.fint.model.resource.utdanning.utdanningsprogram.SkoleResource;
+import no.novari.fint.model.resource.utdanning.utdanningsprogram.SkoleResource;
 
 import java.util.ArrayList;
 import java.util.Collections;

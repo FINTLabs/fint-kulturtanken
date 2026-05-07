@@ -1,7 +1,7 @@
 package no.fint.kulturtanken.model;
 
 import lombok.Data;
-import no.fint.model.resource.utdanning.elev.KlasseResource;
+import no.novari.fint.model.resource.utdanning.elev.KlasseResource;
 
 @Data
 public class Klasse {
