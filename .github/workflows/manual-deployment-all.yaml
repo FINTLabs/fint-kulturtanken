@@ -1,4 +1,4 @@
-# Lets user manually trigger a deployment to a selected cluster for all organizations.
+# Lets user manually trigger a deployment to a selected cluster
 name: manual-deployment
 on:
   workflow_dispatch:
@@ -16,5 +16,6 @@ on:
 jobs:
   deploy:
     uses: ./.github/workflows/CD.yaml
+    secrets: inherit
     with:
       cluster: ${{ github.event.inputs.cluster }}

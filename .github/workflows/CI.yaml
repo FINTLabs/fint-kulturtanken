@@ -17,19 +17,27 @@ jobs:
         run: echo ::set-output name=REPO::${GITHUB_REPOSITORY#*/}
 
       - name: Setup Java 17
-        uses: actions/setup-java@v3.10.0
+        uses: actions/setup-java@v3.12.0
         with:
           distribution: 'temurin'
           java-version: '17'
 
       - name: Gradle Wrapper Validation
-        uses: gradle/actions/wrapper-validation@v3
+        uses: gradle/actions/wrapper-validation@v5
 
       - name: Gradle Setup
-        uses: gradle/gradle-build-action@v2.8.0
+        uses: gradle/actions/setup-gradle@v5
         with:
           gradle-version: wrapper
-          arguments: build
 
-      - name: Gradle Build Check
-        run: ./gradlew build
+      - name: Gradle build
+        run: |
+          ./gradlew build
+          mkdir data
+          cp ./build/libs/${GITHUB_REPOSITORY#*/}-*.jar ./data/app.jar
+
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{steps.get_repo.outputs.REPO}}
+          path: ./data/app.jar
