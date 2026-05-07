@@ -88,12 +88,9 @@ public class FintRepository {
         return Flux.merge(organisation.getRegistration().values()
                 .stream()
                 .map(registration -> get(registration, clazz)
-                        .flatMapIterable(T::getContent)
-                .onErrorResume(e -> {
-                    log.warn("Skipping {} for registration {}: {}", clazz.getSimpleName(), registration.getId(), e.getMessage());
-                    return Flux.empty();
-                }))
-                .collect(Collectors.toList()));
+                        .flatMapIterable(T::getContent))
+                        .collect(Collectors.toList()))
+                .doOnError(throwable -> log.error("Error getting resource {}", clazz.getSimpleName(), throwable));
     }
 
     private <T> Mono<T> get(KulturtankenProperties.Registration registration, Class<T> clazz) {
@@ -144,7 +141,7 @@ public class FintRepository {
 
     private static final Map<Class<?>, String> paths = Stream.of(
             new AbstractMap.SimpleImmutableEntry<>(SkoleResources.class, "/utdanning/utdanningsprogram/skole"),
-            new AbstractMap.SimpleImmutableEntry<>(KlasseResources.class, "/utdanning/elev/basisgruppe"),
+            new AbstractMap.SimpleImmutableEntry<>(KlasseResources.class, "/utdanning/elev/klasse"),
             new AbstractMap.SimpleImmutableEntry<>(ArstrinnResources.class, "/utdanning/utdanningsprogram/arstrinn"),
             new AbstractMap.SimpleImmutableEntry<>(UndervisningsgruppeResources.class, "/utdanning/timeplan/undervisningsgruppe"),
             new AbstractMap.SimpleImmutableEntry<>(FagResources.class, "/utdanning/timeplan/fag"))
