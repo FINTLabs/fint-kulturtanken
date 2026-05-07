@@ -7,5 +7,5 @@ import java.util.List;
 @Data
 public class Trinn {
 	private String niva;
-	private List<Basisgruppe> basisgrupper;
+	private List<Klasse> klasser;
 }

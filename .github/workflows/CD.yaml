@@ -70,7 +70,7 @@ jobs:
         uses: actions/github-script@v6
         id: environment
         with:
-          script: return '${{ matrix.cluster }}'.split('-')[1]
+          script: return '${{ inputs.cluster }}'.split('-')[1]
           result-encoding: string
 
       - name: Get resource group name
@@ -87,9 +87,14 @@ jobs:
           renderEngine: 'kustomize'
           kustomizationPath: 'kustomize/base'
 
-      - uses: azure/login@v1
+      - name: Determine secret name
+        id: secretname
+        run: |
+          echo "SECRET_NAME=$(echo AKS_${{ steps.environment.outputs.result }}_FINT_GITHUB | tr '[:lower:]' '[:upper:]')" >> $GITHUB_OUTPUT
+
+      - uses: azure/login@v2
         with:
-          creds: "${{ secrets[format('AKS_{0}_FINT_GITHUB', steps.environment.outputs.result)] }}"
+          creds: ${{ secrets[ steps.secretname.outputs.SECRET_NAME ] }}
 
       - uses: azure/use-kubelogin@v1.1
         with:

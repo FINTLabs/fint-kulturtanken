@@ -3,18 +3,19 @@ package no.fint.kulturtanken.repository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import no.fint.kulturtanken.configuration.KulturtankenProperties;
-import no.fint.model.resource.AbstractCollectionResources;
-import no.fint.model.resource.FintLinks;
-import no.fint.model.resource.Link;
-import no.fint.model.resource.utdanning.elev.*;
-import no.fint.model.resource.utdanning.timeplan.FagResource;
-import no.fint.model.resource.utdanning.timeplan.FagResources;
-import no.fint.model.resource.utdanning.timeplan.UndervisningsgruppeResource;
-import no.fint.model.resource.utdanning.timeplan.UndervisningsgruppeResources;
-import no.fint.model.resource.utdanning.utdanningsprogram.ArstrinnResource;
-import no.fint.model.resource.utdanning.utdanningsprogram.ArstrinnResources;
-import no.fint.model.resource.utdanning.utdanningsprogram.SkoleResource;
-import no.fint.model.resource.utdanning.utdanningsprogram.SkoleResources;
+import no.novari.fint.model.resource.AbstractCollectionResources;
+import no.novari.fint.model.resource.FintLinks;
+import no.novari.fint.model.resource.Link;
+import no.novari.fint.model.resource.utdanning.elev.*;
+import no.novari.fint.model.resource.utdanning.kodeverk.SkolearResource;
+import no.novari.fint.model.resource.utdanning.timeplan.FagResource;
+import no.novari.fint.model.resource.utdanning.timeplan.FagResources;
+import no.novari.fint.model.resource.utdanning.timeplan.UndervisningsgruppeResource;
+import no.novari.fint.model.resource.utdanning.timeplan.UndervisningsgruppeResources;
+import no.novari.fint.model.resource.utdanning.utdanningsprogram.ArstrinnResource;
+import no.novari.fint.model.resource.utdanning.utdanningsprogram.ArstrinnResources;
+import no.novari.fint.model.resource.utdanning.utdanningsprogram.SkoleResource;
+import no.novari.fint.model.resource.utdanning.utdanningsprogram.SkoleResources;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.OAuth2AuthorizeRequest;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
@@ -47,14 +48,19 @@ public class FintRepository {
         return getResourcesByType(orgId, SkoleResource.class);
     }
 
-    public BasisgruppeResource getBasisGroupById(String orgId, String groupId) {
+    public KlasseResource getKlasseById(String orgId, String groupId) {
         String selfLinks = this.selfLinks.get(orgId).get(groupId);
-        return (BasisgruppeResource) resources.get(orgId).get(selfLinks);
+        return (KlasseResource) resources.get(orgId).get(selfLinks);
     }
 
     public ArstrinnResource getLevelById(String orgId, String groupId) {
         String selfLinks = this.selfLinks.get(orgId).get(groupId);
         return (ArstrinnResource) resources.get(orgId).get(selfLinks);
+    }
+
+    public SkolearResource getSkolearById(String orgId, String groupId) {
+        String selfLinks = this.selfLinks.get(orgId).get(groupId);
+        return (SkolearResource) resources.get(orgId).get(selfLinks);
     }
 
     public UndervisningsgruppeResource getTeachingGroupById(String orgId, String groupId) {
@@ -83,7 +89,7 @@ public class FintRepository {
                 .stream()
                 .map(registration -> get(registration, clazz)
                         .flatMapIterable(T::getContent))
-                .collect(Collectors.toList()))
+                        .collect(Collectors.toList()))
                 .doOnError(throwable -> log.error("Error getting resource {}", clazz.getSimpleName(), throwable));
     }
 
@@ -111,7 +117,7 @@ public class FintRepository {
         resources.put(orgId, new HashMap<>());
 
         Flux.merge(getResources(orgId, SkoleResources.class),
-                getResources(orgId, BasisgruppeResources.class),
+                getResources(orgId, KlasseResources.class),
                 getResources(orgId, UndervisningsgruppeResources.class),
                 getResources(orgId, ArstrinnResources.class),
                 getResources(orgId, FagResources.class))
@@ -135,7 +141,7 @@ public class FintRepository {
 
     private static final Map<Class<?>, String> paths = Stream.of(
             new AbstractMap.SimpleImmutableEntry<>(SkoleResources.class, "/utdanning/utdanningsprogram/skole"),
-            new AbstractMap.SimpleImmutableEntry<>(BasisgruppeResources.class, "/utdanning/elev/basisgruppe"),
+            new AbstractMap.SimpleImmutableEntry<>(KlasseResources.class, "/utdanning/elev/klasse"),
             new AbstractMap.SimpleImmutableEntry<>(ArstrinnResources.class, "/utdanning/utdanningsprogram/arstrinn"),
             new AbstractMap.SimpleImmutableEntry<>(UndervisningsgruppeResources.class, "/utdanning/timeplan/undervisningsgruppe"),
             new AbstractMap.SimpleImmutableEntry<>(FagResources.class, "/utdanning/timeplan/fag"))

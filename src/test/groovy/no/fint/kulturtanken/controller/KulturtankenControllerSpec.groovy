@@ -1,7 +1,7 @@
 package no.fint.kulturtanken.controller
 
 import no.fint.kulturtanken.configuration.KulturtankenProperties
-import no.fint.kulturtanken.model.Basisgruppe
+import no.fint.kulturtanken.model.Klasse
 import no.fint.kulturtanken.model.Besoksadresse
 import no.fint.kulturtanken.model.Fag
 import no.fint.kulturtanken.model.Kontaktinformasjon
@@ -41,7 +41,7 @@ class KulturtankenControllerSpec extends Specification {
                 skolear: '2019/2020', skoler: [new Skole(navn: 'School', organisasjonsnummer: '012345678', kontaktinformasjon:
                 new Kontaktinformasjon(epostadresse: 'school@schools.no', telefonnummer: '00 11 22 33'), besoksadresse:
                 new Besoksadresse(adresselinje: ['Address'], postnummer: '0123', poststed: 'City'), trinn:
-                [new Trinn(niva: 'Level', basisgrupper: [new Basisgruppe(navn: 'Basis group', antall: 1)])], fag:
+                [new Trinn(niva: 'Level', klasser: [new Klasse(navn: 'Klasse', antall: 1)])], fag:
                 [new Fag(fagkode: 'Subject', undervisningsgrupper: [new Undervisningsgruppe(navn: 'Teaching group', antall: 1)])])])
 
         when:

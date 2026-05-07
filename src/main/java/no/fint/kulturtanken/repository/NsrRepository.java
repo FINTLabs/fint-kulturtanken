@@ -13,6 +13,9 @@ import reactor.core.publisher.Mono;
 import java.util.*;
 import java.util.function.Predicate;
 
+/**
+ * NSR means "Nasjonalt Skoleregister"
+ */
 @Slf4j
 @Repository
 public class NsrRepository {

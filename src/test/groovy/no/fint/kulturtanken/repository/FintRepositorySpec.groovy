@@ -3,7 +3,7 @@ package no.fint.kulturtanken.repository
 import com.fasterxml.jackson.databind.ObjectMapper
 import no.fint.kulturtanken.configuration.KulturtankenProperties
 import no.fint.kulturtanken.util.FintObjectFactory
-import no.fint.model.resource.utdanning.utdanningsprogram.SkoleResources
+import no.novari.fint.model.resource.utdanning.utdanningsprogram.SkoleResources
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.springframework.security.core.Authentication
