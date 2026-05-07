@@ -91,6 +91,7 @@ public class SecurityConfiguration {
                 .clientConnector(clientHttpConnector)
                 .exchangeStrategies(exchangeStrategies)
                 .filter(authorizedClientExchangeFilterFunction)
+                .defaultHeader("x-fint-model-version-override", "v4")
                 .build();
     }
 }
