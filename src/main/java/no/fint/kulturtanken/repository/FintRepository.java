@@ -88,9 +88,12 @@ public class FintRepository {
         return Flux.merge(organisation.getRegistration().values()
                 .stream()
                 .map(registration -> get(registration, clazz)
-                        .flatMapIterable(T::getContent))
-                .collect(Collectors.toList()))
-                .doOnError(throwable -> log.error("Error getting resource {}", clazz.getSimpleName(), throwable));
+                        .flatMapIterable(T::getContent)
+                .onErrorResume(e -> {
+                    log.warn("Skipping {} for registration {}: {}", clazz.getSimpleName(), registration.getId(), e.getMessage());
+                    return Flux.empty();
+                }))
+                .collect(Collectors.toList()));
     }
 
     private <T> Mono<T> get(KulturtankenProperties.Registration registration, Class<T> clazz) {
