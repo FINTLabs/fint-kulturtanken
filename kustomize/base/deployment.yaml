@@ -41,3 +41,6 @@ spec:
               value: /tjenester/kulturtanken
             - name: spring.security.oauth2.client.provider.fint.token-uri
               value: https://idp.felleskomponent.no/nidp/oauth/nam/token
+            # Java4Shell (CVE-2026-114938): turn off the Base64 intrinsic until the JDK has a fix.
+            - name: JDK_JAVA_OPTIONS
+              value: -XX:-UseBASE64Intrinsics
